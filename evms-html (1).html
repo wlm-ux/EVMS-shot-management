@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EVMS – Event Shots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Work+Sans:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #161431; font-family: 'Work Sans', sans-serif; }
+  #root { max-width: 1440px; margin: 0 auto; }
+  input::placeholder { color: #bbbcd6; }
+  input { color: #faf9f9; }
+  button { font-family: 'Work Sans', sans-serif; }
+  ::-webkit-scrollbar { display: none; }
+  * { scrollbar-width: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script type="text/babel">
+var useState   = React.useState;
+var useRef     = React.useRef;
+var useEffect  = React.useEffect;
+var useCallback = React.useCallback;
+
+// ── Figma assets ──────────────────────────────────────────────────
+var imgLogo            = "https://www.figma.com/api/mcp/asset/413ac3bd-3e54-40e0-8bcb-da9e6f4dd9ef";
+var imgAvatar          = "https://www.figma.com/api/mcp/asset/bb8d2a08-f7c4-4d4e-8eb0-9174ec8c0dc9";
+var imgNavEvents       = "https://www.figma.com/api/mcp/asset/eabc0218-f2ec-42be-947b-4f16125cb1e1";
+var imgNavAcct         = "https://www.figma.com/api/mcp/asset/5f866286-25ae-4d6a-b1de-5e70fa1eaff4";
+var imgNavPlus         = "https://www.figma.com/api/mcp/asset/cc004bc3-559f-4ba4-964e-58eba81c564f";
+var imgNavArrow        = "https://www.figma.com/api/mcp/asset/c887a96b-a9d9-4556-9e3e-371064d8645a";
+var imgCover           = "https://www.figma.com/api/mcp/asset/ce39ac5d-b3d1-428d-99a1-55e0c2bf3b8e";
+var imgChevDown        = "https://www.figma.com/api/mcp/asset/3f479a99-8033-41f0-a5d7-e073d9807ec5";
+var imgAttendeesStroke = "https://www.figma.com/api/mcp/asset/efdebbdc-4588-4150-add0-2c728284fff4";
+var imgPin             = "https://www.figma.com/api/mcp/asset/6b97b4a3-6e45-412b-a70a-dd1acc19686e";
+var imgUpload          = "https://www.figma.com/api/mcp/asset/a07d989f-6827-4cae-9eff-0f9ce48c5c66";
+var imgBatch           = "https://www.figma.com/api/mcp/asset/cc65c8a8-d217-49c9-9fa4-cf9ca6447844";
+var imgCardDl          = "https://www.figma.com/api/mcp/asset/a22b6452-bbcc-44f5-9799-616c602c41f0";
+var imgTagCal          = "https://www.figma.com/api/mcp/asset/99cae968-9f01-4b03-a4ca-82dc20daa2dd";
+var imgTagClock        = "https://www.figma.com/api/mcp/asset/e6d3a4f0-8a6f-426d-b54b-494d12ddb399";
+var imgTagTimer        = "https://www.figma.com/api/mcp/asset/1de6f24f-6c5c-49b4-9aa2-a8892510e582";
+var imgTagUser         = "https://www.figma.com/api/mcp/asset/54de14ff-66e5-4c6e-8d45-efdba2942d40";
+var imgTagFile         = "https://www.figma.com/api/mcp/asset/8dbe5cf7-87a9-42e7-bdc4-4ba191c3f91f";
+
+var C = {
+  bgPage:        "#161431",
+  bgSecondary:   "#29284b",
+  bgTertiary:    "#3e3d64",
+  action:        "#f1665c",
+  textPrimary:   "#faf9f9",
+  textSecondary: "#bbbcd6",
+  textMuted:     "#a1a5b7",
+  border:        "#6c6d93",
+};
+var sans = "'Work Sans', sans-serif";
+var mono = "'Roboto Mono', monospace";
+
+function pad2(n) { return String(n).padStart(2, "0"); }
+function fmtMs(ms) {
+  var d = new Date(ms);
+  return pad2(d.getDate()) + "." + pad2(d.getMonth()+1) + "." + String(d.getFullYear()).slice(2) + " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+}
+
+var RAW = [
+  { id:0,  ts:new Date("2026-03-10T09:20:00").getTime(), img:"https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=260&h=380&fit=crop&q=80", user:"Alice M.",  size:"14.2 MB", dur:"2 s" },
+  { id:1,  ts:new Date("2026-03-10T10:35:00").getTime(), img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=260&h=380&fit=crop&q=80", user:"Bob K.",    size:"22.7 MB", dur:"4 s" },
+  { id:2,  ts:new Date("2026-03-10T12:00:00").getTime(), img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=260&h=380&fit=crop&q=80", user:"Carol T.",  size:"18.1 MB", dur:"3 s" },
+  { id:3,  ts:new Date("2026-03-10T13:30:00").getTime(), img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=260&h=380&fit=crop&q=80", user:"Dan R.",    size:"31.0 MB", dur:"5 s" },
+  { id:4,  ts:new Date("2026-03-10T15:30:00").getTime(), img:"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=260&h=380&fit=crop&q=80", user:"Eve S.",    size:"12.5 MB", dur:"2 s" },
+  { id:5,  ts:new Date("2026-03-10T17:00:00").getTime(), img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=260&h=380&fit=crop&q=80", user:"Frank L.", size:"41.3 MB", dur:"6 s" },
+  { id:6,  ts:new Date("2026-03-10T19:00:00").getTime(), img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=260&h=380&fit=crop&q=80", user:"Grace W.", size:"19.8 MB", dur:"3 s" },
+  { id:7,  ts:new Date("2026-03-10T21:00:00").getTime(), img:"https://images.unsplash.com/photo-1468359601543-843bfaef291a?w=260&h=380&fit=crop&q=80", user:"Hank P.",  size:"27.6 MB", dur:"4 s" },
+  { id:8,  ts:new Date("2026-03-10T23:00:00").getTime(), img:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=260&h=380&fit=crop&q=80", user:"Iris N.",  size:"15.9 MB", dur:"2 s" },
+  { id:9,  ts:new Date("2026-03-11T01:00:00").getTime(), img:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=260&h=380&fit=crop&q=80", user:"Jack O.",  size:"48.2 MB", dur:"7 s" },
+  { id:10, ts:new Date("2026-03-11T05:00:00").getTime(), img:"https://images.unsplash.com/photo-1506157786151-b8491531f063?w=260&h=380&fit=crop&q=80", user:"Kim Y.",   size:"20.4 MB", dur:"3 s" },
+  { id:11, ts:new Date("2026-03-11T09:00:00").getTime(), img:"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=260&h=380&fit=crop&q=80", user:"Leo A.",   size:"33.7 MB", dur:"5 s" },
+  { id:12, ts:new Date("2026-03-11T13:00:00").getTime(), img:"https://images.unsplash.com/photo-1598387846148-47e82ee120cc?w=260&h=380&fit=crop&q=80", user:"Mia B.",   size:"11.3 MB", dur:"2 s" },
+  { id:13, ts:new Date("2026-03-11T16:00:00").getTime(), img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=260&h=380&fit=crop&q=80", user:"Nate C.",  size:"28.9 MB", dur:"4 s" },
+];
+var TL_START = RAW[0].ts;
+var TL_END   = RAW[RAW.length - 1].ts;
+var TL_SPAN  = TL_END - TL_START;
+var SHOTS = RAW.map(function(s) {
+  var d = new Date(s.ts);
+  return Object.assign({}, s, {
+    date: pad2(d.getDate()) + "." + pad2(d.getMonth()+1) + "." + String(d.getFullYear()).slice(2),
+    time: pad2(d.getHours()) + ":" + pad2(d.getMinutes()),
+  });
+});
+function sumMB(ids) {
+  return SHOTS.filter(function(s) { return ids.has(s.id); })
+    .reduce(function(a, s) { return a + parseFloat(s.size); }, 0).toFixed(1);
+}
+
+// ── Primitives ────────────────────────────────────────────────────
+function FigmaIcon(props) {
+  var sz = props.size || 16;
+  return React.createElement("div", { style:{ position:"relative", flexShrink:0, width:sz, height:sz, overflow:"hidden" } },
+    React.createElement("img", { src:props.src, alt:"", style:{ position:"absolute", inset:0, width:"100%", height:"100%", display:"block", maxWidth:"none" } })
+  );
+}
+
+function Tag(props) {
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:4, padding:"2px 8px", borderRadius:4, flexShrink:0 }}>
+      <FigmaIcon src={props.iconSrc} size={12} />
+      <span style={{ fontFamily:sans, fontWeight:400, fontSize:14, lineHeight:"20px", color:C.textPrimary, whiteSpace:"nowrap" }}>{props.label}</span>
+    </div>
+  );
+}
+
+function Toggle(props) {
+  return (
+    <div onClick={props.onToggle} style={{ display:"flex", alignItems:"center", gap:12, cursor:"pointer", userSelect:"none" }}>
+      <div style={{ width:26.7, height:16, borderRadius:999, padding:"2.7px", boxSizing:"border-box", background:props.active ? C.textPrimary : C.bgTertiary, display:"flex", alignItems:"center", justifyContent:props.active ? "flex-end" : "flex-start", transition:"background 0.2s", flexShrink:0 }}>
+        <div style={{ width:10.7, height:10.7, borderRadius:"50%", background:props.active ? C.bgPage : C.textPrimary }} />
+      </div>
+      <span style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textPrimary }}>{props.label}</span>
+    </div>
+  );
+}
+
+// ── Range Slider ──────────────────────────────────────────────────
+function RangeSlider(props) {
+  var lo = props.lo; var hi = props.hi; var onChange = props.onChange; var gridRef = props.gridRef;
+  var trackRef = useRef(null);
+  var dragging = useRef(null);
+  var [sliderW, setSliderW] = useState(null);
+
+  useEffect(function() {
+    var el = gridRef && gridRef.current;
+    if (!el) return;
+    function calc() { var gw = el.getBoundingClientRect().width; setSliderW(Math.round((gw-48)/4*2+16)); }
+    calc();
+    var ro = new ResizeObserver(calc);
+    ro.observe(el);
+    return function() { ro.disconnect(); };
+  }, [gridRef]);
+
+  var fracFromX = useCallback(function(cx) {
+    var r = trackRef.current.getBoundingClientRect();
+    return Math.max(0, Math.min(1, (cx - r.left) / r.width));
+  }, []);
+
+  useEffect(function() {
+    function onMove(e) {
+      if (!dragging.current || !trackRef.current) return;
+      var f = fracFromX(e.clientX);
+      if (dragging.current === "lo") onChange(Math.min(f, hi-0.001), hi);
+      else onChange(lo, Math.max(f, lo+0.001));
+    }
+    function onUp() { dragging.current = null; }
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return function() { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+  }, [lo, hi, onChange, fracFromX]);
+
+  function ts(pct) {
+    return { position:"absolute", top:"50%", left:(pct*100)+"%", transform:"translate(-50%,-50%)", width:20, height:20, borderRadius:"50%", background:C.textPrimary, cursor:"grab", zIndex:2, userSelect:"none", boxShadow:"0 0 0 3px rgba(255,255,255,0.2)" };
+  }
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:8, width:sliderW ? sliderW+"px" : "100%" }}>
+      <div ref={trackRef} style={{ position:"relative", height:6, borderRadius:3, background:"rgba(187,188,214,0.25)" }}>
+        <div style={{ position:"absolute", top:0, height:"100%", borderRadius:3, left:(lo*100)+"%", width:((hi-lo)*100)+"%", background:C.textSecondary }} />
+        <div style={ts(lo)} onMouseDown={function(e){e.preventDefault();dragging.current="lo";}} />
+        <div style={ts(hi)} onMouseDown={function(e){e.preventDefault();dragging.current="hi";}} />
+      </div>
+      <div style={{ display:"flex", justifyContent:"space-between" }}>
+        <span style={{ fontFamily:sans, fontSize:14, lineHeight:"20px", color:C.textPrimary }}>{fmtMs(TL_START+lo*TL_SPAN)}</span>
+        <span style={{ fontFamily:sans, fontSize:14, lineHeight:"20px", color:C.textPrimary }}>{fmtMs(TL_START+hi*TL_SPAN)}</span>
+      </div>
+    </div>
+  );
+}
+
+// ── Batch Dropdown ────────────────────────────────────────────────
+function BatchDropdown(props) {
+  var [open, setOpen] = useState(false);
+  var ref = useRef(null);
+  useEffect(function() {
+    function h(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }
+    document.addEventListener("mousedown", h);
+    return function() { document.removeEventListener("mousedown", h); };
+  }, []);
+  var items = [
+    { label:"Download videos", action:function(){ setOpen(false); props.onDownload(); },
+      icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> },
+    { label:"Create highlight", action:function(){ setOpen(false); props.onCollection(); },
+      icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> },
+  ];
+  return (
+    <div ref={ref} style={{ position:"relative" }}>
+      <button onClick={function(){ setOpen(function(v){return !v;}); }} style={{ background:C.action, border:"none", borderRadius:999, padding:"8px 12px 8px 16px", display:"flex", alignItems:"center", gap:8, cursor:"pointer" }}>
+        <FigmaIcon src={imgBatch} size={20} />
+        <span style={{ fontFamily:sans, fontWeight:600, fontSize:16, color:C.bgPage }}>{"Batch ("+props.count+")"}</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      {open && (
+        <div style={{ position:"absolute", top:"calc(100% + 6px)", right:0, zIndex:50, background:C.bgSecondary, borderRadius:12, padding:6, boxShadow:"0 8px 24px rgba(0,0,0,0.35)", minWidth:200 }}>
+          {items.map(function(item) {
+            return (
+              <div key={item.label} onClick={item.action}
+                onMouseEnter={function(e){e.currentTarget.style.background=C.bgTertiary;}}
+                onMouseLeave={function(e){e.currentTarget.style.background="transparent";}}
+                style={{ padding:"10px 16px", display:"flex", alignItems:"center", gap:10, borderRadius:8, cursor:"pointer", fontFamily:sans, fontSize:15, color:C.textPrimary, whiteSpace:"nowrap", background:"transparent" }}>
+                {item.icon}{item.label}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Download Modal ────────────────────────────────────────────────
+function DownloadModal(props) {
+  var count = props.selectedIds.size;
+  var mb = sumMB(props.selectedIds);
+  return (
+    <div onClick={props.onCancel} style={{ position:"fixed", inset:0, zIndex:100, background:"rgba(22,20,49,0.75)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <div onClick={function(e){e.stopPropagation();}} style={{ background:C.bgSecondary, borderRadius:24, padding:32, display:"flex", flexDirection:"column", gap:32, width:400, boxShadow:"0 10px 15px rgba(0,0,0,0.15)" }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:16, alignItems:"center", textAlign:"center" }}>
+          <div style={{ background:C.action, borderRadius:"50%", width:64, height:64, display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+            <p style={{ fontFamily:sans, fontWeight:600, fontSize:32, lineHeight:"40px", color:C.textPrimary, margin:0 }}>Download videos?</p>
+            <p style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textSecondary, margin:0 }}>You are about to download the following:</p>
+          </div>
+          <div style={{ display:"flex", gap:16 }}>
+            {[{v:String(count),l:count!==1?"videos":"video"},{v:mb+" MB",l:"total size"}].map(function(s){
+              return <div key={s.l} style={{ background:C.bgTertiary, borderRadius:12, padding:"12px 24px", display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}><span style={{ fontFamily:sans, fontWeight:600, fontSize:28, color:C.action }}>{s.v}</span><span style={{ fontFamily:sans, fontSize:13, color:C.textSecondary, whiteSpace:"nowrap" }}>{s.l}</span></div>;
+            })}
+          </div>
+        </div>
+        <div style={{ display:"flex", gap:16 }}>
+          <button onClick={props.onCancel}  style={{ flex:1, border:"1px solid "+C.action, background:"none", borderRadius:999, padding:"16px 24px", fontFamily:sans, fontWeight:600, fontSize:20, color:C.action, cursor:"pointer" }}>Cancel</button>
+          <button onClick={props.onConfirm} style={{ flex:1, background:C.action, border:"none", borderRadius:999, padding:"16px 24px", fontFamily:sans, fontWeight:600, fontSize:20, color:C.bgPage, cursor:"pointer" }}>Download</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Highlight Modal ───────────────────────────────────────────────
+function HighlightModal(props) {
+  var selectedIds = props.selectedIds;
+  var onClose = props.onClose;
+  var initialIds = SHOTS.filter(function(s){return selectedIds.has(s.id);}).map(function(s){return s.id;});
+  var [order,     setOrder]     = useState(initialIds);
+  var [name,      setName]      = useState("");
+  var [featured,  setFeatured]  = useState(false);
+  var [published, setPublished] = useState(false);
+  var [confirmDiscard, setConfirmDiscard] = useState(false);
+  var dragSrc     = useRef(null);
+  var initialOrder = useRef(initialIds.join(","));
+
+  function isDirty() { return name.trim().length > 0 || order.join(",") !== initialOrder.current; }
+  function handleClose() { if (isDirty()) setConfirmDiscard(true); else onClose(); }
+
+  var ordered = order.map(function(id){return SHOTS.find(function(s){return s.id===id;});}).filter(Boolean);
+
+  if (published) {
+    return (
+      <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(22,20,49,0.8)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+        <div onClick={function(e){e.stopPropagation();}} style={{ background:C.bgSecondary, borderRadius:24, padding:40, display:"flex", flexDirection:"column", alignItems:"center", gap:24, width:420, boxShadow:"0 10px 15px rgba(0,0,0,0.2)", textAlign:"center" }}>
+          <div style={{ background:C.action, borderRadius:"50%", width:72, height:72, display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            <p style={{ fontFamily:sans, fontWeight:600, fontSize:28, color:C.textPrimary, margin:0 }}>Highlight created!</p>
+            <p style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textSecondary, margin:0 }}>
+              {'"'+(name||"Untitled highlight")+'" has been published'+(featured?" and featured on the event page":"")+"."}
+            </p>
+          </div>
+          <button onClick={onClose} style={{ background:C.action, border:"none", borderRadius:999, padding:"14px 40px", fontFamily:sans, fontWeight:600, fontSize:18, color:C.bgPage, cursor:"pointer" }}>Done</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div onClick={handleClose} style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(22,20,49,0.8)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
+      {confirmDiscard && (
+        <div onClick={function(e){e.stopPropagation();}} style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:10 }}>
+          <div style={{ background:C.bgSecondary, borderRadius:24, padding:32, display:"flex", flexDirection:"column", gap:32, width:400, boxShadow:"0 10px 15px rgba(0,0,0,0.2)", textAlign:"center" }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:16, alignItems:"center" }}>
+              <div style={{ background:C.action, borderRadius:"50%", width:64, height:64, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                <p style={{ fontFamily:sans, fontWeight:600, fontSize:32, lineHeight:"40px", color:C.textPrimary, margin:0 }}>Are you sure?</p>
+                <p style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textSecondary, margin:0 }}>You will lose all progress and your highlight reel will not be created.</p>
+              </div>
+            </div>
+            <div style={{ display:"flex", gap:16 }}>
+              <button onClick={function(){setConfirmDiscard(false);}} style={{ flex:1, border:"1px solid "+C.action, background:"none", borderRadius:999, padding:"16px 24px", fontFamily:sans, fontWeight:600, fontSize:20, color:C.action, cursor:"pointer" }}>Keep editing</button>
+              <button onClick={function(){setConfirmDiscard(false);onClose();}} style={{ flex:1, background:C.action, border:"none", borderRadius:999, padding:"16px 24px", fontFamily:sans, fontWeight:600, fontSize:20, color:C.bgPage, cursor:"pointer" }}>Discard</button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div onClick={function(e){e.stopPropagation();}} style={{ background:C.bgSecondary, borderRadius:24, padding:24, display:"flex", flexDirection:"column", gap:24, width:600, maxHeight:"90vh", overflowY:"auto", overflowX:"hidden", scrollbarWidth:"none", boxShadow:"0 10px 15px rgba(0,0,0,0.2)" }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            <p style={{ fontFamily:sans, fontWeight:600, fontSize:24, lineHeight:"30px", color:C.textPrimary, margin:0 }}>Create a highlight reel</p>
+            <p style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textSecondary, margin:0 }}>A highlight is a curated selection of shots. It'll be featured on the event page for everyone attending to see.</p>
+          </div>
+          <button onClick={handleClose} style={{ background:"none", border:"none", cursor:"pointer", color:C.textSecondary, flexShrink:0, marginLeft:16, padding:4 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+          <span style={{ fontFamily:mono, fontWeight:700, fontSize:12, lineHeight:"16px", color:C.textPrimary }}>Name of the highlight</span>
+          <input value={name} onChange={function(e){setName(e.target.value);}} placeholder="e.g. Best moments of the night"
+            style={{ border:"2px solid "+C.border, borderRadius:16, padding:"10px 24px", fontFamily:sans, fontSize:16, lineHeight:"24px", background:"transparent", outline:"none", width:"100%" }}
+            onFocus={function(e){e.target.style.borderColor=C.textPrimary;}} onBlur={function(e){e.target.style.borderColor=C.border;}} />
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          <p style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textSecondary, margin:0 }}>Here's how the shots will show up. Feel free to drag and drop them to rearrange!</p>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:12 }}>
+            {ordered.map(function(shot) {
+              return (
+                <div key={shot.id} draggable
+                  onDragStart={function(){dragSrc.current=shot.id;}}
+                  onDragOver={function(e){
+                    e.preventDefault();
+                    if (dragSrc.current===null||dragSrc.current===shot.id) return;
+                    setOrder(function(prev){
+                      var next=prev.slice(),from=next.indexOf(dragSrc.current),to=next.indexOf(shot.id);
+                      next.splice(from,1); next.splice(to,0,dragSrc.current); return next;
+                    });
+                  }}
+                  onDragEnd={function(){dragSrc.current=null;}}
+                  style={{ background:C.bgTertiary, borderRadius:8, display:"flex", flexDirection:"column", cursor:"grab", userSelect:"none", overflow:"hidden" }}>
+                  <div style={{ position:"relative", width:"100%", paddingBottom:"150%", flexShrink:0 }}>
+                    <img src={shot.img} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", display:"block", pointerEvents:"none" }} />
+                    <div style={{ position:"absolute", top:6, left:6, opacity:0.75 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill={C.textPrimary}><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
+                    </div>
+                  </div>
+                  <div style={{ padding:8, display:"flex", flexWrap:"wrap", gap:2 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:3, padding:"1px 6px" }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      <span style={{ fontFamily:sans, fontSize:12, color:C.textPrimary, whiteSpace:"nowrap" }}>{shot.dur}</span>
+                    </div>
+                    <div style={{ display:"flex", alignItems:"center", gap:3, padding:"1px 6px" }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      <span style={{ fontFamily:sans, fontSize:12, color:C.textPrimary, whiteSpace:"nowrap" }}>{shot.user}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+          <Toggle active={featured} onToggle={function(){setFeatured(function(v){return !v;});}} label="Featured highlight" />
+          <div style={{ display:"flex", gap:12 }}>
+            <div style={{ width:26.7, flexShrink:0 }} />
+            <span style={{ fontFamily:sans, fontSize:14, lineHeight:"20px", color:C.textSecondary }}>The content will show up in attendees home screen on the app.</span>
+          </div>
+        </div>
+        <button onClick={function(){setPublished(true);}} style={{ background:C.action, border:"none", borderRadius:999, padding:"16px 24px", fontFamily:sans, fontWeight:600, fontSize:20, color:C.bgPage, cursor:"pointer", width:"100%" }}>
+          Create highlight reel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Shot Card ─────────────────────────────────────────────────────
+function ShotCard(props) {
+  var shot=props.shot, selected=props.selected, fav=props.fav, showMeta=props.showMeta;
+  return (
+    <div onClick={props.onToggle} style={{ background:C.bgTertiary, borderRadius:8, display:"flex", flexDirection:"column", border:selected?"2px solid "+C.action:"2px solid transparent", overflow:"hidden", cursor:"pointer", transition:"border-color 0.15s", userSelect:"none" }}>
+      <div style={{ position:"relative", width:"100%", paddingBottom:"146.15%", flexShrink:0 }}>
+        <img src={shot.img} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+        <div style={{ position:"absolute", top:10, right:8, display:"flex", flexDirection:"column", gap:8 }}>
+          <div onClick={function(e){e.stopPropagation();props.onToggleFav();}} style={{ background:C.bgPage, borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={fav?C.action:"none"} stroke={C.action} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition:"fill 0.15s" }}>
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+          <div onClick={function(e){e.stopPropagation();}} style={{ background:C.bgPage, borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <FigmaIcon src={imgCardDl} size={16} />
+          </div>
+        </div>
+      </div>
+      {showMeta && (
+        <div style={{ padding:12 }}>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:2 }}>
+            <Tag iconSrc={imgTagCal}   label={shot.date} />
+            <Tag iconSrc={imgTagClock} label={shot.time} />
+            <Tag iconSrc={imgTagTimer} label={shot.dur} />
+            <Tag iconSrc={imgTagUser}  label={shot.user} />
+            <Tag iconSrc={imgTagFile}  label={shot.size} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────
+function Sidebar() {
+  return (
+    <div style={{ background:C.bgSecondary, width:241, minWidth:241, flexShrink:0, borderRadius:"0 32px 32px 0", display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"24px 16px 12px", boxSizing:"border-box", position:"sticky", top:0, height:"100vh", overflow:"hidden" }}>
+      <div style={{ display:"flex", flexDirection:"column", gap:32 }}>
+        <img src={imgLogo} alt="SureShot" style={{ height:36, width:151.75, objectFit:"contain", display:"block" }} />
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          <div style={{ display:"flex", flexDirection:"column" }}>
+            {[{icon:imgNavEvents,label:"Events"},{icon:imgNavAcct,label:"Account"}].map(function(item){return(
+              <div key={item.label} style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 0" }}>
+                <div style={{ background:C.bgPage, borderRadius:999, width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}><FigmaIcon src={item.icon} size={17} /></div>
+                <span style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textPrimary }}>{item.label}</span>
+              </div>
+            );})}
+          </div>
+          <div style={{ border:"1px solid "+C.textPrimary, borderRadius:999, display:"flex", alignItems:"center", gap:8, padding:"4px 12px", alignSelf:"flex-start" }}>
+            <FigmaIcon src={imgNavPlus} size={16} />
+            <span style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textPrimary, whiteSpace:"nowrap" }}>Create new event</span>
+          </div>
+        </div>
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+        <div style={{ display:"flex", alignItems:"center" }}>
+          <div style={{ flex:1, display:"flex", alignItems:"center", gap:8, height:42 }}>
+            <img src={imgAvatar} alt="" style={{ width:32, height:32, borderRadius:"50%", flexShrink:0 }} />
+            <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
+              <span style={{ fontFamily:sans, fontSize:14, lineHeight:"20px", color:C.textPrimary }}>John Doe</span>
+              <span style={{ fontFamily:mono, fontWeight:700, fontSize:12, lineHeight:"16px", color:C.textSecondary }}>@username</span>
+            </div>
+          </div>
+          <div style={{ border:"1px solid "+C.textPrimary, borderRadius:999, width:24, height:24, display:"flex", alignItems:"center", justifyContent:"center" }}><FigmaIcon src={imgNavArrow} size={13} /></div>
+        </div>
+        <span style={{ fontFamily:mono, fontSize:12, lineHeight:"16px", color:C.textSecondary }}>© 2026 SURESHOT APS</span>
+      </div>
+    </div>
+  );
+}
+
+// ── Event Summary ─────────────────────────────────────────────────
+function EventSummary() {
+  var stats = [{v:"55",l:"Joined users",muted:true},{v:"33",l:"Shots uploaded"},{v:"20.04",l:"Duration (min)"},{v:"890",l:"Size (MB)"}];
+  return (
+    <div style={{ background:C.bgSecondary, borderRadius:12, padding:"12px 16px" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:24, padding:"12px 0" }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:12, flexShrink:0 }}>
+          <div style={{ width:241, height:128, borderRadius:16, overflow:"hidden" }}><img src={imgCover} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} /></div>
+          <div style={{ background:C.action, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"4px 8px 4px 12px", width:241, boxSizing:"border-box" }}>
+            <span style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.bgPage }}>Published</span>
+            <FigmaIcon src={imgChevDown} size={24} />
+          </div>
+        </div>
+        <div style={{ flex:1, display:"flex", flexDirection:"column", gap:12 }}>
+          <span style={{ fontFamily:sans, fontWeight:600, fontSize:20, lineHeight:"24px", color:C.textPrimary }}>Event name</span>
+          <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:4 }}><FigmaIcon src={imgAttendeesStroke} size={16} /><span style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textSecondary }}>4498</span></div>
+            <div style={{ display:"flex", alignItems:"center", gap:4 }}><FigmaIcon src={imgPin} size={16} /><span style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textSecondary }}>Location name</span></div>
+            <div style={{ display:"flex", alignItems:"center", gap:4 }}><span style={{ fontFamily:mono, fontWeight:700, fontSize:12, color:C.textPrimary }}>Start</span><span style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textSecondary }}>10.03.26 09:00h</span></div>
+            <div style={{ display:"flex", alignItems:"center", gap:4 }}><span style={{ fontFamily:mono, fontWeight:700, fontSize:12, color:C.textPrimary }}>Finish</span><span style={{ fontFamily:sans, fontSize:16, lineHeight:"24px", color:C.textSecondary }}>11.03.26 17:00h</span></div>
+          </div>
+          <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+            {stats.map(function(sc){return(
+              <div key={sc.l} style={{ background:C.bgTertiary, borderRadius:12, padding:12, minWidth:120, display:"flex", flexDirection:"column" }}>
+                <span style={{ fontFamily:sans, fontWeight:600, fontSize:20, lineHeight:"24px", color:C.textPrimary }}>{sc.v}</span>
+                <span style={{ fontFamily:sans, fontSize:14, lineHeight:"20px", color:sc.muted?C.textMuted:C.textSecondary, whiteSpace:"nowrap" }}>{sc.l}</span>
+              </div>
+            );})}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Shots Panel ───────────────────────────────────────────────────
+function ShotsPanel(props) {
+  var selectedIds=props.selectedIds, onToggle=props.onToggle, onSelectAll=props.onSelectAll, onDeselectAll=props.onDeselectAll;
+  var favIds=props.favIds, onToggleFav=props.onToggleFav;
+  var showMeta=props.showMeta, onToggleMeta=props.onToggleMeta;
+  var showFavsOnly=props.showFavsOnly, onToggleFavsOnly=props.onToggleFavsOnly;
+  var rangeLo=props.rangeLo, rangeHi=props.rangeHi, onRange=props.onRange;
+  var onDownload=props.onDownload, onCollection=props.onCollection;
+  var count = selectedIds.size;
+  var loMs = TL_START+rangeLo*TL_SPAN, hiMs = TL_START+rangeHi*TL_SPAN;
+  var gridRef = useRef(null);
+  var tabs = ["Shots","Attendees","Highlights","Pages","Settings"];
+  var visible = SHOTS.filter(function(s){return s.ts>=loMs&&s.ts<=hiMs;}).filter(function(s){return !showFavsOnly||favIds.has(s.id);});
+  var allSel = visible.length>0 && visible.every(function(s){return selectedIds.has(s.id);});
+
+  return (
+    <div style={{ background:C.bgSecondary, borderRadius:12, padding:"8px 24px 16px", display:"flex", flexDirection:"column", gap:12 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:12, padding:"8px 12px" }}>
+        {tabs.map(function(t,i){return(
+          <div key={t} style={{ minWidth:128, padding:8, textAlign:"center", borderBottom:i===0?"2px solid "+C.textPrimary:"2px solid transparent" }}>
+            <span style={{ fontFamily:sans, fontWeight:600, fontSize:16, lineHeight:"24px", color:i===0?C.textPrimary:C.textSecondary }}>{t}</span>
+          </div>
+        );})}
+      </div>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:24, padding:"12px 0" }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+          <span style={{ fontFamily:mono, fontWeight:700, fontSize:12, lineHeight:"16px", color:C.textPrimary }}>Filter by date</span>
+          <RangeSlider lo={rangeLo} hi={rangeHi} onChange={onRange} gridRef={gridRef} />
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
+          <div style={{ border:"1px solid "+C.action, borderRadius:999, padding:"8px 16px", display:"flex", alignItems:"center", gap:12 }}>
+            <FigmaIcon src={imgUpload} size={20} />
+            <span style={{ fontFamily:sans, fontWeight:600, fontSize:16, color:C.action }}>Upload</span>
+          </div>
+          <BatchDropdown count={count} onDownload={onDownload} onCollection={onCollection} />
+        </div>
+      </div>
+      <div style={{ display:"flex", alignItems:"center", gap:24 }}>
+        <Toggle active={showMeta}     onToggle={onToggleMeta}     label="Show shot metadata" />
+        <Toggle active={showFavsOnly} onToggle={onToggleFavsOnly} label="Favorites only" />
+        <button
+          onClick={function(){if(allSel)onDeselectAll(visible);else onSelectAll(visible);}}
+          onMouseEnter={function(e){e.currentTarget.style.borderColor=C.action;e.currentTarget.style.color=C.action;}}
+          onMouseLeave={function(e){e.currentTarget.style.borderColor=C.textSecondary;e.currentTarget.style.color=C.textPrimary;}}
+          style={{ background:"none", border:"1px solid "+C.textSecondary, borderRadius:999, padding:"3px 14px", fontFamily:sans, fontWeight:600, fontSize:14, lineHeight:"20px", color:C.textPrimary, cursor:"pointer", whiteSpace:"nowrap", transition:"border-color 0.15s, color 0.15s" }}>
+          {allSel?"Deselect all":"Select all ("+visible.length+")"}
+        </button>
+      </div>
+      {visible.length>0 ? (
+        <div ref={gridRef} style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:16 }}>
+          {visible.map(function(shot){return(
+            <ShotCard key={shot.id} shot={shot} selected={selectedIds.has(shot.id)} onToggle={function(){onToggle(shot.id);}} fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}} showMeta={showMeta} />
+          );})}
+        </div>
+      ) : (
+        <div ref={gridRef} style={{ textAlign:"center", padding:"48px 0", color:C.textSecondary, fontFamily:sans, fontSize:16 }}>No shots in this time range</div>
+      )}
+    </div>
+  );
+}
+
+// ── Root ──────────────────────────────────────────────────────────
+function App() {
+  var [selectedIds,   setSelectedIds]   = useState(new Set());
+  var [favIds,        setFavIds]        = useState(new Set());
+  var [showMeta,      setShowMeta]      = useState(true);
+  var [showFavsOnly,  setShowFavsOnly]  = useState(false);
+  var [rangeLo,       setRangeLo]       = useState(0);
+  var [rangeHi,       setRangeHi]       = useState(1);
+  var [showDlModal,   setShowDlModal]   = useState(false);
+  var [showHighlight, setShowHighlight] = useState(false);
+
+  function toggleCard(id){ setSelectedIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;}); }
+  function toggleFav(id){  setFavIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;}); }
+  var selectAll   = useCallback(function(shots){ setSelectedIds(function(p){var n=new Set(p);shots.forEach(function(s){n.add(s.id);});return n;}); },[]);
+  var deselectAll = useCallback(function(shots){ setSelectedIds(function(p){var n=new Set(p);shots.forEach(function(s){n.delete(s.id);});return n;}); },[]);
+  var handleRange = useCallback(function(lo,hi){ setRangeLo(lo);setRangeHi(hi); },[]);
+
+  return (
+    <div style={{ display:"flex", alignItems:"flex-start", minHeight:"100vh", background:C.bgPage, fontFamily:sans }}>
+      <Sidebar />
+      <div style={{ flex:1, display:"flex", flexDirection:"column", gap:10, padding:"24px 16px", overflowY:"auto", boxSizing:"border-box" }}>
+        <EventSummary />
+        <ShotsPanel
+          selectedIds={selectedIds}   onToggle={toggleCard}
+          onSelectAll={selectAll}     onDeselectAll={deselectAll}
+          favIds={favIds}             onToggleFav={toggleFav}
+          showMeta={showMeta}         onToggleMeta={function(){setShowMeta(function(v){return !v;});}}
+          showFavsOnly={showFavsOnly} onToggleFavsOnly={function(){setShowFavsOnly(function(v){return !v;});}}
+          rangeLo={rangeLo}           rangeHi={rangeHi} onRange={handleRange}
+          onDownload={function(){setShowDlModal(true);}}
+          onCollection={function(){setShowHighlight(true);}}
+        />
+      </div>
+      {showHighlight && <HighlightModal selectedIds={selectedIds} onClose={function(){setShowHighlight(false);}} />}
+      {showDlModal   && <DownloadModal  selectedIds={selectedIds} onConfirm={function(){setShowDlModal(false);}} onCancel={function(){setShowDlModal(false);}} />}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
