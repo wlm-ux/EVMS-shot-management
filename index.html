@@ -29,26 +29,6 @@ var useRef      = React.useRef;
 var useEffect   = React.useEffect;
 var useCallback = React.useCallback;
 
-var imgLogo            = "https://www.figma.com/api/mcp/asset/413ac3bd-3e54-40e0-8bcb-da9e6f4dd9ef";
-var imgAvatar          = "https://www.figma.com/api/mcp/asset/bb8d2a08-f7c4-4d4e-8eb0-9174ec8c0dc9";
-var imgNavEvents       = "https://www.figma.com/api/mcp/asset/eabc0218-f2ec-42be-947b-4f16125cb1e1";
-var imgNavAcct         = "https://www.figma.com/api/mcp/asset/5f866286-25ae-4d6a-b1de-5e70fa1eaff4";
-var imgNavPlus         = "https://www.figma.com/api/mcp/asset/cc004bc3-559f-4ba4-964e-58eba81c564f";
-var imgNavArrow        = "https://www.figma.com/api/mcp/asset/c887a96b-a9d9-4556-9e3e-371064d8645a";
-var imgCover           = "https://www.figma.com/api/mcp/asset/ce39ac5d-b3d1-428d-99a1-55e0c2bf3b8e";
-var imgChevDown        = "https://www.figma.com/api/mcp/asset/3f479a99-8033-41f0-a5d7-e073d9807ec5";
-var imgAttendeesStroke = "https://www.figma.com/api/mcp/asset/efdebbdc-4588-4150-add0-2c728284fff4";
-var imgPin             = "https://www.figma.com/api/mcp/asset/6b97b4a3-6e45-412b-a70a-dd1acc19686e";
-var imgUpload          = "https://www.figma.com/api/mcp/asset/a07d989f-6827-4cae-9eff-0f9ce48c5c66";
-var imgBatch           = "https://www.figma.com/api/mcp/asset/cc65c8a8-d217-49c9-9fa4-cf9ca6447844";
-var imgCardDl          = "https://www.figma.com/api/mcp/asset/a22b6452-bbcc-44f5-9799-616c602c41f0";
-var imgTagCal          = "https://www.figma.com/api/mcp/asset/99cae968-9f01-4b03-a4ca-82dc20daa2dd";
-var imgTagClock        = "https://www.figma.com/api/mcp/asset/e6d3a4f0-8a6f-426d-b54b-494d12ddb399";
-var imgTagTimer        = "https://www.figma.com/api/mcp/asset/1de6f24f-6c5c-49b4-9aa2-a8892510e582";
-var imgTagUser         = "https://www.figma.com/api/mcp/asset/54de14ff-66e5-4c6e-8d45-efdba2942d40";
-var imgTagFile         = "https://www.figma.com/api/mcp/asset/8dbe5cf7-87a9-42e7-bdc4-4ba191c3f91f";
-var imgCheckIcon       = "https://www.figma.com/api/mcp/asset/b6536ea2-9487-4734-a158-5a7be7a5e038";
-
 var VIDEO_LANDSCAPE = "https://www.pexels.com/download/video/9005710/";
 var VIDEO_PORTRAIT  = "https://www.pexels.com/download/video/35110969/";
 
@@ -84,134 +64,155 @@ var TL_START=RAW[0].ts, TL_END=RAW[RAW.length-1].ts, TL_SPAN=TL_END-TL_START;
 var SHOTS=RAW.map(function(s){ var d=new Date(s.ts); return Object.assign({},s,{ date:pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+String(d.getFullYear()).slice(2), time:pad2(d.getHours())+":"+pad2(d.getMinutes()) }); });
 function sumMB(ids){ return SHOTS.filter(function(s){return ids.has(s.id);}).reduce(function(a,s){return a+parseFloat(s.size);},0).toFixed(1); }
 
-// ── Icons ─────────────────────────────────────────────────────────
-function IconTrash(props){
-  var c=props.color||C.textPrimary, sz=props.size||14;
-  return <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;
+// ── Lucide-style SVG Icons ────────────────────────────────────────
+function IconTrash({color=C.textPrimary,size=14}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;
 }
-function IconRecover(props){
-  var c=props.color||C.textPrimary, sz=props.size||14;
-  return <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
+function IconRecover({color=C.textPrimary,size=14}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
 }
-function IconHeart(props){
-  var c=props.color||C.textPrimary, sz=props.size||14;
-  return <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>;
+function IconHeart({color=C.textPrimary,size=14,filled=false}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill={filled?color:"none"} stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>;
 }
-function IconDownload(props){
-  var c=props.color||C.textPrimary, sz=props.size||14;
-  return <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
+function IconDownload({color=C.textPrimary,size=14}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
+}
+function IconCalendar({color=C.textPrimary,size=12}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+}
+function IconClock({color=C.textPrimary,size=12}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
+}
+function IconTimer({color=C.textPrimary,size=12}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/></svg>;
+}
+function IconUser({color=C.textPrimary,size=12}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+}
+function IconFile({color=C.textPrimary,size=12}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>;
+}
+function IconUpload({color=C.action,size=20}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;
+}
+function IconLayers({color=C.bgPage,size=20}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>;
+}
+function IconUsers({color=C.textSecondary,size=16}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+}
+function IconMapPin({color=C.textSecondary,size=16}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>;
+}
+function IconChevronDown({color=C.bgPage,size=20}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>;
+}
+function IconArrowRight({color=C.textPrimary,size=13}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;
+}
+function IconStar({color=C.textPrimary,size=16}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+}
+function IconCheck({color=C.bgPage,size=11}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
+}
+function IconX({color="currentColor",size=20}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+}
+function IconPlay({color=C.textPrimary,size=18}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><polygon points="5 3 19 12 5 21 5 3"/></svg>;
+}
+function IconPause({color=C.textPrimary,size=22}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>;
+}
+function IconDots({color=C.textPrimary,size=14}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>;
 }
 
 // ── Primitives ────────────────────────────────────────────────────
-function FigmaIcon(props){
-  var sz=props.size||16;
-  return React.createElement("div",{style:{position:"relative",flexShrink:0,width:sz,height:sz,overflow:"hidden"}},
-    React.createElement("img",{src:props.src,alt:"",style:{position:"absolute",inset:0,width:"100%",height:"100%",display:"block",maxWidth:"none"}}));
+function Tag({icon, label}){
+  return <div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{icon}<span style={{fontFamily:sans,fontWeight:400,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{label}</span></div>;
 }
-function Tag(props){
-  return <div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}><FigmaIcon src={props.iconSrc} size={12}/><span style={{fontFamily:sans,fontWeight:400,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{props.label}</span></div>;
-}
-function Toggle(props){
+function Toggle({active,onToggle,label}){
   return(
-    <div onClick={props.onToggle} style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}}>
-      <div style={{width:26.7,height:16,borderRadius:999,padding:"2.7px",boxSizing:"border-box",background:props.active?C.textPrimary:C.bgTertiary,display:"flex",alignItems:"center",justifyContent:props.active?"flex-end":"flex-start",transition:"background 0.2s",flexShrink:0}}>
-        <div style={{width:10.7,height:10.7,borderRadius:"50%",background:props.active?C.bgPage:C.textPrimary}}/>
+    <div onClick={onToggle} style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}}>
+      <div style={{width:26.7,height:16,borderRadius:999,padding:"2.7px",boxSizing:"border-box",background:active?C.textPrimary:C.bgTertiary,display:"flex",alignItems:"center",justifyContent:active?"flex-end":"flex-start",transition:"background 0.2s",flexShrink:0}}>
+        <div style={{width:10.7,height:10.7,borderRadius:"50%",background:active?C.bgPage:C.textPrimary}}/>
       </div>
-      <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{props.label}</span>
+      <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{label}</span>
     </div>
   );
 }
-function Checkbox(props){
-  var checked=props.checked,isChecked=checked===true,isIndet=checked==="indeterminate";
+function Checkbox({checked,onClick}){
+  var isChecked=checked===true,isIndet=checked==="indeterminate";
   return(
-    <div onClick={props.onClick} style={{width:16,height:16,borderRadius:4,flexShrink:0,border:"1px solid "+(isChecked||isIndet?C.action:C.border),background:isChecked||isIndet?C.action:C.textPrimary,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",cursor:"pointer",transition:"background 0.15s,border-color 0.15s"}}>
-      {isChecked&&<div style={{position:"relative",width:16,height:16,overflow:"hidden"}}><div style={{position:"absolute",top:"25%",left:"16.67%",right:"16.67%",bottom:"29.17%"}}><div style={{position:"absolute",inset:"-10.91% -7.5%"}}><img alt="" src={imgCheckIcon} style={{display:"block",width:"100%",height:"100%",maxWidth:"none"}}/></div></div></div>}
+    <div onClick={onClick} style={{width:16,height:16,borderRadius:4,flexShrink:0,border:"1px solid "+(isChecked||isIndet?C.action:C.border),background:isChecked||isIndet?C.action:C.textPrimary,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",cursor:"pointer",transition:"background 0.15s,border-color 0.15s"}}>
+      {isChecked&&<IconCheck/>}
       {isIndet&&<div style={{width:8,height:2,background:C.bgPage,borderRadius:1}}/>}
     </div>
   );
 }
-function CheckboxField(props){
+function CheckboxField({checked,onClick,label}){
   return(
-    <div onClick={props.onClick} style={{display:"flex",alignItems:"center",gap:12,minWidth:120,cursor:"pointer",userSelect:"none"}}>
-      <Checkbox checked={props.checked}/>
-      <span style={{fontFamily:sans,fontWeight:400,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>{props.label}</span>
+    <div onClick={onClick} style={{display:"flex",alignItems:"center",gap:12,minWidth:120,cursor:"pointer",userSelect:"none"}}>
+      <Checkbox checked={checked}/>
+      <span style={{fontFamily:sans,fontWeight:400,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>{label}</span>
     </div>
   );
 }
-
-// ── Card chip (dark bg, default icons) ───────────────────────────
-function CardChip(props){
+function CardChip({onClick,children}){
   return(
-    <div onClick={props.onClick} style={{background:C.bgPage,borderRadius:"50%",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>
-      {props.children}
+    <div onClick={onClick} style={{background:C.bgPage,borderRadius:"50%",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>
+      {children}
     </div>
   );
 }
-
-// ── Modal action chip (solid action bg, blue icon, NO border) ────
-function ModalChip(props){
+function ModalChip({onClick,tip,children}){
   var [hov,setHov]=useState(false);
   return(
-    <div onClick={props.onClick} title={props.tip}
-      onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}}
+    <div onClick={onClick} title={tip} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}}
       style={{width:36,height:36,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,opacity:hov?0.8:1,transition:"opacity 0.15s"}}>
-      {props.children}
+      {children}
     </div>
   );
 }
 
 // ── Preview Modal ─────────────────────────────────────────────────
-function PreviewModal(props){
-  var shot=props.shot, onClose=props.onClose, onDiscard=props.onDiscard;
-  var vidRef=useRef(null), trackRef=useRef(null);
-  var [playing,  setPlaying]  = useState(false);
-  var [current,  setCurrent]  = useState(0);
-  var [duration, setDuration] = useState(0);
-  var [seeking,  setSeeking]  = useState(false);
-  var [visible,  setVisible]  = useState(false);
-  var isLandscape = shot.orient==="landscape";
-  var videoSrc = isLandscape ? VIDEO_LANDSCAPE : VIDEO_PORTRAIT;
-
-  useEffect(function(){ var t=setTimeout(function(){setVisible(true);},10); return function(){clearTimeout(t);}; },[]);
-  useEffect(function(){
-    var v=vidRef.current; if(!v) return;
-    if(playing) v.play().catch(function(){setPlaying(false);});
-    else v.pause();
-  },[playing]);
-
-  function handleLoadedMeta(){ setDuration(vidRef.current.duration); setPlaying(true); }
-  function handleTimeUpdate(){ if(!seeking) setCurrent(vidRef.current.currentTime); }
-  function handleEnded(){ setPlaying(false); }
+function PreviewModal({shot,onClose,onDiscard}){
+  var vidRef=useRef(null),trackRef=useRef(null);
+  var [playing,setPlaying]=useState(false);
+  var [current,setCurrent]=useState(0);
+  var [duration,setDuration]=useState(0);
+  var [seeking,setSeeking]=useState(false);
+  var [visible,setVisible]=useState(false);
+  var isLandscape=shot.orient==="landscape";
+  var videoSrc=isLandscape?VIDEO_LANDSCAPE:VIDEO_PORTRAIT;
+  useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);
+  useEffect(function(){var v=vidRef.current;if(!v)return;if(playing)v.play().catch(function(){setPlaying(false);});else v.pause();},[playing]);
+  function handleLoadedMeta(){setDuration(vidRef.current.duration);setPlaying(true);}
+  function handleTimeUpdate(){if(!seeking)setCurrent(vidRef.current.currentTime);}
+  function handleEnded(){setPlaying(false);}
   function onTrackDown(e){
-    e.preventDefault(); setSeeking(true);
-    function seek(ex){ var r=trackRef.current.getBoundingClientRect(); var t=Math.max(0,Math.min(1,(ex-r.left)/r.width))*(vidRef.current.duration||0); vidRef.current.currentTime=t; setCurrent(t); }
+    e.preventDefault();setSeeking(true);
+    function seek(ex){var r=trackRef.current.getBoundingClientRect();var t=Math.max(0,Math.min(1,(ex-r.left)/r.width))*(vidRef.current.duration||0);vidRef.current.currentTime=t;setCurrent(t);}
     seek(e.clientX);
     function onMove(ev){seek(ev.clientX);}
     function onUp(){setSeeking(false);window.removeEventListener("mousemove",onMove);window.removeEventListener("mouseup",onUp);}
-    window.addEventListener("mousemove",onMove); window.addEventListener("mouseup",onUp);
+    window.addEventListener("mousemove",onMove);window.addEventListener("mouseup",onUp);
   }
-  function handleClose(){ setVisible(false); setTimeout(onClose,220); }
+  function handleClose(){setVisible(false);setTimeout(onClose,220);}
   var pct=duration>0?(current/duration)*100:0;
-
   return(
     <div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:300,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s ease, backdrop-filter 0.22s ease"}}>
       <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,display:"flex",flexDirection:"column",width:isLandscape?"min(720px,100%)":"min(420px,100%)",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0px)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s ease, transform 0.22s ease"}}>
-
-        {/* header */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px 0"}}>
           <span style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary}}>Shot preview</span>
-          <button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4}}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
+          <button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4}}><IconX size={20}/></button>
         </div>
-
-        {/* video */}
         <div onClick={function(){setPlaying(function(v){return !v;});}} style={{position:"relative",background:"#000",margin:"12px 20px 0",borderRadius:12,overflow:"hidden",aspectRatio:isLandscape?"16/9":"9/16",cursor:"pointer",maxHeight:isLandscape?"none":"55vh"}}>
           <video ref={vidRef} src={videoSrc} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} onLoadedMetadata={handleLoadedMeta} onTimeUpdate={handleTimeUpdate} onEnded={handleEnded} preload="auto" playsInline muted/>
-          {!playing&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none"}}><div style={{width:64,height:64,borderRadius:"50%",background:"rgba(22,20,49,0.72)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="26" height="26" viewBox="0 0 24 24" fill={C.textPrimary}><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>}
+          {!playing&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none"}}><div style={{width:64,height:64,borderRadius:"50%",background:"rgba(22,20,49,0.72)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><IconPlay size={26}/></div></div>}
         </div>
-
-        {/* controls */}
         <div style={{padding:"12px 20px 0",display:"flex",flexDirection:"column",gap:8}}>
           <div ref={trackRef} onMouseDown={onTrackDown} style={{position:"relative",height:6,borderRadius:3,background:"rgba(187,188,214,0.2)",cursor:"pointer"}}>
             <div style={{position:"absolute",top:0,left:0,height:"100%",width:pct+"%",borderRadius:3,background:C.action}}/>
@@ -219,53 +220,41 @@ function PreviewModal(props){
           </div>
           <div style={{display:"flex",alignItems:"center",gap:12}}>
             <button onClick={function(){if(vidRef.current&&vidRef.current.ended){vidRef.current.currentTime=0;setCurrent(0);}setPlaying(function(v){return !v;});}} style={{background:"none",border:"none",cursor:"pointer",padding:0,display:"flex",alignItems:"center"}}>
-              {playing?<svg width="22" height="22" viewBox="0 0 24 24" fill={C.textPrimary}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>:<svg width="22" height="22" viewBox="0 0 24 24" fill={C.textPrimary}><polygon points="5 3 19 12 5 21 5 3"/></svg>}
+              {playing?<IconPause/>:<IconPlay size={22}/>}
             </button>
             <span style={{fontFamily:mono,fontSize:13,color:C.textSecondary}}>{fmtSec(current)} / {fmtSec(duration)}</span>
           </div>
         </div>
-
-        {/* metadata + action chips */}
         <div style={{padding:"16px 20px 20px",display:"flex",flexDirection:"column",gap:12}}>
           <div style={{height:1,background:C.bgTertiary}}/>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,flexWrap:"wrap"}}>
             <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-              <Tag iconSrc={imgTagCal} label={shot.date}/>
-              <Tag iconSrc={imgTagClock} label={shot.time}/>
-              <Tag iconSrc={imgTagTimer} label={shot.dur}/>
-              <Tag iconSrc={imgTagUser} label={shot.user}/>
-              <Tag iconSrc={imgTagFile} label={shot.size}/>
+              <Tag icon={<IconCalendar/>} label={shot.date}/>
+              <Tag icon={<IconClock/>} label={shot.time}/>
+              <Tag icon={<IconTimer/>} label={shot.dur}/>
+              <Tag icon={<IconUser/>} label={shot.user}/>
+              <Tag icon={<IconFile/>} label={shot.size}/>
             </div>
-            {/* ── action chips: solid orange bg, blue (textSecondary) icon, no border ── */}
             <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-              <ModalChip tip="Save" onClick={function(){}}>
-                <IconHeart color={C.textSecondary} size={15}/>
-              </ModalChip>
-              <ModalChip tip="Download" onClick={function(){window.open(videoSrc,"_blank");}}>
-                <IconDownload color={C.textSecondary} size={15}/>
-              </ModalChip>
-              <ModalChip tip="Discard" onClick={function(){onDiscard&&onDiscard(shot.id);handleClose();}}>
-                <IconTrash color={C.textSecondary} size={15}/>
-              </ModalChip>
+              <ModalChip tip="Save" onClick={function(){}}><IconHeart color={C.textSecondary} size={15}/></ModalChip>
+              <ModalChip tip="Download" onClick={function(){window.open(videoSrc,"_blank");}}><IconDownload color={C.textSecondary} size={15}/></ModalChip>
+              <ModalChip tip="Discard" onClick={function(){onDiscard&&onDiscard(shot.id);handleClose();}}><IconTrash color={C.textSecondary} size={15}/></ModalChip>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
 }
 
 // ── Range Slider ──────────────────────────────────────────────────
-function RangeSlider(props){
-  var lo=props.lo,hi=props.hi,onChange=props.onChange,gridRef=props.gridRef;
+function RangeSlider({lo,hi,onChange,gridRef}){
   var trackRef=useRef(null),dragging=useRef(null);
   var [sliderW,setSliderW]=useState(null);
   useEffect(function(){
-    var el=gridRef&&gridRef.current; if(!el)return;
+    var el=gridRef&&gridRef.current;if(!el)return;
     function calc(){var gw=el.getBoundingClientRect().width;setSliderW(Math.round((gw-48)/4*2+16));}
-    calc(); var ro=new ResizeObserver(calc); ro.observe(el);
-    return function(){ro.disconnect();};
+    calc();var ro=new ResizeObserver(calc);ro.observe(el);return function(){ro.disconnect();};
   },[gridRef]);
   var fracFromX=useCallback(function(cx){var r=trackRef.current.getBoundingClientRect();return Math.max(0,Math.min(1,(cx-r.left)/r.width));},[]);
   useEffect(function(){
@@ -291,20 +280,20 @@ function RangeSlider(props){
 }
 
 // ── Batch Dropdown ────────────────────────────────────────────────
-function BatchDropdown(props){
+function BatchDropdown({count,onDownload,onCollection,onDiscard}){
   var [open,setOpen]=useState(false),ref=useRef(null);
   useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);
   var items=[
-    {label:"Download videos",color:C.textPrimary,action:function(){setOpen(false);props.onDownload();},icon:<IconDownload color={C.textPrimary} size={16}/>},
-    {label:"Create highlight",color:C.textPrimary,action:function(){setOpen(false);props.onCollection();},icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>},
-    {label:"Discard selected",color:C.action,action:function(){setOpen(false);props.onDiscard();},icon:<IconTrash color={C.action} size={16}/>},
+    {label:"Download videos",color:C.textPrimary,action:function(){setOpen(false);onDownload();},icon:<IconDownload color={C.textPrimary} size={16}/>},
+    {label:"Create highlight",color:C.textPrimary,action:function(){setOpen(false);onCollection();},icon:<IconStar color={C.textPrimary} size={16}/>},
+    {label:"Discard selected",color:C.action,action:function(){setOpen(false);onDiscard();},icon:<IconTrash color={C.action} size={16}/>},
   ];
   return(
     <div ref={ref} style={{position:"relative"}}>
       <button onClick={function(){setOpen(function(v){return !v;});}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 12px 8px 16px",display:"flex",alignItems:"center",gap:8,cursor:"pointer"}}>
-        <FigmaIcon src={imgBatch} size={20}/>
-        <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage}}>{"Batch ("+props.count+")"}</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <IconLayers color={C.bgPage} size={20}/>
+        <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage}}>{"Batch ("+count+")"}</span>
+        <IconChevronDown color={C.bgPage} size={18}/>
       </button>
       {open&&(
         <div style={{position:"absolute",top:"calc(100% + 6px)",right:0,zIndex:50,background:C.bgSecondary,borderRadius:12,padding:6,boxShadow:"0 8px 24px rgba(0,0,0,0.35)",minWidth:200}}>
@@ -323,15 +312,13 @@ function BatchDropdown(props){
 }
 
 // ── Download Modal ────────────────────────────────────────────────
-function DownloadModal(props){
-  var count=props.selectedIds.size,mb=sumMB(props.selectedIds);
+function DownloadModal({selectedIds,onCancel,onConfirm}){
+  var count=selectedIds.size,mb=sumMB(selectedIds);
   return(
-    <div onClick={props.onCancel} style={{position:"fixed",inset:0,zIndex:100,background:"rgba(22,20,49,0.75)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+    <div onClick={onCancel} style={{position:"fixed",inset:0,zIndex:100,background:"rgba(22,20,49,0.75)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:400}}>
         <div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center",textAlign:"center"}}>
-          <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <IconDownload color={C.bgPage} size={28}/>
-          </div>
+          <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><IconDownload color={C.bgPage} size={28}/></div>
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
             <p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Download videos?</p>
             <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>You are about to download the following:</p>
@@ -346,8 +333,8 @@ function DownloadModal(props){
           </div>
         </div>
         <div style={{display:"flex",gap:16}}>
-          <button onClick={props.onCancel}  style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Cancel</button>
-          <button onClick={props.onConfirm} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Download</button>
+          <button onClick={onCancel}  style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Cancel</button>
+          <button onClick={onConfirm} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Download</button>
         </div>
       </div>
     </div>
@@ -355,8 +342,7 @@ function DownloadModal(props){
 }
 
 // ── Highlight Modal ───────────────────────────────────────────────
-function HighlightModal(props){
-  var selectedIds=props.selectedIds,onClose=props.onClose;
+function HighlightModal({selectedIds,onClose}){
   var initialIds=SHOTS.filter(function(s){return selectedIds.has(s.id);}).map(function(s){return s.id;});
   var [order,setOrder]=useState(initialIds),[name,setName]=useState(""),[featured,setFeatured]=useState(false),[published,setPublished]=useState(false),[confirmDiscard,setConfirmDiscard]=useState(false);
   var dragSrc=useRef(null),initialOrder=useRef(initialIds.join(","));
@@ -401,7 +387,7 @@ function HighlightModal(props){
             <p style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"30px",color:C.textPrimary,margin:0}}>Create a highlight reel</p>
             <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>A highlight is a curated selection of shots. It'll be featured on the event page for everyone attending to see.</p>
           </div>
-          <button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,flexShrink:0,marginLeft:16,padding:4}}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,flexShrink:0,marginLeft:16,padding:4}}><IconX size={20}/></button>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:4}}>
           <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Name of the highlight</span>
@@ -419,11 +405,11 @@ function HighlightModal(props){
                 style={{background:C.bgTertiary,borderRadius:8,overflow:"hidden",cursor:"grab",userSelect:"none"}}>
                 <div style={{position:"relative",width:"100%",paddingBottom:"150%"}}>
                   <img src={shot.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",pointerEvents:"none"}}/>
-                  <div style={{position:"absolute",top:6,left:6,opacity:0.75}}><svg width="14" height="14" viewBox="0 0 24 24" fill={C.textPrimary}><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg></div>
+                  <div style={{position:"absolute",top:6,left:6,opacity:0.75}}><IconDots/></div>
                 </div>
                 <div style={{padding:8,display:"flex",flexWrap:"wrap",gap:2}}>
-                  <div style={{display:"flex",alignItems:"center",gap:3,padding:"1px 6px"}}><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.dur}</span></div>
-                  <div style={{display:"flex",alignItems:"center",gap:3,padding:"1px 6px"}}><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.user}</span></div>
+                  <div style={{display:"flex",alignItems:"center",gap:3,padding:"1px 6px"}}><IconTimer size={10}/><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.dur}</span></div>
+                  <div style={{display:"flex",alignItems:"center",gap:3,padding:"1px 6px"}}><IconUser size={10}/><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.user}</span></div>
                 </div>
               </div>
             );})}
@@ -440,120 +426,60 @@ function HighlightModal(props){
 }
 
 // ── Shot Card ─────────────────────────────────────────────────────
-function ShotCard(props){
-  var shot=props.shot,selected=props.selected,fav=props.fav,showMeta=props.showMeta,discarded=props.discarded;
-  var videoSrc = shot.orient==="landscape" ? VIDEO_LANDSCAPE : VIDEO_PORTRAIT;
-  var vidRef=useRef(null);
-  var scrubRef=useRef(null); // rAF id
+function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onToggleFav,onDiscard,onRecover}){
+  var videoSrc=shot.orient==="landscape"?VIDEO_LANDSCAPE:VIDEO_PORTRAIT;
+  var vidRef=useRef(null),scrubRef=useRef(null);
   var [hovering,setHovering]=useState(false);
   var [scrubPct,setScrubPct]=useState(0);
   var clickTimer=useRef(null);
-
-  // video play/pause on hover
-  useEffect(function(){
-    var v=vidRef.current; if(!v) return;
-    if(hovering){v.currentTime=0;v.play().catch(function(){});}
-    else{v.pause();v.currentTime=0;}
-  },[hovering]);
-
-  // scrub bar animation while hovering
+  useEffect(function(){var v=vidRef.current;if(!v)return;if(hovering){v.currentTime=0;v.play().catch(function(){});}else{v.pause();v.currentTime=0;}},[hovering]);
   useEffect(function(){
     if(!hovering){setScrubPct(0);if(scrubRef.current)cancelAnimationFrame(scrubRef.current);return;}
-    var start=null, dur=4000; // 4 s loop
-    function tick(ts){
-      if(!start)start=ts;
-      var elapsed=(ts-start)%dur;
-      setScrubPct((elapsed/dur)*100);
-      scrubRef.current=requestAnimationFrame(tick);
-    }
+    var start=null,dur=4000;
+    function tick(ts){if(!start)start=ts;var elapsed=(ts-start)%dur;setScrubPct((elapsed/dur)*100);scrubRef.current=requestAnimationFrame(tick);}
     scrubRef.current=requestAnimationFrame(tick);
     return function(){if(scrubRef.current)cancelAnimationFrame(scrubRef.current);};
   },[hovering]);
-
-  // single vs double click disambiguation
   function handleClick(e){
-    if(clickTimer.current){
-      // second click arrived — treat as double-click, cancel single
-      clearTimeout(clickTimer.current);
-      clickTimer.current=null;
-      e.preventDefault();
-      props.onPreview();
-      return;
-    }
-    clickTimer.current=setTimeout(function(){
-      clickTimer.current=null;
-      props.onToggle();
-    },220);
+    if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;e.preventDefault();onPreview();return;}
+    clickTimer.current=setTimeout(function(){clickTimer.current=null;onToggle();},220);
   }
-
   return(
-    <div
-      onClick={handleClick}
-      onMouseEnter={function(){setHovering(true);}}
-      onMouseLeave={function(){setHovering(false);}}
+    <div onClick={handleClick} onMouseEnter={function(){setHovering(true);}} onMouseLeave={function(){setHovering(false);}}
       style={{background:C.bgTertiary,borderRadius:8,display:"flex",flexDirection:"column",border:selected?"2px solid "+C.action:"2px solid transparent",overflow:"hidden",cursor:"pointer",transition:"border-color 0.15s",userSelect:"none"}}>
       <div style={{position:"relative",width:"100%",paddingBottom:"146.15%",flexShrink:0}}>
         <img src={shot.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"opacity 0.2s",opacity:hovering?0:1}}/>
         <video ref={vidRef} src={videoSrc} muted playsInline loop preload="none"
           style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"opacity 0.2s",opacity:hovering?1:0}}/>
-
-        {/* scrub bar — bottom of thumbnail, visible on hover */}
         <div style={{position:"absolute",bottom:0,left:0,right:0,height:3,background:"rgba(187,188,214,0.2)",opacity:hovering?1:0,transition:"opacity 0.2s"}}>
           <div style={{height:"100%",width:scrubPct+"%",background:C.textSecondary,borderRadius:1,transition:"width 0.05s linear"}}/>
         </div>
-
-        {/* centered play button — visible on hover, opens modal, no selection */}
         {hovering&&(
-          <div onClick={function(e){e.stopPropagation();if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;}props.onPreview();}}
+          <div onClick={function(e){e.stopPropagation();if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;}onPreview();}}
             style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"auto"}}>
             <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(22,20,49,0.72)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill={C.textPrimary}><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <IconPlay size={18}/>
             </div>
           </div>
         )}
-
-        {/* top-left: checkbox — Google Photos style.
-            Always rendered (so CSS transition works), fades in on hover or when selected */}
-        <div
-          onClick={function(e){
-            e.stopPropagation();
-            if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;}
-            props.onToggle();
-          }}
-          style={{
-            position:"absolute",top:8,left:8,
-            opacity:(hovering||selected)?1:0,
-            transition:"opacity 0.15s",
-            pointerEvents:(hovering||selected)?"auto":"none",
-          }}>
-          <div style={{
-            width:20,height:20,borderRadius:4,
-            background:selected?C.action:"rgba(22,20,49,0.6)",
-            border:"2px solid "+(selected?C.action:C.textPrimary),
-            display:"flex",alignItems:"center",justifyContent:"center",
-            transition:"background 0.15s, border-color 0.15s",
-            backdropFilter:"blur(2px)",
-          }}>
-            {selected&&<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+        <div onClick={function(e){e.stopPropagation();if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;}onToggle();}}
+          style={{position:"absolute",top:8,left:8,opacity:(hovering||selected)?1:0,transition:"opacity 0.15s",pointerEvents:(hovering||selected)?"auto":"none"}}>
+          <div style={{width:20,height:20,borderRadius:4,background:selected?C.action:"rgba(22,20,49,0.6)",border:"2px solid "+(selected?C.action:C.textPrimary),display:"flex",alignItems:"center",justifyContent:"center",transition:"background 0.15s, border-color 0.15s",backdropFilter:"blur(2px)"}}>
+            {selected&&<IconCheck/>}
           </div>
         </div>
-
-        {/* top-right chips — visible on hover */}
-        {/* top-right chip column — heart always visible when fav, rest on hover */}
         <div style={{position:"absolute",top:10,right:8,display:"flex",flexDirection:"column",gap:8}}>
           {(hovering||fav)&&(
-            <CardChip onClick={function(e){e.stopPropagation();props.onToggleFav();}}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill={fav?C.action:"none"} stroke={C.action} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{transition:"fill 0.15s"}}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <CardChip onClick={function(e){e.stopPropagation();onToggleFav();}}>
+              <IconHeart size={15} color={C.action} filled={fav}/>
             </CardChip>
           )}
           {hovering&&(
             <>
-              <CardChip onClick={function(e){e.stopPropagation();}}>
-                <IconDownload color={C.action} size={15}/>
-              </CardChip>
+              <CardChip onClick={function(e){e.stopPropagation();}}><IconDownload color={C.action} size={15}/></CardChip>
               {discarded
-                ?<CardChip onClick={function(e){e.stopPropagation();props.onRecover();}}><IconRecover color={C.action} size={15}/></CardChip>
-                :<CardChip onClick={function(e){e.stopPropagation();props.onDiscard();}}><IconTrash color={C.action} size={15}/></CardChip>
+                ?<CardChip onClick={function(e){e.stopPropagation();onRecover();}}><IconRecover color={C.action} size={15}/></CardChip>
+                :<CardChip onClick={function(e){e.stopPropagation();onDiscard();}}><IconTrash color={C.action} size={15}/></CardChip>
               }
             </>
           )}
@@ -562,14 +488,17 @@ function ShotCard(props){
       {showMeta&&(
         <div style={{padding:12}}>
           <div style={{display:"flex",flexWrap:"wrap",gap:2}}>
-            {/* orientation as a metadata tag — same size/style as the others */}
             <div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>
               {shot.orient==="landscape"
                 ?<svg width="14" height="10" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>
                 :<svg width="10" height="14" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>
               }
             </div>
-            <Tag iconSrc={imgTagCal} label={shot.date}/><Tag iconSrc={imgTagClock} label={shot.time}/><Tag iconSrc={imgTagTimer} label={shot.dur}/><Tag iconSrc={imgTagUser} label={shot.user}/><Tag iconSrc={imgTagFile} label={shot.size}/>
+            <Tag icon={<IconCalendar/>} label={shot.date}/>
+            <Tag icon={<IconClock/>} label={shot.time}/>
+            <Tag icon={<IconTimer/>} label={shot.dur}/>
+            <Tag icon={<IconUser/>} label={shot.user}/>
+            <Tag icon={<IconFile/>} label={shot.size}/>
           </div>
         </div>
       )}
@@ -582,18 +511,24 @@ function Sidebar(){
   return(
     <div style={{background:C.bgSecondary,width:241,minWidth:241,flexShrink:0,borderRadius:"0 32px 32px 0",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"24px 16px 12px",boxSizing:"border-box",position:"sticky",top:0,height:"100vh",overflow:"hidden"}}>
       <div style={{display:"flex",flexDirection:"column",gap:32}}>
-        <img src={imgLogo} alt="SureShot" style={{height:36,width:151.75,objectFit:"contain",display:"block"}}/>
+        {/* Logo — texto en lugar de imagen Figma */}
+        <div style={{height:36,display:"flex",alignItems:"center"}}>
+          <span style={{fontFamily:sans,fontWeight:600,fontSize:22,color:C.textPrimary,letterSpacing:2}}>SURESHOT</span>
+        </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
           <div style={{display:"flex",flexDirection:"column"}}>
-            {[{icon:imgNavEvents,label:"Events"},{icon:imgNavAcct,label:"Account"}].map(function(item){return(
+            {[
+              {label:"Events", icon:<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>},
+              {label:"Account", icon:<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
+            ].map(function(item){return(
               <div key={item.label} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0"}}>
-                <div style={{background:C.bgPage,borderRadius:999,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><FigmaIcon src={item.icon} size={17}/></div>
+                <div style={{background:C.bgPage,borderRadius:999,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{item.icon}</div>
                 <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{item.label}</span>
               </div>
             );})}
           </div>
-          <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,display:"flex",alignItems:"center",gap:8,padding:"4px 12px",alignSelf:"flex-start"}}>
-            <FigmaIcon src={imgNavPlus} size={16}/>
+          <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,display:"flex",alignItems:"center",gap:8,padding:"4px 12px",alignSelf:"flex-start",cursor:"pointer"}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,whiteSpace:"nowrap"}}>Create new event</span>
           </div>
         </div>
@@ -601,13 +536,18 @@ function Sidebar(){
       <div style={{display:"flex",flexDirection:"column",gap:20}}>
         <div style={{display:"flex",alignItems:"center"}}>
           <div style={{flex:1,display:"flex",alignItems:"center",gap:8,height:42}}>
-            <img src={imgAvatar} alt="" style={{width:32,height:32,borderRadius:"50%",flexShrink:0}}/>
+            {/* Avatar placeholder */}
+            <div style={{width:32,height:32,borderRadius:"50%",background:C.action,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontFamily:sans,fontWeight:600,fontSize:13,color:C.bgPage}}>JD</span>
+            </div>
             <div style={{display:"flex",flexDirection:"column",gap:2}}>
               <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>John Doe</span>
               <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>@username</span>
             </div>
           </div>
-          <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center"}}><FigmaIcon src={imgNavArrow} size={13}/></div>
+          <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+            <IconArrowRight size={13}/>
+          </div>
         </div>
         <span style={{fontFamily:mono,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>© 2026 SURESHOT APS</span>
       </div>
@@ -622,17 +562,20 @@ function EventSummary(){
     <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px"}}>
       <div style={{display:"flex",alignItems:"center",gap:24,padding:"12px 0"}}>
         <div style={{display:"flex",flexDirection:"column",gap:12,flexShrink:0}}>
-          <div style={{width:241,height:128,borderRadius:16,overflow:"hidden"}}><img src={imgCover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/></div>
-          <div style={{background:C.action,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"4px 8px 4px 12px",width:241,boxSizing:"border-box"}}>
+          {/* Cover placeholder */}
+          <div style={{width:241,height:128,borderRadius:16,overflow:"hidden"}}>
+            <img src="https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?q=80&w=2340&auto=format&fit=crop" alt="Event cover" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+          </div>
+          <div style={{background:C.action,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"4px 8px 4px 12px",width:241,boxSizing:"border-box",cursor:"pointer"}}>
             <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.bgPage}}>Published</span>
-            <FigmaIcon src={imgChevDown} size={24}/>
+            <IconChevronDown color={C.bgPage} size={24}/>
           </div>
         </div>
         <div style={{flex:1,display:"flex",flexDirection:"column",gap:12}}>
           <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>Event name</span>
           <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}><FigmaIcon src={imgAttendeesStroke} size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>4498</span></div>
-            <div style={{display:"flex",alignItems:"center",gap:4}}><FigmaIcon src={imgPin} size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Location name</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}><IconUsers size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>4498</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}><IconMapPin size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Location name</span></div>
             <div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Start</span><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>10.03.26 09:00h</span></div>
             <div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Finish</span><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>11.03.26 17:00h</span></div>
           </div>
@@ -651,14 +594,7 @@ function EventSummary(){
 }
 
 // ── Shots Panel ───────────────────────────────────────────────────
-function ShotsPanel(props){
-  var selectedIds=props.selectedIds,onToggle=props.onToggle,onSelectAll=props.onSelectAll,onDeselectAll=props.onDeselectAll;
-  var favIds=props.favIds,onToggleFav=props.onToggleFav;
-  var showMeta=props.showMeta,onToggleMeta=props.onToggleMeta;
-  var showFavsOnly=props.showFavsOnly,onToggleFavsOnly=props.onToggleFavsOnly;
-  var rangeLo=props.rangeLo,rangeHi=props.rangeHi,onRange=props.onRange;
-  var onDownload=props.onDownload,onCollection=props.onCollection,onPreview=props.onPreview;
-  var discardedIds=props.discardedIds,onDiscard=props.onDiscard,onRecover=props.onRecover,onBatchDiscard=props.onBatchDiscard;
+function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onToggleFav,showMeta,onToggleMeta,showFavsOnly,onToggleFavsOnly,rangeLo,rangeHi,onRange,onDownload,onCollection,onPreview,discardedIds,onDiscard,onRecover,onBatchDiscard}){
   var [innerTab,setInnerTab]=useState("shots");
   var count=selectedIds.size;
   var loMs=TL_START+rangeLo*TL_SPAN,hiMs=TL_START+rangeHi*TL_SPAN;
@@ -687,14 +623,14 @@ function ShotsPanel(props){
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
           <div style={{border:"1px solid "+C.action,borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}>
-            <FigmaIcon src={imgUpload} size={20}/>
+            <IconUpload size={20}/>
             <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.action}}>Upload</span>
           </div>
           <BatchDropdown count={count} onDownload={onDownload} onCollection={onCollection} onDiscard={onBatchDiscard}/>
         </div>
       </div>
       <div style={{display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
-        <Toggle active={showMeta}     onToggle={onToggleMeta}     label="Show shot metadata"/>
+        <Toggle active={showMeta} onToggle={onToggleMeta} label="Show shot metadata"/>
         <Toggle active={showFavsOnly} onToggle={onToggleFavsOnly} label="Favorites only"/>
         <CheckboxField checked={checkState} onClick={handleCheckbox} label={"Select all ("+visible.length+")"}/>
         <div onClick={function(){setInnerTab(function(t){return t==="shots"?"discarded":"shots";});}}
@@ -739,51 +675,48 @@ function ShotsPanel(props){
 
 // ── App ───────────────────────────────────────────────────────────
 function App(){
-  var [selectedIds,   setSelectedIds]   = useState(new Set());
-  var [favIds,        setFavIds]        = useState(new Set());
-  var [discardedIds,  setDiscardedIds]  = useState(new Set());
-  var [showMeta,      setShowMeta]      = useState(true);
-  var [showFavsOnly,  setShowFavsOnly]  = useState(false);
-  var [rangeLo,       setRangeLo]       = useState(0);
-  var [rangeHi,       setRangeHi]       = useState(1);
-  var [showDlModal,   setShowDlModal]   = useState(false);
-  var [showHighlight, setShowHighlight] = useState(false);
-  var [previewShot,   setPreviewShot]   = useState(null);
-
+  var [selectedIds,setSelectedIds]=useState(new Set());
+  var [favIds,setFavIds]=useState(new Set());
+  var [discardedIds,setDiscardedIds]=useState(new Set());
+  var [showMeta,setShowMeta]=useState(true);
+  var [showFavsOnly,setShowFavsOnly]=useState(false);
+  var [rangeLo,setRangeLo]=useState(0);
+  var [rangeHi,setRangeHi]=useState(1);
+  var [showDlModal,setShowDlModal]=useState(false);
+  var [showHighlight,setShowHighlight]=useState(false);
+  var [previewShot,setPreviewShot]=useState(null);
   function toggleCard(id){setSelectedIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
   function toggleFav(id){setFavIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
   function discardShot(id){setDiscardedIds(function(p){var n=new Set(p);n.add(id);return n;});setSelectedIds(function(p){var n=new Set(p);n.delete(id);return n;});}
   function recoverShot(id){setDiscardedIds(function(p){var n=new Set(p);n.delete(id);return n;});}
   function batchDiscard(){setDiscardedIds(function(p){var n=new Set(p);selectedIds.forEach(function(id){n.add(id);});return n;});setSelectedIds(new Set());}
-  var selectAll  =useCallback(function(shots){setSelectedIds(function(p){var n=new Set(p);shots.forEach(function(s){n.add(s.id);});return n;});},[]);
+  var selectAll=useCallback(function(shots){setSelectedIds(function(p){var n=new Set(p);shots.forEach(function(s){n.add(s.id);});return n;});},[]);
   var deselectAll=useCallback(function(shots){setSelectedIds(function(p){var n=new Set(p);shots.forEach(function(s){n.delete(s.id);});return n;});},[]);
   var handleRange=useCallback(function(lo,hi){setRangeLo(lo);setRangeHi(hi);},[]);
-
   return(
     <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
       <Sidebar/>
       <div style={{flex:1,display:"flex",flexDirection:"column",gap:10,padding:"24px 16px",overflowY:"auto",boxSizing:"border-box"}}>
         <EventSummary/>
         <ShotsPanel
-          selectedIds={selectedIds}   onToggle={toggleCard}
-          onSelectAll={selectAll}     onDeselectAll={deselectAll}
-          favIds={favIds}             onToggleFav={toggleFav}
+          selectedIds={selectedIds} onToggle={toggleCard}
+          onSelectAll={selectAll} onDeselectAll={deselectAll}
+          favIds={favIds} onToggleFav={toggleFav}
           discardedIds={discardedIds} onDiscard={discardShot} onRecover={recoverShot} onBatchDiscard={batchDiscard}
-          showMeta={showMeta}         onToggleMeta={function(){setShowMeta(function(v){return !v;});}}
+          showMeta={showMeta} onToggleMeta={function(){setShowMeta(function(v){return !v;});}}
           showFavsOnly={showFavsOnly} onToggleFavsOnly={function(){setShowFavsOnly(function(v){return !v;});}}
-          rangeLo={rangeLo}           rangeHi={rangeHi} onRange={handleRange}
+          rangeLo={rangeLo} rangeHi={rangeHi} onRange={handleRange}
           onDownload={function(){setShowDlModal(true);}}
           onCollection={function(){setShowHighlight(true);}}
           onPreview={function(shot){setPreviewShot(shot);}}
         />
       </div>
-      {previewShot   && <PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}} onDiscard={discardShot}/>}
-      {showHighlight && <HighlightModal selectedIds={selectedIds} onClose={function(){setShowHighlight(false);}}/>}
-      {showDlModal   && <DownloadModal  selectedIds={selectedIds} onConfirm={function(){setShowDlModal(false);}} onCancel={function(){setShowDlModal(false);}}/>}
+      {previewShot&&<PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}} onDiscard={discardShot}/>}
+      {showHighlight&&<HighlightModal selectedIds={selectedIds} onClose={function(){setShowHighlight(false);}}/>}
+      {showDlModal&&<DownloadModal selectedIds={selectedIds} onConfirm={function(){setShowDlModal(false);}} onCancel={function(){setShowDlModal(false);}}/>}
     </div>
   );
 }
-
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
 </script>
 </body>
