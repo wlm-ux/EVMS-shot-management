@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>EVMS – Event Shots</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Work+Sans:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Work+Sans:wght@400;600;800&display=swap" rel="stylesheet"/>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #161431; font-family: 'Work Sans', sans-serif; }
-  #root { max-width: 1440px; margin: 0 auto; }
-  input::placeholder { color: #bbbcd6; }
-  input { color: #faf9f9; }
-  button { font-family: 'Work Sans', sans-serif; }
-  ::-webkit-scrollbar { display: none; }
-  * { scrollbar-width: none; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:#161431;font-family:'Work Sans',sans-serif;}
+#root{max-width:1440px;margin:0 auto;}
+input::placeholder{color:#bbbcd6;}
+input{color:#faf9f9;}
+button{font-family:'Work Sans',sans-serif;}
+::-webkit-scrollbar{display:none;}
+*{scrollbar-width:none;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-28px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
 <body>
@@ -24,113 +26,85 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <script type="text/babel">
-var useState    = React.useState;
-var useRef      = React.useRef;
-var useEffect   = React.useEffect;
-var useCallback = React.useCallback;
+var useState=React.useState,useRef=React.useRef,useEffect=React.useEffect,useCallback=React.useCallback;
 
-var VIDEO_LANDSCAPE = "https://www.pexels.com/download/video/9005710/";
-var VIDEO_PORTRAIT  = "https://www.pexels.com/download/video/35110969/";
+// ── Constants ─────────────────────────────────────────────────────
+var VIDEO_LANDSCAPE="https://www.pexels.com/download/video/9005710/";
+var VIDEO_PORTRAIT="https://www.pexels.com/download/video/35110969/";
+var C={bgPage:"#161431",bgSecondary:"#29284b",bgTertiary:"#3e3d64",action:"#f1665c",textPrimary:"#faf9f9",textSecondary:"#bbbcd6",textMuted:"#a1a5b7",border:"#6c6d93"};
+var sans="'Work Sans',sans-serif",mono="'Roboto Mono',monospace";
 
-var C = {
-  bgPage:"#161431", bgSecondary:"#29284b", bgTertiary:"#3e3d64",
-  action:"#f1665c", textPrimary:"#faf9f9", textSecondary:"#bbbcd6",
-  textMuted:"#a1a5b7", border:"#6c6d93",
-};
-var sans = "'Work Sans', sans-serif";
-var mono = "'Roboto Mono', monospace";
+function pad2(n){return String(n).padStart(2,"0");}
+function fmtMs(ms){var d=new Date(ms);return pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+String(d.getFullYear()).slice(2)+" "+pad2(d.getHours())+":"+pad2(d.getMinutes());}
+function fmtSec(s){s=Math.floor(s||0);return pad2(Math.floor(s/60))+":"+pad2(s%60);}
 
-function pad2(n){ return String(n).padStart(2,"0"); }
-function fmtMs(ms){ var d=new Date(ms); return pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+String(d.getFullYear()).slice(2)+" "+pad2(d.getHours())+":"+pad2(d.getMinutes()); }
-function fmtSec(s){ s=Math.floor(s||0); return pad2(Math.floor(s/60))+":"+pad2(s%60); }
-
-var RAW = [
-  { id:0,  orient:"portrait",  ts:new Date("2026-03-10T09:20:00").getTime(), img:"https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=260&h=380&fit=crop&q=80", user:"Alice M.",  size:"14.2 MB", dur:"0:12" },
-  { id:1,  orient:"portrait",  ts:new Date("2026-03-10T10:35:00").getTime(), img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=260&h=380&fit=crop&q=80", user:"Bob K.",    size:"22.7 MB", dur:"0:24" },
-  { id:2,  orient:"landscape", ts:new Date("2026-03-10T12:00:00").getTime(), img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=780&h=440&fit=crop&q=80", user:"Carol T.",  size:"18.1 MB", dur:"0:18" },
-  { id:3,  orient:"portrait",  ts:new Date("2026-03-10T13:30:00").getTime(), img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=260&h=380&fit=crop&q=80", user:"Dan R.",    size:"31.0 MB", dur:"0:30" },
-  { id:4,  orient:"portrait",  ts:new Date("2026-03-10T15:30:00").getTime(), img:"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=260&h=380&fit=crop&q=80", user:"Eve S.",    size:"12.5 MB", dur:"0:08" },
-  { id:5,  orient:"landscape", ts:new Date("2026-03-10T17:00:00").getTime(), img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=780&h=440&fit=crop&q=80", user:"Frank L.",  size:"41.3 MB", dur:"0:36" },
-  { id:6,  orient:"portrait",  ts:new Date("2026-03-10T19:00:00").getTime(), img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=260&h=380&fit=crop&q=80", user:"Grace W.",  size:"19.8 MB", dur:"0:18" },
-  { id:7,  orient:"landscape", ts:new Date("2026-03-10T21:00:00").getTime(), img:"https://images.unsplash.com/photo-1468359601543-843bfaef291a?w=780&h=440&fit=crop&q=80", user:"Hank P.",   size:"27.6 MB", dur:"0:22" },
-  { id:8,  orient:"portrait",  ts:new Date("2026-03-10T23:00:00").getTime(), img:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=260&h=380&fit=crop&q=80", user:"Iris N.",   size:"15.9 MB", dur:"0:10" },
-  { id:9,  orient:"portrait",  ts:new Date("2026-03-11T01:00:00").getTime(), img:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=260&h=380&fit=crop&q=80", user:"Jack O.",   size:"48.2 MB", dur:"0:42" },
-  { id:10, orient:"landscape", ts:new Date("2026-03-11T05:00:00").getTime(), img:"https://images.unsplash.com/photo-1506157786151-b8491531f063?w=780&h=440&fit=crop&q=80", user:"Kim Y.",    size:"20.4 MB", dur:"0:18" },
-  { id:11, orient:"portrait",  ts:new Date("2026-03-11T09:00:00").getTime(), img:"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=260&h=380&fit=crop&q=80", user:"Leo A.",    size:"33.7 MB", dur:"0:28" },
-  { id:12, orient:"portrait",  ts:new Date("2026-03-11T13:00:00").getTime(), img:"https://images.unsplash.com/photo-1598387846148-47e82ee120cc?w=260&h=380&fit=crop&q=80", user:"Mia B.",    size:"11.3 MB", dur:"0:09" },
-  { id:13, orient:"landscape", ts:new Date("2026-03-11T16:00:00").getTime(), img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=780&h=440&fit=crop&q=80", user:"Nate C.",   size:"28.9 MB", dur:"0:24" },
+var RAW=[
+  {id:0, orient:"portrait", ts:new Date("2026-03-10T09:20:00").getTime(),img:"https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=260&h=380&fit=crop&q=80", user:"Alice M.", size:"14.2 MB",dur:"0:12"},
+  {id:1, orient:"portrait", ts:new Date("2026-03-10T10:35:00").getTime(),img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=260&h=380&fit=crop&q=80", user:"Bob K.",   size:"22.7 MB",dur:"0:24"},
+  {id:2, orient:"landscape",ts:new Date("2026-03-10T12:00:00").getTime(),img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=780&h=440&fit=crop&q=80", user:"Carol T.", size:"18.1 MB",dur:"0:18"},
+  {id:3, orient:"portrait", ts:new Date("2026-03-10T13:30:00").getTime(),img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=260&h=380&fit=crop&q=80", user:"Dan R.",   size:"31.0 MB",dur:"0:30"},
+  {id:4, orient:"portrait", ts:new Date("2026-03-10T15:30:00").getTime(),img:"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=260&h=380&fit=crop&q=80", user:"Eve S.",   size:"12.5 MB",dur:"0:08"},
+  {id:5, orient:"landscape",ts:new Date("2026-03-10T17:00:00").getTime(),img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=780&h=440&fit=crop&q=80", user:"Frank L.", size:"41.3 MB",dur:"0:36"},
+  {id:6, orient:"portrait", ts:new Date("2026-03-10T19:00:00").getTime(),img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=260&h=380&fit=crop&q=80", user:"Grace W.", size:"19.8 MB",dur:"0:18"},
+  {id:7, orient:"landscape",ts:new Date("2026-03-10T21:00:00").getTime(),img:"https://images.unsplash.com/photo-1468359601543-843bfaef291a?w=780&h=440&fit=crop&q=80", user:"Hank P.",  size:"27.6 MB",dur:"0:22"},
+  {id:8, orient:"portrait", ts:new Date("2026-03-10T23:00:00").getTime(),img:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=260&h=380&fit=crop&q=80", user:"Iris N.",  size:"15.9 MB",dur:"0:10"},
+  {id:9, orient:"portrait", ts:new Date("2026-03-11T01:00:00").getTime(),img:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=260&h=380&fit=crop&q=80", user:"Jack O.",  size:"48.2 MB",dur:"0:42"},
+  {id:10,orient:"landscape",ts:new Date("2026-03-11T05:00:00").getTime(),img:"https://images.unsplash.com/photo-1506157786151-b8491531f063?w=780&h=440&fit=crop&q=80", user:"Kim Y.",   size:"20.4 MB",dur:"0:18"},
+  {id:11,orient:"portrait", ts:new Date("2026-03-11T09:00:00").getTime(),img:"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=260&h=380&fit=crop&q=80", user:"Leo A.",   size:"33.7 MB",dur:"0:28"},
+  {id:12,orient:"portrait", ts:new Date("2026-03-11T13:00:00").getTime(),img:"https://images.unsplash.com/photo-1598387846148-47e82ee120cc?w=260&h=380&fit=crop&q=80", user:"Mia B.",   size:"11.3 MB",dur:"0:09"},
+  {id:13,orient:"landscape",ts:new Date("2026-03-11T16:00:00").getTime(),img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=780&h=440&fit=crop&q=80", user:"Nate C.",  size:"28.9 MB",dur:"0:24"},
 ];
-var TL_START=RAW[0].ts, TL_END=RAW[RAW.length-1].ts, TL_SPAN=TL_END-TL_START;
-var SHOTS=RAW.map(function(s){ var d=new Date(s.ts); return Object.assign({},s,{ date:pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+String(d.getFullYear()).slice(2), time:pad2(d.getHours())+":"+pad2(d.getMinutes()) }); });
-function sumMB(ids){ return SHOTS.filter(function(s){return ids.has(s.id);}).reduce(function(a,s){return a+parseFloat(s.size);},0).toFixed(1); }
+var TL_START=RAW[0].ts,TL_END=RAW[RAW.length-1].ts,TL_SPAN=TL_END-TL_START;
+var SHOTS=RAW.map(function(s){var d=new Date(s.ts);return Object.assign({},s,{date:pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+String(d.getFullYear()).slice(2),time:pad2(d.getHours())+":"+pad2(d.getMinutes())});});
+function sumMB(ids){return SHOTS.filter(function(s){return ids.has(s.id);}).reduce(function(a,s){return a+parseFloat(s.size);},0).toFixed(1);}
 
-// ── Lucide-style SVG Icons ────────────────────────────────────────
-function IconTrash({color=C.textPrimary,size=14}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;
-}
-function IconRecover({color=C.textPrimary,size=14}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
-}
-function IconHeart({color=C.textPrimary,size=14,filled=false}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill={filled?color:"none"} stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>;
-}
-function IconDownload({color=C.textPrimary,size=14}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
-}
-function IconCalendar({color=C.textPrimary,size=12}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
-}
-function IconClock({color=C.textPrimary,size=12}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
-}
-function IconTimer({color=C.textPrimary,size=12}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/></svg>;
-}
-function IconUser({color=C.textPrimary,size=12}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-}
-function IconFile({color=C.textPrimary,size=12}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>;
-}
-function IconUpload({color=C.action,size=20}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;
-}
-function IconLayers({color=C.bgPage,size=20}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>;
-}
-function IconUsers({color=C.textSecondary,size=16}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
-}
-function IconMapPin({color=C.textSecondary,size=16}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>;
-}
-function IconChevronDown({color=C.bgPage,size=20}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>;
-}
-function IconArrowRight({color=C.textPrimary,size=13}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;
-}
-function IconStar({color=C.textPrimary,size=16}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
-}
-function IconCheck({color=C.bgPage,size=11}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
-}
-function IconX({color="currentColor",size=20}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
-}
-function IconPlay({color=C.textPrimary,size=18}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><polygon points="5 3 19 12 5 21 5 3"/></svg>;
-}
-function IconPause({color=C.textPrimary,size=22}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>;
-}
-function IconDots({color=C.textPrimary,size=14}){
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>;
-}
+var DL_STEPS=[
+  {label:"Kindly rewinding",          icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>},
+  {label:"Pumping up the volume",     icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>},
+  {label:"Fetching another coffee",   icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>},
+  {label:"Untangling the cables",     icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>},
+  {label:"Counting the pixels",       icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>},
+  {label:"Compiling the best moments",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>},
+];
+var PEEK=12,MAX_VIS=4,STEP_DUR=3200,TOTAL_MS=18000;
+
+var HIGHLIGHTS_SEED=[
+  {id:0,name:"Stage A",             status:"draft",     shots:23,  published:null,           duration:"3m 36s", img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=80&h=120&fit=crop&q=80"},
+  {id:1,name:"Sponsors",            status:"published", shots:34,  published:"11.04.26 16h", duration:"1m 20s", img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=80&h=120&fit=crop&q=80"},
+  {id:2,name:"Best of the audience",status:"featured",  shots:123, published:"11.04.26 16h", duration:"10m 03s",img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=80&h=120&fit=crop&q=80"},
+  {id:3,name:"Stage B",             status:"published", shots:8,   published:"11.04.26 16h", duration:"0m 30s", img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=80&h=120&fit=crop&q=80"},
+];
+
+// ── Icons ─────────────────────────────────────────────────────────
+function ITrash({color=C.textPrimary,size=14}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;}
+function IRecover({color=C.textPrimary,size=14}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;}
+function IHeart({color=C.textPrimary,size=14,filled=false}){return <svg width={size} height={size} viewBox="0 0 24 24" fill={filled?color:"none"} stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>;}
+function IDownload({color=C.textPrimary,size=14}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;}
+function ICalendar({color=C.textPrimary,size=12}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;}
+function IClock({color=C.textPrimary,size=12}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;}
+function ITimer({color=C.textPrimary,size=12}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/></svg>;}
+function IUser({color=C.textPrimary,size=12}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;}
+function IFile({color=C.textPrimary,size=12}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>;}
+function IUpload({color=C.action,size=20}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;}
+function ILayers({color=C.bgPage,size=20}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>;}
+function IUsers({color=C.textSecondary,size=16}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;}
+function IPin({color=C.textSecondary,size=16}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>;}
+function IChevDown({color=C.bgPage,size=20}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>;}
+function IChevLeft({color=C.textMuted,size=11}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>;}
+function IChevRight({color=C.textSecondary,size=11}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>;}
+function IArrowLeft({color=C.textPrimary,size=20}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>;}
+function IArrowRight({color=C.textPrimary,size=13}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;}
+function IStar({color=C.textPrimary,size=16}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;}
+function ICheck({color=C.bgPage,size=11}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;}
+function IX({color="currentColor",size=20}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;}
+function IPlay({color=C.textPrimary,size=18}){return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><polygon points="5 3 19 12 5 21 5 3"/></svg>;}
+function IPause({color=C.textPrimary,size=22}){return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>;}
+function IDots({color=C.textPrimary,size=14}){return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>;}
+function IEdit({color=C.textPrimary,size=16}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;}
+function IPlus({color=C.textPrimary,size=24}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;}
 
 // ── Primitives ────────────────────────────────────────────────────
-function Tag({icon, label}){
+function Tag({icon,label}){
   return <div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{icon}<span style={{fontFamily:sans,fontWeight:400,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{label}</span></div>;
 }
 function Toggle({active,onToggle,label}){
@@ -146,8 +120,8 @@ function Toggle({active,onToggle,label}){
 function Checkbox({checked,onClick}){
   var isChecked=checked===true,isIndet=checked==="indeterminate";
   return(
-    <div onClick={onClick} style={{width:16,height:16,borderRadius:4,flexShrink:0,border:"1px solid "+(isChecked||isIndet?C.action:C.border),background:isChecked||isIndet?C.action:C.textPrimary,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",cursor:"pointer",transition:"background 0.15s,border-color 0.15s"}}>
-      {isChecked&&<IconCheck/>}
+    <div onClick={onClick} style={{width:16,height:16,borderRadius:4,flexShrink:0,border:"1px solid "+(isChecked||isIndet?C.action:C.border),background:isChecked||isIndet?C.action:C.textPrimary,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"background 0.15s"}}>
+      {isChecked&&<ICheck/>}
       {isIndet&&<div style={{width:8,height:2,background:C.bgPage,borderRadius:1}}/>}
     </div>
   );
@@ -161,349 +135,15 @@ function CheckboxField({checked,onClick,label}){
   );
 }
 function CardChip({onClick,children}){
-  return(
-    <div onClick={onClick} style={{background:C.bgPage,borderRadius:"50%",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>
-      {children}
-    </div>
-  );
+  return <div onClick={onClick} style={{background:C.bgPage,borderRadius:"50%",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>{children}</div>;
 }
 function ModalChip({onClick,tip,children}){
   var [hov,setHov]=useState(false);
-  return(
-    <div onClick={onClick} title={tip} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}}
-      style={{width:36,height:36,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,opacity:hov?0.8:1,transition:"opacity 0.15s"}}>
-      {children}
-    </div>
-  );
+  return <div onClick={onClick} title={tip} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{width:36,height:36,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,opacity:hov?0.8:1,transition:"opacity 0.15s"}}>{children}</div>;
 }
-
-// ── Preview Modal ─────────────────────────────────────────────────
-function PreviewModal({shot,onClose,onDiscard}){
-  var vidRef=useRef(null),trackRef=useRef(null);
-  var [playing,setPlaying]=useState(false);
-  var [current,setCurrent]=useState(0);
-  var [duration,setDuration]=useState(0);
-  var [seeking,setSeeking]=useState(false);
-  var [visible,setVisible]=useState(false);
-  var isLandscape=shot.orient==="landscape";
-  var videoSrc=isLandscape?VIDEO_LANDSCAPE:VIDEO_PORTRAIT;
-  useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);
-  useEffect(function(){var v=vidRef.current;if(!v)return;if(playing)v.play().catch(function(){setPlaying(false);});else v.pause();},[playing]);
-  function handleLoadedMeta(){setDuration(vidRef.current.duration);setPlaying(true);}
-  function handleTimeUpdate(){if(!seeking)setCurrent(vidRef.current.currentTime);}
-  function handleEnded(){setPlaying(false);}
-  function onTrackDown(e){
-    e.preventDefault();setSeeking(true);
-    function seek(ex){var r=trackRef.current.getBoundingClientRect();var t=Math.max(0,Math.min(1,(ex-r.left)/r.width))*(vidRef.current.duration||0);vidRef.current.currentTime=t;setCurrent(t);}
-    seek(e.clientX);
-    function onMove(ev){seek(ev.clientX);}
-    function onUp(){setSeeking(false);window.removeEventListener("mousemove",onMove);window.removeEventListener("mouseup",onUp);}
-    window.addEventListener("mousemove",onMove);window.addEventListener("mouseup",onUp);
-  }
-  function handleClose(){setVisible(false);setTimeout(onClose,220);}
-  var pct=duration>0?(current/duration)*100:0;
-  return(
-    <div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:300,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s ease, backdrop-filter 0.22s ease"}}>
-      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,display:"flex",flexDirection:"column",width:isLandscape?"min(720px,100%)":"min(420px,100%)",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0px)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s ease, transform 0.22s ease"}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px 0"}}>
-          <span style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary}}>Shot preview</span>
-          <button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4}}><IconX size={20}/></button>
-        </div>
-        <div onClick={function(){setPlaying(function(v){return !v;});}} style={{position:"relative",background:"#000",margin:"12px 20px 0",borderRadius:12,overflow:"hidden",aspectRatio:isLandscape?"16/9":"9/16",cursor:"pointer",maxHeight:isLandscape?"none":"55vh"}}>
-          <video ref={vidRef} src={videoSrc} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} onLoadedMetadata={handleLoadedMeta} onTimeUpdate={handleTimeUpdate} onEnded={handleEnded} preload="auto" playsInline muted/>
-          {!playing&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none"}}><div style={{width:64,height:64,borderRadius:"50%",background:"rgba(22,20,49,0.72)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><IconPlay size={26}/></div></div>}
-        </div>
-        <div style={{padding:"12px 20px 0",display:"flex",flexDirection:"column",gap:8}}>
-          <div ref={trackRef} onMouseDown={onTrackDown} style={{position:"relative",height:6,borderRadius:3,background:"rgba(187,188,214,0.2)",cursor:"pointer"}}>
-            <div style={{position:"absolute",top:0,left:0,height:"100%",width:pct+"%",borderRadius:3,background:C.action}}/>
-            <div style={{position:"absolute",top:"50%",left:pct+"%",transform:"translate(-50%,-50%)",width:14,height:14,borderRadius:"50%",background:C.textPrimary,boxShadow:"0 0 0 3px rgba(241,102,92,0.35)"}}/>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:12}}>
-            <button onClick={function(){if(vidRef.current&&vidRef.current.ended){vidRef.current.currentTime=0;setCurrent(0);}setPlaying(function(v){return !v;});}} style={{background:"none",border:"none",cursor:"pointer",padding:0,display:"flex",alignItems:"center"}}>
-              {playing?<IconPause/>:<IconPlay size={22}/>}
-            </button>
-            <span style={{fontFamily:mono,fontSize:13,color:C.textSecondary}}>{fmtSec(current)} / {fmtSec(duration)}</span>
-          </div>
-        </div>
-        <div style={{padding:"16px 20px 20px",display:"flex",flexDirection:"column",gap:12}}>
-          <div style={{height:1,background:C.bgTertiary}}/>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,flexWrap:"wrap"}}>
-            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-              <Tag icon={<IconCalendar/>} label={shot.date}/>
-              <Tag icon={<IconClock/>} label={shot.time}/>
-              <Tag icon={<IconTimer/>} label={shot.dur}/>
-              <Tag icon={<IconUser/>} label={shot.user}/>
-              <Tag icon={<IconFile/>} label={shot.size}/>
-            </div>
-            <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-              <ModalChip tip="Save" onClick={function(){}}><IconHeart color={C.textSecondary} size={15}/></ModalChip>
-              <ModalChip tip="Download" onClick={function(){window.open(videoSrc,"_blank");}}><IconDownload color={C.textSecondary} size={15}/></ModalChip>
-              <ModalChip tip="Discard" onClick={function(){onDiscard&&onDiscard(shot.id);handleClose();}}><IconTrash color={C.textSecondary} size={15}/></ModalChip>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Range Slider ──────────────────────────────────────────────────
-function RangeSlider({lo,hi,onChange,gridRef}){
-  var trackRef=useRef(null),dragging=useRef(null);
-  var [sliderW,setSliderW]=useState(null);
-  useEffect(function(){
-    var el=gridRef&&gridRef.current;if(!el)return;
-    function calc(){var gw=el.getBoundingClientRect().width;setSliderW(Math.round((gw-48)/4*2+16));}
-    calc();var ro=new ResizeObserver(calc);ro.observe(el);return function(){ro.disconnect();};
-  },[gridRef]);
-  var fracFromX=useCallback(function(cx){var r=trackRef.current.getBoundingClientRect();return Math.max(0,Math.min(1,(cx-r.left)/r.width));},[]);
-  useEffect(function(){
-    function onMove(e){if(!dragging.current||!trackRef.current)return;var f=fracFromX(e.clientX);if(dragging.current==="lo")onChange(Math.min(f,hi-0.001),hi);else onChange(lo,Math.max(f,lo+0.001));}
-    function onUp(){dragging.current=null;}
-    window.addEventListener("mousemove",onMove);window.addEventListener("mouseup",onUp);
-    return function(){window.removeEventListener("mousemove",onMove);window.removeEventListener("mouseup",onUp);};
-  },[lo,hi,onChange,fracFromX]);
-  function ts(pct){return{position:"absolute",top:"50%",left:(pct*100)+"%",transform:"translate(-50%,-50%)",width:20,height:20,borderRadius:"50%",background:C.textPrimary,cursor:"grab",zIndex:2,userSelect:"none",boxShadow:"0 0 0 3px rgba(255,255,255,0.2)"};}
-  return(
-    <div style={{display:"flex",flexDirection:"column",gap:8,width:sliderW?sliderW+"px":"100%"}}>
-      <div ref={trackRef} style={{position:"relative",height:6,borderRadius:3,background:"rgba(187,188,214,0.25)"}}>
-        <div style={{position:"absolute",top:0,height:"100%",borderRadius:3,left:(lo*100)+"%",width:((hi-lo)*100)+"%",background:C.textSecondary}}/>
-        <div style={ts(lo)} onMouseDown={function(e){e.preventDefault();dragging.current="lo";}}/>
-        <div style={ts(hi)} onMouseDown={function(e){e.preventDefault();dragging.current="hi";}}/>
-      </div>
-      <div style={{display:"flex",justifyContent:"space-between"}}>
-        <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>{fmtMs(TL_START+lo*TL_SPAN)}</span>
-        <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>{fmtMs(TL_START+hi*TL_SPAN)}</span>
-      </div>
-    </div>
-  );
-}
-
-// ── Batch Dropdown ────────────────────────────────────────────────
-function BatchDropdown({count,onDownload,onCollection,onDiscard}){
-  var [open,setOpen]=useState(false),ref=useRef(null);
-  useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);
-  var items=[
-    {label:"Download videos",color:C.textPrimary,action:function(){setOpen(false);onDownload();},icon:<IconDownload color={C.textPrimary} size={16}/>},
-    {label:"Create highlight",color:C.textPrimary,action:function(){setOpen(false);onCollection();},icon:<IconStar color={C.textPrimary} size={16}/>},
-    {label:"Discard selected",color:C.action,action:function(){setOpen(false);onDiscard();},icon:<IconTrash color={C.action} size={16}/>},
-  ];
-  return(
-    <div ref={ref} style={{position:"relative"}}>
-      <button onClick={function(){setOpen(function(v){return !v;});}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 12px 8px 16px",display:"flex",alignItems:"center",gap:8,cursor:"pointer"}}>
-        <IconLayers color={C.bgPage} size={20}/>
-        <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage}}>{"Batch ("+count+")"}</span>
-        <IconChevronDown color={C.bgPage} size={18}/>
-      </button>
-      {open&&(
-        <div style={{position:"absolute",top:"calc(100% + 6px)",right:0,zIndex:50,background:C.bgSecondary,borderRadius:12,padding:6,boxShadow:"0 8px 24px rgba(0,0,0,0.35)",minWidth:200}}>
-          {items.map(function(item){return(
-            <div key={item.label} onClick={item.action}
-              onMouseEnter={function(e){e.currentTarget.style.background=C.bgTertiary;}}
-              onMouseLeave={function(e){e.currentTarget.style.background="transparent";}}
-              style={{padding:"10px 16px",display:"flex",alignItems:"center",gap:10,borderRadius:8,cursor:"pointer",fontFamily:sans,fontSize:15,color:item.color,whiteSpace:"nowrap",background:"transparent"}}>
-              {item.icon}{item.label}
-            </div>
-          );})}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Download Modal ────────────────────────────────────────────────
-function DownloadModal({selectedIds,onCancel,onConfirm}){
-  var count=selectedIds.size,mb=sumMB(selectedIds);
-  return(
-    <div onClick={onCancel} style={{position:"fixed",inset:0,zIndex:100,background:"rgba(22,20,49,0.75)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:400}}>
-        <div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center",textAlign:"center"}}>
-          <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><IconDownload color={C.bgPage} size={28}/></div>
-          <div style={{display:"flex",flexDirection:"column",gap:4}}>
-            <p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Download videos?</p>
-            <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>You are about to download the following:</p>
-          </div>
-          <div style={{display:"flex",gap:16}}>
-            {[{v:String(count),l:count!==1?"videos":"video"},{v:mb+" MB",l:"total size"}].map(function(s){return(
-              <div key={s.l} style={{background:C.bgTertiary,borderRadius:12,padding:"12px 24px",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-                <span style={{fontFamily:sans,fontWeight:600,fontSize:28,color:C.action}}>{s.v}</span>
-                <span style={{fontFamily:sans,fontSize:13,color:C.textSecondary,whiteSpace:"nowrap"}}>{s.l}</span>
-              </div>
-            );})}
-          </div>
-        </div>
-        <div style={{display:"flex",gap:16}}>
-          <button onClick={onCancel}  style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Cancel</button>
-          <button onClick={onConfirm} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Download</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Highlight Modal ───────────────────────────────────────────────
-function HighlightModal({selectedIds,onClose}){
-  var initialIds=SHOTS.filter(function(s){return selectedIds.has(s.id);}).map(function(s){return s.id;});
-  var [order,setOrder]=useState(initialIds),[name,setName]=useState(""),[featured,setFeatured]=useState(false),[published,setPublished]=useState(false),[confirmDiscard,setConfirmDiscard]=useState(false);
-  var dragSrc=useRef(null),initialOrder=useRef(initialIds.join(","));
-  function isDirty(){return name.trim().length>0||order.join(",")!==initialOrder.current;}
-  function handleClose(){if(isDirty())setConfirmDiscard(true);else onClose();}
-  var ordered=order.map(function(id){return SHOTS.find(function(s){return s.id===id;});}).filter(Boolean);
-  if(published){return(
-    <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:200,background:"rgba(22,20,49,0.8)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,width:420,textAlign:"center"}}>
-        <div style={{background:C.action,borderRadius:"50%",width:72,height:72,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div style={{display:"flex",flexDirection:"column",gap:8}}>
-          <p style={{fontFamily:sans,fontWeight:600,fontSize:28,color:C.textPrimary,margin:0}}>Highlight created!</p>
-          <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>{'"'+(name||"Untitled highlight")+'" has been published'+(featured?" and featured on the event page":"")+"."}
-          </p>
-        </div>
-        <button onClick={onClose} style={{background:C.action,border:"none",borderRadius:999,padding:"14px 40px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Done</button>
-      </div>
-    </div>
-  );}
-  return(
-    <div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:200,background:"rgba(22,20,49,0.8)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
-      {confirmDiscard&&(
-        <div onClick={function(e){e.stopPropagation();}} style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",zIndex:10}}>
-          <div style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:400,textAlign:"center"}}>
-            <div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}>
-              <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-              <div style={{display:"flex",flexDirection:"column",gap:4}}>
-                <p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Are you sure?</p>
-                <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>You will lose all progress and your highlight reel will not be created.</p>
-              </div>
-            </div>
-            <div style={{display:"flex",gap:16}}>
-              <button onClick={function(){setConfirmDiscard(false);}} style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Keep editing</button>
-              <button onClick={function(){setConfirmDiscard(false);onClose();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Discard</button>
-            </div>
-          </div>
-        </div>
-      )}
-      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",flexDirection:"column",gap:24,width:600,maxHeight:"90vh",overflowY:"auto",scrollbarWidth:"none"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-          <div style={{display:"flex",flexDirection:"column",gap:8}}>
-            <p style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"30px",color:C.textPrimary,margin:0}}>Create a highlight reel</p>
-            <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>A highlight is a curated selection of shots. It'll be featured on the event page for everyone attending to see.</p>
-          </div>
-          <button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,flexShrink:0,marginLeft:16,padding:4}}><IconX size={20}/></button>
-        </div>
-        <div style={{display:"flex",flexDirection:"column",gap:4}}>
-          <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Name of the highlight</span>
-          <input value={name} onChange={function(e){setName(e.target.value);}} placeholder="e.g. Best moments of the night"
-            style={{border:"2px solid "+C.border,borderRadius:16,padding:"10px 24px",fontFamily:sans,fontSize:16,background:"transparent",outline:"none",width:"100%"}}
-            onFocus={function(e){e.target.style.borderColor=C.textPrimary;}} onBlur={function(e){e.target.style.borderColor=C.border;}}/>
-        </div>
-        <div style={{display:"flex",flexDirection:"column",gap:12}}>
-          <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>Here's how the shots will show up. Feel free to drag and drop them to rearrange!</p>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(4, 1fr)",gap:12}}>
-            {ordered.map(function(shot){return(
-              <div key={shot.id} draggable onDragStart={function(){dragSrc.current=shot.id;}}
-                onDragOver={function(e){e.preventDefault();if(dragSrc.current===null||dragSrc.current===shot.id)return;setOrder(function(prev){var next=prev.slice(),from=next.indexOf(dragSrc.current),to=next.indexOf(shot.id);next.splice(from,1);next.splice(to,0,dragSrc.current);return next;});}}
-                onDragEnd={function(){dragSrc.current=null;}}
-                style={{background:C.bgTertiary,borderRadius:8,overflow:"hidden",cursor:"grab",userSelect:"none"}}>
-                <div style={{position:"relative",width:"100%",paddingBottom:"150%"}}>
-                  <img src={shot.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",pointerEvents:"none"}}/>
-                  <div style={{position:"absolute",top:6,left:6,opacity:0.75}}><IconDots/></div>
-                </div>
-                <div style={{padding:8,display:"flex",flexWrap:"wrap",gap:2}}>
-                  <div style={{display:"flex",alignItems:"center",gap:3,padding:"1px 6px"}}><IconTimer size={10}/><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.dur}</span></div>
-                  <div style={{display:"flex",alignItems:"center",gap:3,padding:"1px 6px"}}><IconUser size={10}/><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.user}</span></div>
-                </div>
-              </div>
-            );})}
-          </div>
-        </div>
-        <div style={{display:"flex",flexDirection:"column",gap:4}}>
-          <Toggle active={featured} onToggle={function(){setFeatured(function(v){return !v;});}} label="Featured highlight"/>
-          <div style={{display:"flex",gap:12}}><div style={{width:26.7,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>The content will show up in attendees home screen on the app.</span></div>
-        </div>
-        <button onClick={function(){setPublished(true);}} style={{background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",width:"100%"}}>Create highlight reel</button>
-      </div>
-    </div>
-  );
-}
-
-// ── Shot Card ─────────────────────────────────────────────────────
-function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onToggleFav,onDiscard,onRecover}){
-  var videoSrc=shot.orient==="landscape"?VIDEO_LANDSCAPE:VIDEO_PORTRAIT;
-  var vidRef=useRef(null),scrubRef=useRef(null);
-  var [hovering,setHovering]=useState(false);
-  var [scrubPct,setScrubPct]=useState(0);
-  var clickTimer=useRef(null);
-  useEffect(function(){var v=vidRef.current;if(!v)return;if(hovering){v.currentTime=0;v.play().catch(function(){});}else{v.pause();v.currentTime=0;}},[hovering]);
-  useEffect(function(){
-    if(!hovering){setScrubPct(0);if(scrubRef.current)cancelAnimationFrame(scrubRef.current);return;}
-    var start=null,dur=4000;
-    function tick(ts){if(!start)start=ts;var elapsed=(ts-start)%dur;setScrubPct((elapsed/dur)*100);scrubRef.current=requestAnimationFrame(tick);}
-    scrubRef.current=requestAnimationFrame(tick);
-    return function(){if(scrubRef.current)cancelAnimationFrame(scrubRef.current);};
-  },[hovering]);
-  function handleClick(e){
-    if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;e.preventDefault();onPreview();return;}
-    clickTimer.current=setTimeout(function(){clickTimer.current=null;onToggle();},220);
-  }
-  return(
-    <div onClick={handleClick} onMouseEnter={function(){setHovering(true);}} onMouseLeave={function(){setHovering(false);}}
-      style={{background:C.bgTertiary,borderRadius:8,display:"flex",flexDirection:"column",border:selected?"2px solid "+C.action:"2px solid transparent",overflow:"hidden",cursor:"pointer",transition:"border-color 0.15s",userSelect:"none"}}>
-      <div style={{position:"relative",width:"100%",paddingBottom:"146.15%",flexShrink:0}}>
-        <img src={shot.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"opacity 0.2s",opacity:hovering?0:1}}/>
-        <video ref={vidRef} src={videoSrc} muted playsInline loop preload="none"
-          style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"opacity 0.2s",opacity:hovering?1:0}}/>
-        <div style={{position:"absolute",bottom:0,left:0,right:0,height:3,background:"rgba(187,188,214,0.2)",opacity:hovering?1:0,transition:"opacity 0.2s"}}>
-          <div style={{height:"100%",width:scrubPct+"%",background:C.textSecondary,borderRadius:1,transition:"width 0.05s linear"}}/>
-        </div>
-        {hovering&&(
-          <div onClick={function(e){e.stopPropagation();if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;}onPreview();}}
-            style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"auto"}}>
-            <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(22,20,49,0.72)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <IconPlay size={18}/>
-            </div>
-          </div>
-        )}
-        <div onClick={function(e){e.stopPropagation();if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;}onToggle();}}
-          style={{position:"absolute",top:8,left:8,opacity:(hovering||selected)?1:0,transition:"opacity 0.15s",pointerEvents:(hovering||selected)?"auto":"none"}}>
-          <div style={{width:20,height:20,borderRadius:4,background:selected?C.action:"rgba(22,20,49,0.6)",border:"2px solid "+(selected?C.action:C.textPrimary),display:"flex",alignItems:"center",justifyContent:"center",transition:"background 0.15s, border-color 0.15s",backdropFilter:"blur(2px)"}}>
-            {selected&&<IconCheck/>}
-          </div>
-        </div>
-        <div style={{position:"absolute",top:10,right:8,display:"flex",flexDirection:"column",gap:8}}>
-          {(hovering||fav)&&(
-            <CardChip onClick={function(e){e.stopPropagation();onToggleFav();}}>
-              <IconHeart size={15} color={C.action} filled={fav}/>
-            </CardChip>
-          )}
-          {hovering&&(
-            <>
-              <CardChip onClick={function(e){e.stopPropagation();}}><IconDownload color={C.action} size={15}/></CardChip>
-              {discarded
-                ?<CardChip onClick={function(e){e.stopPropagation();onRecover();}}><IconRecover color={C.action} size={15}/></CardChip>
-                :<CardChip onClick={function(e){e.stopPropagation();onDiscard();}}><IconTrash color={C.action} size={15}/></CardChip>
-              }
-            </>
-          )}
-        </div>
-      </div>
-      {showMeta&&(
-        <div style={{padding:12}}>
-          <div style={{display:"flex",flexWrap:"wrap",gap:2}}>
-            <div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>
-              {shot.orient==="landscape"
-                ?<svg width="14" height="10" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>
-                :<svg width="10" height="14" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>
-              }
-            </div>
-            <Tag icon={<IconCalendar/>} label={shot.date}/>
-            <Tag icon={<IconClock/>} label={shot.time}/>
-            <Tag icon={<IconTimer/>} label={shot.dur}/>
-            <Tag icon={<IconUser/>} label={shot.user}/>
-            <Tag icon={<IconFile/>} label={shot.size}/>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+function IconBtn({onClick,children}){
+  var [hov,setHov]=useState(false);
+  return <div onClick={onClick} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{padding:8,borderRadius:"50%",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:hov?C.bgTertiary:"transparent",transition:"background 0.15s"}}>{children}</div>;
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────
@@ -511,7 +151,6 @@ function Sidebar(){
   return(
     <div style={{background:C.bgSecondary,width:241,minWidth:241,flexShrink:0,borderRadius:"0 32px 32px 0",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"24px 16px 12px",boxSizing:"border-box",position:"sticky",top:0,height:"100vh",overflow:"hidden"}}>
       <div style={{display:"flex",flexDirection:"column",gap:32}}>
-        {/* Logo — texto en lugar de imagen Figma */}
         <div style={{height:36,display:"flex",alignItems:"center"}}>
           <span style={{fontFamily:sans,fontWeight:600,fontSize:22,color:C.textPrimary,letterSpacing:2}}>SURESHOT</span>
         </div>
@@ -519,7 +158,7 @@ function Sidebar(){
           <div style={{display:"flex",flexDirection:"column"}}>
             {[
               {label:"Events", icon:<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>},
-              {label:"Account", icon:<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
+              {label:"Account",icon:<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>},
             ].map(function(item){return(
               <div key={item.label} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0"}}>
                 <div style={{background:C.bgPage,borderRadius:999,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{item.icon}</div>
@@ -528,7 +167,7 @@ function Sidebar(){
             );})}
           </div>
           <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,display:"flex",alignItems:"center",gap:8,padding:"4px 12px",alignSelf:"flex-start",cursor:"pointer"}}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <IPlus color={C.textPrimary} size={16}/>
             <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,whiteSpace:"nowrap"}}>Create new event</span>
           </div>
         </div>
@@ -536,18 +175,13 @@ function Sidebar(){
       <div style={{display:"flex",flexDirection:"column",gap:20}}>
         <div style={{display:"flex",alignItems:"center"}}>
           <div style={{flex:1,display:"flex",alignItems:"center",gap:8,height:42}}>
-            {/* Avatar placeholder */}
-            <div style={{width:32,height:32,borderRadius:"50%",background:C.action,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <span style={{fontFamily:sans,fontWeight:600,fontSize:13,color:C.bgPage}}>JD</span>
-            </div>
+            <div style={{width:32,height:32,borderRadius:"50%",background:C.action,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:13,color:C.bgPage}}>JD</span></div>
             <div style={{display:"flex",flexDirection:"column",gap:2}}>
               <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>John Doe</span>
               <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>@username</span>
             </div>
           </div>
-          <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
-            <IconArrowRight size={13}/>
-          </div>
+          <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><IArrowRight size={13}/></div>
         </div>
         <span style={{fontFamily:mono,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>© 2026 SURESHOT APS</span>
       </div>
@@ -562,20 +196,19 @@ function EventSummary(){
     <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px"}}>
       <div style={{display:"flex",alignItems:"center",gap:24,padding:"12px 0"}}>
         <div style={{display:"flex",flexDirection:"column",gap:12,flexShrink:0}}>
-          {/* Cover placeholder */}
           <div style={{width:241,height:128,borderRadius:16,overflow:"hidden"}}>
             <img src="https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?q=80&w=2340&auto=format&fit=crop" alt="Event cover" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
           </div>
           <div style={{background:C.action,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"4px 8px 4px 12px",width:241,boxSizing:"border-box",cursor:"pointer"}}>
             <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.bgPage}}>Published</span>
-            <IconChevronDown color={C.bgPage} size={24}/>
+            <IChevDown color={C.bgPage} size={24}/>
           </div>
         </div>
         <div style={{flex:1,display:"flex",flexDirection:"column",gap:12}}>
           <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>Event name</span>
           <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}><IconUsers size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>4498</span></div>
-            <div style={{display:"flex",alignItems:"center",gap:4}}><IconMapPin size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Location name</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}><IUsers size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>4498</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}><IPin size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Location name</span></div>
             <div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Start</span><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>10.03.26 09:00h</span></div>
             <div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Finish</span><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>11.03.26 17:00h</span></div>
           </div>
@@ -593,8 +226,584 @@ function EventSummary(){
   );
 }
 
+// ── Preview Modal ─────────────────────────────────────────────────
+function PreviewModal({shot,onClose,onDiscard}){
+  var vidRef=useRef(null),trackRef=useRef(null);
+  var [playing,setPlaying]=useState(false);
+  var [current,setCurrent]=useState(0);
+  var [duration,setDuration]=useState(0);
+  var [seeking,setSeeking]=useState(false);
+  var [visible,setVisible]=useState(false);
+  var isLandscape=shot.orient==="landscape";
+  var videoSrc=isLandscape?VIDEO_LANDSCAPE:VIDEO_PORTRAIT;
+  useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);
+  useEffect(function(){var v=vidRef.current;if(!v)return;if(playing)v.play().catch(function(){setPlaying(false);});else v.pause();},[playing]);
+  function onTrackDown(e){
+    e.preventDefault();setSeeking(true);
+    function seek(ex){var r=trackRef.current.getBoundingClientRect();var t=Math.max(0,Math.min(1,(ex-r.left)/r.width))*(vidRef.current.duration||0);vidRef.current.currentTime=t;setCurrent(t);}
+    seek(e.clientX);
+    function onMove(ev){seek(ev.clientX);}
+    function onUp(){setSeeking(false);window.removeEventListener("mousemove",onMove);window.removeEventListener("mouseup",onUp);}
+    window.addEventListener("mousemove",onMove);window.addEventListener("mouseup",onUp);
+  }
+  function handleClose(){setVisible(false);setTimeout(onClose,220);}
+  var pct=duration>0?(current/duration)*100:0;
+  return(
+    <div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:500,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}>
+      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,display:"flex",flexDirection:"column",width:isLandscape?"min(720px,100%)":"min(420px,100%)",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px 0"}}>
+          <span style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary}}>Shot preview</span>
+          <button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4}}><IX size={20}/></button>
+        </div>
+        <div onClick={function(){setPlaying(function(v){return !v;});}} style={{position:"relative",background:"#000",margin:"12px 20px 0",borderRadius:12,overflow:"hidden",aspectRatio:isLandscape?"16/9":"9/16",cursor:"pointer",maxHeight:isLandscape?"none":"55vh"}}>
+          <video ref={vidRef} src={videoSrc} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} onLoadedMetadata={function(){setDuration(vidRef.current.duration);setPlaying(true);}} onTimeUpdate={function(){if(!seeking)setCurrent(vidRef.current.currentTime);}} onEnded={function(){setPlaying(false);}} preload="auto" playsInline muted/>
+          {!playing&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none"}}><div style={{width:64,height:64,borderRadius:"50%",background:"rgba(22,20,49,0.72)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><IPlay size={26}/></div></div>}
+        </div>
+        <div style={{padding:"12px 20px 0",display:"flex",flexDirection:"column",gap:8}}>
+          <div ref={trackRef} onMouseDown={onTrackDown} style={{position:"relative",height:6,borderRadius:3,background:"rgba(187,188,214,0.2)",cursor:"pointer"}}>
+            <div style={{position:"absolute",top:0,left:0,height:"100%",width:pct+"%",borderRadius:3,background:C.action}}/>
+            <div style={{position:"absolute",top:"50%",left:pct+"%",transform:"translate(-50%,-50%)",width:14,height:14,borderRadius:"50%",background:C.textPrimary,boxShadow:"0 0 0 3px rgba(241,102,92,0.35)"}}/>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <button onClick={function(){if(vidRef.current&&vidRef.current.ended){vidRef.current.currentTime=0;setCurrent(0);}setPlaying(function(v){return !v;});}} style={{background:"none",border:"none",cursor:"pointer",padding:0,display:"flex",alignItems:"center"}}>
+              {playing?<IPause/>:<IPlay size={22}/>}
+            </button>
+            <span style={{fontFamily:mono,fontSize:13,color:C.textSecondary}}>{fmtSec(current)} / {fmtSec(duration)}</span>
+          </div>
+        </div>
+        <div style={{padding:"16px 20px 20px",display:"flex",flexDirection:"column",gap:12}}>
+          <div style={{height:1,background:C.bgTertiary}}/>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,flexWrap:"wrap"}}>
+            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+              <Tag icon={<ICalendar/>} label={shot.date}/>
+              <Tag icon={<IClock/>} label={shot.time}/>
+              <Tag icon={<ITimer/>} label={shot.dur}/>
+              <Tag icon={<IUser/>} label={shot.user}/>
+              <Tag icon={<IFile/>} label={shot.size}/>
+            </div>
+            {onDiscard&&<div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+              <ModalChip tip="Save" onClick={function(){}}><IHeart color={C.textSecondary} size={15}/></ModalChip>
+              <ModalChip tip="Discard" onClick={function(){onDiscard(shot.id);handleClose();}}><ITrash color={C.textSecondary} size={15}/></ModalChip>
+            </div>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Range Slider ──────────────────────────────────────────────────
+function RangeSlider({lo,hi,onChange,gridRef,containerW}){
+  var trackRef=useRef(null),dragging=useRef(null);
+  var [sliderW,setSliderW]=useState(null);
+  useEffect(function(){
+    if(containerW){setSliderW(null);return;}
+    var el=gridRef&&gridRef.current;if(!el)return;
+    function calc(){var gw=el.getBoundingClientRect().width;setSliderW(Math.round((gw-48)/4*2+16));}
+    calc();var ro=new ResizeObserver(calc);ro.observe(el);return function(){ro.disconnect();};
+  },[gridRef,containerW]);
+  var fracFromX=useCallback(function(cx){var r=trackRef.current.getBoundingClientRect();return Math.max(0,Math.min(1,(cx-r.left)/r.width));},[]);
+  useEffect(function(){
+    function onMove(e){if(!dragging.current||!trackRef.current)return;var f=fracFromX(e.clientX);if(dragging.current==="lo")onChange(Math.min(f,hi-0.001),hi);else onChange(lo,Math.max(f,lo+0.001));}
+    function onUp(){dragging.current=null;}
+    window.addEventListener("mousemove",onMove);window.addEventListener("mouseup",onUp);
+    return function(){window.removeEventListener("mousemove",onMove);window.removeEventListener("mouseup",onUp);};
+  },[lo,hi,onChange,fracFromX]);
+  function ts(pct){return{position:"absolute",top:"50%",left:(pct*100)+"%",transform:"translate(-50%,-50%)",width:20,height:20,borderRadius:"50%",background:C.textPrimary,cursor:"grab",zIndex:2,userSelect:"none",boxShadow:"0 0 0 3px rgba(255,255,255,0.2)"};}
+  var w=containerW||(sliderW?sliderW+"px":"100%");
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:8,width:w}}>
+      <div ref={trackRef} style={{position:"relative",height:6,borderRadius:3,background:"rgba(187,188,214,0.25)"}}>
+        <div style={{position:"absolute",top:0,height:"100%",borderRadius:3,left:(lo*100)+"%",width:((hi-lo)*100)+"%",background:C.textSecondary}}/>
+        <div style={ts(lo)} onMouseDown={function(e){e.preventDefault();dragging.current="lo";}}/>
+        <div style={ts(hi)} onMouseDown={function(e){e.preventDefault();dragging.current="hi";}}/>
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between"}}>
+        <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{fmtMs(TL_START+lo*TL_SPAN)}</span>
+        <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{fmtMs(TL_START+hi*TL_SPAN)}</span>
+      </div>
+    </div>
+  );
+}
+
+// ── Shot Card ─────────────────────────────────────────────────────
+function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onToggleFav,onDiscard,onRecover,highlightMode}){
+  var videoSrc=shot.orient==="landscape"?VIDEO_LANDSCAPE:VIDEO_PORTRAIT;
+  var vidRef=useRef(null),scrubRef=useRef(null);
+  var [hovering,setHovering]=useState(false);
+  var [scrubPct,setScrubPct]=useState(0);
+  var clickTimer=useRef(null);
+  useEffect(function(){var v=vidRef.current;if(!v)return;if(hovering){v.currentTime=0;v.play().catch(function(){});}else{v.pause();v.currentTime=0;}},[hovering]);
+  useEffect(function(){
+    if(!hovering){setScrubPct(0);if(scrubRef.current)cancelAnimationFrame(scrubRef.current);return;}
+    var start=null,dur=4000;
+    function tick(ts){if(!start)start=ts;var el=(ts-start)%dur;setScrubPct((el/dur)*100);scrubRef.current=requestAnimationFrame(tick);}
+    scrubRef.current=requestAnimationFrame(tick);
+    return function(){if(scrubRef.current)cancelAnimationFrame(scrubRef.current);};
+  },[hovering]);
+  function handleClick(e){
+    if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;e.preventDefault();onPreview();return;}
+    clickTimer.current=setTimeout(function(){clickTimer.current=null;onToggle();},220);
+  }
+  return(
+    <div onClick={handleClick} onMouseEnter={function(){setHovering(true);}} onMouseLeave={function(){setHovering(false);}}
+      style={{background:C.bgTertiary,borderRadius:8,display:"flex",flexDirection:"column",border:selected?"2px solid "+C.action:"2px solid transparent",overflow:"hidden",cursor:"pointer",transition:"border-color 0.15s",userSelect:"none"}}>
+      <div style={{position:"relative",width:"100%",paddingBottom:"146.15%",flexShrink:0}}>
+        <img src={shot.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"opacity 0.2s",opacity:hovering?0:1}}/>
+        <video ref={vidRef} src={videoSrc} muted playsInline loop preload="none" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"opacity 0.2s",opacity:hovering?1:0}}/>
+        <div style={{position:"absolute",bottom:0,left:0,right:0,height:3,background:"rgba(187,188,214,0.2)",opacity:hovering?1:0,transition:"opacity 0.2s"}}>
+          <div style={{height:"100%",width:scrubPct+"%",background:C.textSecondary,borderRadius:1,transition:"width 0.05s linear"}}/>
+        </div>
+        {hovering&&(
+          <div onClick={function(e){e.stopPropagation();if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;}onPreview();}}
+            style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"auto"}}>
+            <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(22,20,49,0.72)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><IPlay size={18}/></div>
+          </div>
+        )}
+        {/* checkbox */}
+        <div onClick={function(e){e.stopPropagation();if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;}onToggle();}}
+          style={{position:"absolute",top:8,left:8,opacity:(hovering||selected)?1:0,transition:"opacity 0.15s",pointerEvents:(hovering||selected)?"auto":"none"}}>
+          <div style={{width:20,height:20,borderRadius:4,background:selected?C.action:"rgba(22,20,49,0.6)",border:"2px solid "+(selected?C.action:C.textPrimary),display:"flex",alignItems:"center",justifyContent:"center",transition:"background 0.15s",backdropFilter:"blur(2px)"}}>
+            {selected&&<ICheck/>}
+          </div>
+        </div>
+        {/* right chips */}
+        <div style={{position:"absolute",top:10,right:8,display:"flex",flexDirection:"column",gap:8}}>
+          {(hovering||fav)&&onToggleFav&&<CardChip onClick={function(e){e.stopPropagation();onToggleFav();}}><IHeart size={15} color={C.action} filled={fav}/></CardChip>}
+          {hovering&&!highlightMode&&onToggleFav&&<CardChip onClick={function(e){e.stopPropagation();}}><IDownload color={C.action} size={15}/></CardChip>}
+          {hovering&&!highlightMode&&onDiscard&&(discarded
+            ?<CardChip onClick={function(e){e.stopPropagation();onRecover();}}><IRecover color={C.action} size={15}/></CardChip>
+            :<CardChip onClick={function(e){e.stopPropagation();onDiscard();}}><ITrash color={C.action} size={15}/></CardChip>
+          )}
+        </div>
+      </div>
+      {showMeta&&(
+        <div style={{padding:12}}>
+          <div style={{display:"flex",flexWrap:"wrap",gap:2}}>
+            <div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>
+              {shot.orient==="landscape"
+                ?<svg width="14" height="10" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>
+                :<svg width="10" height="14" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>}
+            </div>
+            <Tag icon={<ICalendar/>} label={shot.date}/>
+            <Tag icon={<IClock/>} label={shot.time}/>
+            <Tag icon={<ITimer/>} label={shot.dur}/>
+            <Tag icon={<IUser/>} label={shot.user}/>
+            <Tag icon={<IFile/>} label={shot.size}/>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Arrange Modal ─────────────────────────────────────────────────
+function ArrangeModal({selectedIds,onBack,onPublish}){
+  var initialIds=SHOTS.filter(function(s){return selectedIds.has(s.id);}).map(function(s){return s.id;});
+  var [order,setOrder]=useState(initialIds);
+  var dragSrc=useRef(null);
+  var ordered=order.map(function(id){return SHOTS.find(function(s){return s.id===id;});}).filter(Boolean);
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:400,background:"rgba(22,20,49,0.85)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",flexDirection:"column",gap:24,width:620,maxHeight:"90vh",overflowY:"auto",scrollbarWidth:"none"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div style={{display:"flex",flexDirection:"column",gap:4}}>
+            <p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Arrange shots</p>
+            <p style={{fontFamily:sans,fontSize:15,color:C.textSecondary,margin:0}}>Drag and drop to set the order they'll appear in the highlight.</p>
+          </div>
+          <button onClick={onBack} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,flexShrink:0}}><IX size={20}/></button>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+          {ordered.map(function(shot){return(
+            <div key={shot.id} draggable
+              onDragStart={function(){dragSrc.current=shot.id;}}
+              onDragOver={function(e){
+                e.preventDefault();
+                if(dragSrc.current===null||dragSrc.current===shot.id)return;
+                setOrder(function(prev){var next=prev.slice(),from=next.indexOf(dragSrc.current),to=next.indexOf(shot.id);next.splice(from,1);next.splice(to,0,dragSrc.current);return next;});
+              }}
+              onDragEnd={function(){dragSrc.current=null;}}
+              style={{background:C.bgTertiary,borderRadius:8,overflow:"hidden",cursor:"grab",userSelect:"none"}}>
+              <div style={{position:"relative",width:"100%",paddingBottom:"150%"}}>
+                <img src={shot.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",pointerEvents:"none"}}/>
+                <div style={{position:"absolute",top:6,left:6,opacity:0.75}}><IDots/></div>
+              </div>
+              <div style={{padding:"6px 8px",display:"flex",flexWrap:"wrap",gap:4}}>
+                <div style={{display:"flex",alignItems:"center",gap:3}}><ITimer size={10}/><span style={{fontFamily:sans,fontSize:11,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.dur}</span></div>
+                <div style={{display:"flex",alignItems:"center",gap:3}}><IUser size={10}/><span style={{fontFamily:sans,fontSize:11,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.user}</span></div>
+              </div>
+            </div>
+          );})}
+        </div>
+        <div style={{display:"flex",gap:12}}>
+          <button onClick={onBack} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 24px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Back</button>
+          <button onClick={function(){onPublish(order);}} style={{flex:2,background:C.action,border:"none",borderRadius:999,padding:"14px 24px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Publish highlight</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Download Modal ────────────────────────────────────────────────
+function DownloadModal({selectedIds,onCancel,onConfirm}){
+  var count=selectedIds.size,mb=sumMB(selectedIds);
+  var [phase,setPhase]=useState("pre");
+  var [cards,setCards]=useState([]);
+  var [progPct,setProgPct]=useState(0);
+  var [progVisible,setProgVisible]=useState(true);
+  var [copyToast,setCopyToast]=useState(false);
+  var runningRef=useRef(false),barTimerRef=useRef(null),loopTimerRef=useRef(null);
+  useEffect(function(){return function(){runningRef.current=false;clearInterval(barTimerRef.current);clearTimeout(loopTimerRef.current);};},[]);
+  function startDownload(){
+    setPhase("loading");setCards([]);setProgPct(0);setProgVisible(true);
+    runningRef.current=true;
+    var start=Date.now(),end=start+TOTAL_MS;
+    barTimerRef.current=setInterval(function(){setProgPct(Math.min(((Date.now()-start)/TOTAL_MS)*92,92));if(Date.now()>=end)clearInterval(barTimerRef.current);},200);
+    var idx=0;
+    function pushStep(){
+      if(!runningRef.current)return;
+      if(Date.now()>=end){clearInterval(barTimerRef.current);setProgPct(100);setTimeout(function(){setProgVisible(false);setTimeout(function(){setPhase("done");},420);},600);return;}
+      var step=DL_STEPS[idx%DL_STEPS.length];idx++;
+      setCards(function(prev){return [Object.assign({},step,{_id:Date.now()})].concat(prev);});
+      loopTimerRef.current=setTimeout(pushStep,STEP_DUR);
+    }
+    loopTimerRef.current=setTimeout(pushStep,100);
+  }
+  function renderStack(){
+    return(
+      <div style={{position:"relative",height:108,flexShrink:0,overflow:"visible"}}>
+        {cards.slice(0,MAX_VIS).map(function(step,i){
+          var opacity=i===0?1:i===1?0.5:i===2?0.25:0.1;
+          return(
+            <div key={step._id} style={{position:"absolute",left:0,right:0,height:72,background:C.bgTertiary,borderRadius:16,display:"flex",alignItems:"center",padding:"0 20px",gap:14,top:i*PEEK,zIndex:MAX_VIS-i,opacity:opacity,transform:"scale("+(1-i*0.03)+")",transition:"top .45s cubic-bezier(.4,0,.2,1),opacity .45s,transform .45s",animation:i===0?"slideIn .45s cubic-bezier(.4,0,.2,1) both":"none"}}>
+              <div style={{width:40,height:40,background:C.bgSecondary,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:C.action}}>{step.icon}</div>
+              <span style={{flex:1,fontFamily:sans,fontSize:14,fontWeight:600,color:C.textPrimary}}>{step.label}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+  return(
+    <div onClick={phase==="pre"?onCancel:undefined} style={{position:"fixed",inset:0,zIndex:600,background:"rgba(22,20,49,0.75)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:440}}>
+        {phase==="pre"&&(<>
+          <div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center",textAlign:"center"}}>
+            <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><IDownload color={C.bgPage} size={28}/></div>
+            <div style={{display:"flex",flexDirection:"column",gap:4}}>
+              <p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Download shots</p>
+              <p style={{fontFamily:sans,fontSize:16,color:C.textSecondary,margin:0}}>You will download the following data:</p>
+            </div>
+            <div style={{display:"flex",gap:16,width:"100%"}}>
+              {[{v:String(count),l:count!==1?"Total files":"Total file"},{v:mb+" MB",l:"Total size"}].map(function(s){return(
+                <div key={s.l} style={{flex:1,background:C.bgTertiary,borderRadius:16,padding:"24px 32px",display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                  <span style={{fontFamily:sans,fontWeight:800,fontSize:36,lineHeight:"44px",color:C.textPrimary}}>{s.v}</span>
+                  <span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,whiteSpace:"nowrap"}}>{s.l}</span>
+                </div>
+              );})}
+            </div>
+          </div>
+          <div style={{display:"flex",gap:16}}>
+            <button onClick={onCancel} style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Cancel</button>
+            <button onClick={startDownload} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}><IDownload color={C.bgPage} size={22}/> Download</button>
+          </div>
+        </>)}
+        {phase==="loading"&&(<>
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
+            <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><IDownload color={C.bgPage} size={28}/></div>
+            <p style={{fontFamily:sans,fontWeight:600,fontSize:32,color:C.textPrimary,margin:0,textAlign:"center"}}>Compiling…</p>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:32,opacity:progVisible?1:0,transform:progVisible?"scale(1)":"scale(0.97)",transition:"opacity .4s,transform .4s"}}>
+            {renderStack()}
+            <div style={{width:"100%",height:6,background:C.bgTertiary,borderRadius:999,overflow:"hidden"}}>
+              <div style={{height:"100%",width:progPct.toFixed(1)+"%",background:C.action,borderRadius:999,transition:"width 1s cubic-bezier(.4,0,.2,1)"}}/>
+            </div>
+          </div>
+        </>)}
+        {phase==="done"&&(
+          <div style={{display:"flex",flexDirection:"column",gap:16,animation:"fadeUp .45s cubic-bezier(.34,1.1,.64,1) both"}}>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
+              <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div style={{textAlign:"center"}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,color:C.textPrimary,margin:0}}>Ready!</p><p style={{fontFamily:sans,fontSize:16,color:C.textSecondary,margin:0}}>Your shots are ready for downloading.</p></div>
+            </div>
+            <button onClick={onConfirm} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}><IDownload color={C.bgPage} size={20}/> Download</button>
+            <button onClick={function(){setCopyToast(true);setTimeout(function(){setCopyToast(false);},2200);}} style={{width:"100%",background:"transparent",border:"1px solid rgba(187,188,214,.4)",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.textSecondary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Copy download link
+            </button>
+            <p style={{textAlign:"center",fontFamily:sans,fontSize:13,fontWeight:600,color:C.textPrimary,opacity:copyToast?1:0,transition:"opacity .25s",margin:0}}>Link copied to clipboard!</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Batch Dropdown ────────────────────────────────────────────────
+function BatchDropdown({count,onDownload,onCollection,onDiscard}){
+  var [open,setOpen]=useState(false),ref=useRef(null);
+  useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);
+  var items=[
+    {label:"Download videos",  color:C.textPrimary,action:function(){setOpen(false);onDownload();},  icon:<IDownload color={C.textPrimary} size={16}/>},
+    {label:"Create highlight", color:C.textPrimary,action:function(){setOpen(false);onCollection();},icon:<IStar color={C.textPrimary} size={16}/>},
+    {label:"Discard selected", color:C.action,     action:function(){setOpen(false);onDiscard();},   icon:<ITrash color={C.action} size={16}/>},
+  ];
+  return(
+    <div ref={ref} style={{position:"relative"}}>
+      <button onClick={function(){setOpen(function(v){return !v;});}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 12px 8px 16px",display:"flex",alignItems:"center",gap:8,cursor:"pointer"}}>
+        <ILayers color={C.bgPage} size={20}/>
+        <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage}}>{"Batch ("+count+")"}</span>
+        <IChevDown color={C.bgPage} size={18}/>
+      </button>
+      {open&&(
+        <div style={{position:"absolute",top:"calc(100% + 6px)",right:0,zIndex:50,background:C.bgSecondary,borderRadius:12,padding:6,boxShadow:"0 8px 24px rgba(0,0,0,0.35)",minWidth:200}}>
+          {items.map(function(item){return(
+            <div key={item.label} onClick={item.action}
+              onMouseEnter={function(e){e.currentTarget.style.background=C.bgTertiary;}}
+              onMouseLeave={function(e){e.currentTarget.style.background="transparent";}}
+              style={{padding:"10px 16px",display:"flex",alignItems:"center",gap:10,borderRadius:8,cursor:"pointer",fontFamily:sans,fontSize:15,color:item.color,whiteSpace:"nowrap",background:"transparent"}}>
+              {item.icon}{item.label}
+            </div>
+          );})}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Status Tag ────────────────────────────────────────────────────
+function StatusTag({status}){
+  if(status==="draft")     return <div style={{border:"1px solid "+C.textPrimary,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>Draft</span></div>;
+  if(status==="published") return <div style={{background:C.action,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.bgPage}}>Published</span></div>;
+  if(status==="featured")  return <div style={{background:C.textPrimary,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center",gap:4}}><IStar color={C.bgPage} size={12}/><span style={{fontFamily:sans,fontSize:14,color:C.bgPage}}>Featured</span></div>;
+  return null;
+}
+
+// ── Highlights Panel ──────────────────────────────────────────────
+function HighlightsPanel({onNewHighlight,highlights,onEdit,onDelete}){
+  var [deleteTarget,setDeleteTarget]=useState(null);
+  var cols=[{key:"cover",w:79,label:"COVER"},{key:"name",w:200,label:"HIGHLIGHT NAME"},{key:"status",w:84,label:"STATUS"},{key:"shots",w:116,label:"SHOTS"},{key:"published",w:136,label:"PUBLISHED"},{key:"duration",w:116,label:"DURATION"},{key:"actions",w:112,label:"ACTIONS"}];
+  return(
+    <div style={{background:C.bgTertiary,borderRadius:24,padding:24,display:"flex",flexDirection:"column",gap:24}}>
+      {deleteTarget&&(
+        <div style={{position:"fixed",inset:0,zIndex:400,background:"rgba(22,20,49,0.8)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <div style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:420,textAlign:"center"}}>
+            <div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}>
+              <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><ITrash color={C.bgPage} size={26}/></div>
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                <p style={{fontFamily:sans,fontWeight:600,fontSize:28,color:C.textPrimary,margin:0}}>Are you sure?</p>
+                <p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>You will lose <strong style={{color:C.textPrimary}}>"{deleteTarget.name}"</strong> permanently and users won't see it on the event page.</p>
+              </div>
+            </div>
+            <div style={{display:"flex",gap:12}}>
+              <button onClick={function(){setDeleteTarget(null);}} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Go back</button>
+              <button onClick={function(){onDelete(deleteTarget.id);setDeleteTarget(null);}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div style={{display:"flex",justifyContent:"flex-end"}}>
+        <button onClick={onNewHighlight} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}>
+          <IPlus color={C.bgPage} size={24}/>
+          <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage}}>New highlight</span>
+        </button>
+      </div>
+      {highlights.length===0
+        ? <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"64px 0",gap:16}}>
+            <div style={{width:64,height:64,borderRadius:"50%",background:C.bgSecondary,display:"flex",alignItems:"center",justifyContent:"center"}}><IStar color={C.textMuted} size={28}/></div>
+            <div style={{textAlign:"center",display:"flex",flexDirection:"column",gap:4}}>
+              <p style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary,margin:0}}>No highlights yet</p>
+              <p style={{fontFamily:sans,fontSize:15,color:C.textSecondary,margin:0}}>Let's create some — select shots and click "New highlight".</p>
+            </div>
+            <button onClick={onNewHighlight} style={{background:"none",border:"1px solid "+C.action,borderRadius:999,padding:"10px 24px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.action,cursor:"pointer"}}>Create your first highlight</button>
+          </div>
+        : <>
+            <div style={{display:"flex",flexDirection:"column",gap:2}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingBottom:8}}>
+                {cols.map(function(col){return <div key={col.key} style={{width:col.w,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,lineHeight:"20px",color:C.textSecondary,whiteSpace:"nowrap"}}>{col.label}</span></div>;})}
+              </div>
+              {highlights.map(function(row){return(
+                <div key={row.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8}}>
+                  <div style={{width:79,flexShrink:0,padding:4}}><div style={{width:37,height:71,borderRadius:4,overflow:"hidden",background:C.bgSecondary}}><img src={row.img} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/></div></div>
+                  <div style={{width:200,flexShrink:0,padding:4}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary,whiteSpace:"nowrap"}}>{row.name}</span></div>
+                  <div style={{width:84,flexShrink:0,padding:10}}><StatusTag status={row.status}/></div>
+                  <div style={{width:116,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.shots}</span></div>
+                  <div style={{width:136,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.published||"–"}</span></div>
+                  <div style={{width:116,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.duration}</span></div>
+                  <div style={{width:112,flexShrink:0,display:"flex",alignItems:"center",gap:8}}>
+                    <IconBtn onClick={function(){onEdit(row);}}><IEdit color={C.textPrimary} size={16}/></IconBtn>
+                    <IconBtn onClick={function(){setDeleteTarget(row);}}><ITrash color={C.textPrimary} size={16}/></IconBtn>
+                  </div>
+                </div>
+              );})}
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:12,padding:"0 11px"}}>
+              <IChevLeft/><div style={{width:32,height:32,borderRadius:256,background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>1</span></div><IChevRight/>
+            </div>
+          </>
+      }
+    </div>
+  );
+}
+
+// ── New / Edit Highlight Page ─────────────────────────────────────
+function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight}){
+  var isEdit=!!editHighlight;
+  var [name,setName]=useState(isEdit?editHighlight.name:"");
+  var [nameFocused,setNameFocused]=useState(false);
+  var [featured,setFeatured]=useState(isEdit?editHighlight.status==="featured":false);
+  var [selectedIds,setSelectedIds]=useState(isEdit?new Set(editHighlight.selectedIds||[]):new Set());
+  var [showMeta,setShowMeta]=useState(true);
+  var [showFavsOnly,setShowFavsOnly]=useState(false);
+  var [rangeLo,setRangeLo]=useState(0);
+  var [rangeHi,setRangeHi]=useState(1);
+  var [previewShot,setPreviewShot]=useState(null);
+  var [confirmDiscard,setConfirmDiscard]=useState(false);
+  var [showArrange,setShowArrange]=useState(false);
+  var [done,setDone]=useState(false);
+
+  useEffect(function(){
+    if(!done)return;
+    var t=setTimeout(function(){onPublish();},3000);
+    return function(){clearTimeout(t);};
+  },[done]);
+
+  var loMs=TL_START+rangeLo*TL_SPAN,hiMs=TL_START+rangeHi*TL_SPAN;
+  var visible=SHOTS.filter(function(s){return s.ts>=loMs&&s.ts<=hiMs;}).filter(function(s){return !showFavsOnly||favIds.has(s.id);});
+  var allSel=visible.length>0&&visible.every(function(s){return selectedIds.has(s.id);});
+  var someSel=!allSel&&visible.some(function(s){return selectedIds.has(s.id);});
+  var checkState=allSel?true:someSel?"indeterminate":false;
+
+  function toggleShot(id){setSelectedIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
+  function handleSelectAll(){if(allSel){setSelectedIds(function(p){var n=new Set(p);visible.forEach(function(s){n.delete(s.id);});return n;});}else{setSelectedIds(function(p){var n=new Set(p);visible.forEach(function(s){n.add(s.id);});return n;});}}
+  var handleRange=useCallback(function(lo,hi){setRangeLo(lo);setRangeHi(hi);},[]);
+  var canPublish=name.trim()&&selectedIds.size>0;
+  function handleBack(){if(name.trim()||selectedIds.size>0){setConfirmDiscard(true);}else{onCancel();}}
+
+  if(done){
+    return(
+      <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage}}>
+        <Sidebar/>
+        <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh"}}>
+          <div style={{background:C.bgSecondary,borderRadius:24,padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,width:420,textAlign:"center",animation:"fadeUp .4s ease both"}}>
+            <div style={{background:C.action,borderRadius:"50%",width:72,height:72,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <p style={{fontFamily:sans,fontWeight:600,fontSize:28,color:C.textPrimary,margin:0}}>{isEdit?"Changes saved!":"Highlight created!"}</p>
+              <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>{isEdit?'"'+name+'" has been updated.':'"'+name+'" has been published'+(featured?" and featured on the event page":"")+"."}
+              </p>
+              <p style={{fontFamily:sans,fontSize:14,color:C.textMuted,margin:0}}>Taking you to the panel…</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return(
+    <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage}}>
+      <Sidebar/>
+      <div style={{flex:1,display:"flex",flexDirection:"column",gap:10,padding:"24px 16px",overflowY:"auto",boxSizing:"border-box"}}>
+
+        {confirmDiscard&&(
+          <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(22,20,49,0.8)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <div style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:400,textAlign:"center"}}>
+              <div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}>
+                <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                  <p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Discard progress?</p>
+                  <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>You will lose your changes.</p>
+                </div>
+              </div>
+              <div style={{display:"flex",gap:16}}>
+                <button onClick={function(){setConfirmDiscard(false);}} style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Keep editing</button>
+                <button onClick={function(){setConfirmDiscard(false);onCancel();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Discard</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Header */}
+        <div style={{background:C.bgSecondary,borderRadius:12,padding:"16px 24px",display:"flex",alignItems:"center",gap:16}}>
+          <button onClick={handleBack} style={{background:C.bgTertiary,border:"none",borderRadius:"50%",width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>
+            <IArrowLeft color={C.textPrimary} size={20}/>
+          </button>
+          <p style={{flex:1,fontFamily:sans,fontWeight:600,fontSize:20,color:C.textPrimary,margin:0}}>{isEdit?"Edit highlight":"New highlight"}</p>
+          <div style={{display:"flex",gap:12,alignItems:"center"}}>
+            <button onClick={function(){if(name.trim())setShowArrange(true);}}
+              style={{background:"transparent",border:"1px solid "+C.border,borderRadius:999,padding:"11px 24px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.textSecondary,cursor:"pointer"}}>
+              Save as draft
+            </button>
+            <button onClick={function(){if(canPublish)setShowArrange(true);}}
+              style={{background:canPublish?C.action:C.bgTertiary,border:"none",borderRadius:999,padding:"12px 24px",fontFamily:sans,fontWeight:600,fontSize:16,color:canPublish?C.bgPage:C.textMuted,cursor:canPublish?"pointer":"not-allowed",transition:"background .2s,color .2s"}}>
+              Publish
+            </button>
+          </div>
+        </div>
+
+        {/* Name + Featured */}
+        <div style={{background:C.bgSecondary,borderRadius:12,padding:"20px 24px",display:"flex",flexDirection:"column",gap:16}}>
+          <div style={{display:"flex",flexDirection:"column",gap:6,maxWidth:480}}>
+            <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Highlight name</span>
+            <input value={name}
+              onChange={function(e){setName(e.target.value);}}
+              onFocus={function(){setNameFocused(true);}}
+              onBlur={function(){setNameFocused(false);}}
+              placeholder="e.g. Best moments of the night"
+              style={{border:"2px solid "+(nameFocused?C.textPrimary:C.border),borderRadius:12,padding:"10px 20px",fontFamily:sans,fontSize:16,background:C.bgTertiary,outline:"none",width:"100%"}}/>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            <Toggle active={featured} onToggle={function(){setFeatured(function(v){return !v;});}} label="Featured highlight"/>
+            <span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary,paddingLeft:38}}>Featured highlights appear on the attendees' home screen in the app.</span>
+          </div>
+        </div>
+
+        {/* Shot selection */}
+        <div style={{background:C.bgSecondary,borderRadius:12,padding:"16px 24px",display:"flex",flexDirection:"column",gap:16}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,flexWrap:"wrap"}}>
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Filter by date</span>
+              <RangeSlider lo={rangeLo} hi={rangeHi} onChange={handleRange} containerW="380px"/>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
+              <Toggle active={showMeta} onToggle={function(){setShowMeta(function(v){return !v;});}} label="Show metadata"/>
+              <Toggle active={showFavsOnly} onToggle={function(){setShowFavsOnly(function(v){return !v;});}} label="Favorites only"/>
+              <CheckboxField checked={checkState} onClick={handleSelectAll} label={"Select all ("+visible.length+")"}/>
+            </div>
+          </div>
+          {visible.length>0
+            ? <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>
+                {visible.map(function(shot){return(
+                  <ShotCard key={shot.id} shot={shot}
+                    selected={selectedIds.has(shot.id)}
+                    onToggle={function(){toggleShot(shot.id);}}
+                    onPreview={function(){setPreviewShot(shot);}}
+                    fav={favIds.has(shot.id)}
+                    onToggleFav={function(){onToggleFav(shot.id);}}
+                    showMeta={showMeta}
+                    discarded={false}
+                    highlightMode={true}
+                  />
+                );})}
+              </div>
+            : <div style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>No shots in this time range.</div>
+          }
+        </div>
+      </div>
+
+      {previewShot&&<PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}}/>}
+      {showArrange&&(
+        <ArrangeModal
+          selectedIds={selectedIds}
+          onBack={function(){setShowArrange(false);}}
+          onPublish={function(){setShowArrange(false);setDone(true);}}
+        />
+      )}
+    </div>
+  );
+}
+
 // ── Shots Panel ───────────────────────────────────────────────────
-function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onToggleFav,showMeta,onToggleMeta,showFavsOnly,onToggleFavsOnly,rangeLo,rangeHi,onRange,onDownload,onCollection,onPreview,discardedIds,onDiscard,onRecover,onBatchDiscard}){
+function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onToggleFav,showMeta,onToggleMeta,showFavsOnly,onToggleFavsOnly,rangeLo,rangeHi,onRange,onDownload,onCollection,onPreview,discardedIds,onDiscard,onRecover,onBatchDiscard,activeTab,onTabChange,onNewHighlight,highlights,onEditHighlight,onDeleteHighlight}){
   var [innerTab,setInnerTab]=useState("shots");
   var count=selectedIds.size;
   var loMs=TL_START+rangeLo*TL_SPAN,hiMs=TL_START+rangeHi*TL_SPAN;
@@ -610,71 +819,78 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
   return(
     <div style={{background:C.bgSecondary,borderRadius:12,padding:"8px 24px 16px",display:"flex",flexDirection:"column",gap:12}}>
       <div style={{display:"flex",alignItems:"center",gap:12,padding:"8px 12px"}}>
-        {tabs.map(function(t,i){return(
-          <div key={t} style={{minWidth:128,padding:8,textAlign:"center",borderBottom:i===0?"2px solid "+C.textPrimary:"2px solid transparent"}}>
-            <span style={{fontFamily:sans,fontWeight:600,fontSize:16,lineHeight:"24px",color:i===0?C.textPrimary:C.textSecondary}}>{t}</span>
-          </div>
-        );})}
-      </div>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,padding:"12px 0"}}>
-        <div style={{display:"flex",flexDirection:"column",gap:6}}>
-          <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Filter by date</span>
-          <RangeSlider lo={rangeLo} hi={rangeHi} onChange={onRange} gridRef={gridRef}/>
-        </div>
-        <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-          <div style={{border:"1px solid "+C.action,borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}>
-            <IconUpload size={20}/>
-            <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.action}}>Upload</span>
-          </div>
-          <BatchDropdown count={count} onDownload={onDownload} onCollection={onCollection} onDiscard={onBatchDiscard}/>
-        </div>
-      </div>
-      <div style={{display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
-        <Toggle active={showMeta} onToggle={onToggleMeta} label="Show shot metadata"/>
-        <Toggle active={showFavsOnly} onToggle={onToggleFavsOnly} label="Favorites only"/>
-        <CheckboxField checked={checkState} onClick={handleCheckbox} label={"Select all ("+visible.length+")"}/>
-        <div onClick={function(){setInnerTab(function(t){return t==="shots"?"discarded":"shots";});}}
-          style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"4px 12px",borderRadius:8,background:innerTab==="discarded"?C.bgTertiary:"transparent",transition:"background 0.15s",userSelect:"none",marginLeft:"auto"}}>
-          <IconTrash color={innerTab==="discarded"?C.textPrimary:C.textMuted} size={14}/>
-          <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:innerTab==="discarded"?C.textPrimary:C.textMuted,whiteSpace:"nowrap"}}>Discarded shots</span>
-          {discardedShots.length>0&&(
-            <div style={{background:C.action,borderRadius:999,minWidth:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 5px"}}>
-              <span style={{fontFamily:mono,fontWeight:700,fontSize:10,color:C.bgPage}}>{discardedShots.length}</span>
+        {tabs.map(function(t){
+          var active=t===activeTab;
+          return(
+            <div key={t} onClick={function(){onTabChange(t);}} style={{minWidth:128,padding:8,textAlign:"center",cursor:"pointer",borderBottom:active?"2px solid "+C.textPrimary:"2px solid transparent"}}>
+              <span style={{fontFamily:sans,fontWeight:600,fontSize:16,lineHeight:"24px",color:active?C.textPrimary:C.textSecondary}}>{t}</span>
             </div>
-          )}
-        </div>
+          );
+        })}
       </div>
-      {innerTab==="discarded"&&(
-        <div style={{display:"flex",flexDirection:"column",gap:4,padding:"12px 16px",background:C.bgTertiary,borderRadius:12}}>
-          <span style={{fontFamily:sans,fontWeight:600,fontSize:15,color:C.textPrimary}}>Discarded shots</span>
-          <span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>These shots have been removed from the event view. They'll be kept here for 30 days, then permanently deleted. You can restore any shot at any time before that.</span>
-        </div>
-      )}
-      {visible.length>0?(
-        <div ref={gridRef} style={{display:"grid",gridTemplateColumns:"repeat(4, 1fr)",gap:16}}>
-          {visible.map(function(shot){return(
-            <ShotCard key={shot.id} shot={shot}
-              selected={selectedIds.has(shot.id)} onToggle={function(){onToggle(shot.id);}}
-              onPreview={function(){onPreview(shot);}}
-              fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}}
-              showMeta={showMeta}
-              discarded={discardedIds.has(shot.id)}
-              onDiscard={function(){onDiscard(shot.id);}}
-              onRecover={function(){onRecover(shot.id);}}
-            />
-          );})}
-        </div>
-      ):(
-        <div ref={gridRef} style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>
-          {innerTab==="discarded"?"No discarded shots.":"No shots in this time range."}
-        </div>
-      )}
+      {activeTab==="Highlights"
+        ? <HighlightsPanel onNewHighlight={onNewHighlight} highlights={highlights} onEdit={onEditHighlight} onDelete={onDeleteHighlight}/>
+        : <>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,padding:"12px 0"}}>
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Filter by date</span>
+                <RangeSlider lo={rangeLo} hi={rangeHi} onChange={onRange} gridRef={gridRef}/>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+                <div style={{border:"1px solid "+C.action,borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}>
+                  <IUpload size={20}/>
+                  <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.action}}>Upload</span>
+                </div>
+                <BatchDropdown count={count} onDownload={onDownload} onCollection={onCollection} onDiscard={onBatchDiscard}/>
+              </div>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
+              <Toggle active={showMeta} onToggle={onToggleMeta} label="Show shot metadata"/>
+              <Toggle active={showFavsOnly} onToggle={onToggleFavsOnly} label="Favorites only"/>
+              <CheckboxField checked={checkState} onClick={handleCheckbox} label={"Select all ("+visible.length+")"}/>
+              <div onClick={function(){setInnerTab(function(t){return t==="shots"?"discarded":"shots";});}}
+                style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"4px 12px",borderRadius:8,background:innerTab==="discarded"?C.bgTertiary:"transparent",transition:"background 0.15s",userSelect:"none",marginLeft:"auto"}}>
+                <ITrash color={innerTab==="discarded"?C.textPrimary:C.textMuted} size={14}/>
+                <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:innerTab==="discarded"?C.textPrimary:C.textMuted,whiteSpace:"nowrap"}}>Discarded shots</span>
+                {discardedShots.length>0&&(
+                  <div style={{background:C.action,borderRadius:999,minWidth:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 5px"}}>
+                    <span style={{fontFamily:mono,fontWeight:700,fontSize:10,color:C.bgPage}}>{discardedShots.length}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            {innerTab==="discarded"&&(
+              <div style={{display:"flex",flexDirection:"column",gap:4,padding:"12px 16px",background:C.bgTertiary,borderRadius:12}}>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:15,color:C.textPrimary}}>Discarded shots</span>
+                <span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>These shots have been removed from the event view. They'll be kept here for 30 days, then permanently deleted.</span>
+              </div>
+            )}
+            {visible.length>0
+              ? <div ref={gridRef} style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>
+                  {visible.map(function(shot){return(
+                    <ShotCard key={shot.id} shot={shot}
+                      selected={selectedIds.has(shot.id)} onToggle={function(){onToggle(shot.id);}}
+                      onPreview={function(){onPreview(shot);}}
+                      fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}}
+                      showMeta={showMeta} discarded={discardedIds.has(shot.id)}
+                      onDiscard={function(){onDiscard(shot.id);}} onRecover={function(){onRecover(shot.id);}}
+                    />
+                  );})}
+                </div>
+              : <div ref={gridRef} style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>
+                  {innerTab==="discarded"?"No discarded shots.":"No shots in this time range."}
+                </div>
+            }
+          </>
+      }
     </div>
   );
 }
 
 // ── App ───────────────────────────────────────────────────────────
 function App(){
+  var [page,setPage]=useState("main");
+  var [editTarget,setEditTarget]=useState(null);
   var [selectedIds,setSelectedIds]=useState(new Set());
   var [favIds,setFavIds]=useState(new Set());
   var [discardedIds,setDiscardedIds]=useState(new Set());
@@ -683,16 +899,32 @@ function App(){
   var [rangeLo,setRangeLo]=useState(0);
   var [rangeHi,setRangeHi]=useState(1);
   var [showDlModal,setShowDlModal]=useState(false);
-  var [showHighlight,setShowHighlight]=useState(false);
+  var [showArrangeModal,setShowArrangeModal]=useState(false);
+  var [arrangeIds,setArrangeIds]=useState(new Set());
   var [previewShot,setPreviewShot]=useState(null);
+  var [activeTab,setActiveTab]=useState("Shots");
+  var [highlights,setHighlights]=useState(HIGHLIGHTS_SEED);
+
   function toggleCard(id){setSelectedIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
   function toggleFav(id){setFavIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
   function discardShot(id){setDiscardedIds(function(p){var n=new Set(p);n.add(id);return n;});setSelectedIds(function(p){var n=new Set(p);n.delete(id);return n;});}
   function recoverShot(id){setDiscardedIds(function(p){var n=new Set(p);n.delete(id);return n;});}
   function batchDiscard(){setDiscardedIds(function(p){var n=new Set(p);selectedIds.forEach(function(id){n.add(id);});return n;});setSelectedIds(new Set());}
+  function deleteHighlight(id){setHighlights(function(p){return p.filter(function(h){return h.id!==id;});});}
   var selectAll=useCallback(function(shots){setSelectedIds(function(p){var n=new Set(p);shots.forEach(function(s){n.add(s.id);});return n;});},[]);
   var deselectAll=useCallback(function(shots){setSelectedIds(function(p){var n=new Set(p);shots.forEach(function(s){n.delete(s.id);});return n;});},[]);
   var handleRange=useCallback(function(lo,hi){setRangeLo(lo);setRangeHi(hi);},[]);
+
+  if(page==="new-highlight"||page==="edit-highlight"){
+    return <NewHighlightPage
+      onCancel={function(){setPage("main");setEditTarget(null);}}
+      onPublish={function(){setActiveTab("Highlights");setPage("main");setEditTarget(null);}}
+      favIds={favIds}
+      onToggleFav={toggleFav}
+      editHighlight={editTarget}
+    />;
+  }
+
   return(
     <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
       <Sidebar/>
@@ -707,16 +939,26 @@ function App(){
           showFavsOnly={showFavsOnly} onToggleFavsOnly={function(){setShowFavsOnly(function(v){return !v;});}}
           rangeLo={rangeLo} rangeHi={rangeHi} onRange={handleRange}
           onDownload={function(){setShowDlModal(true);}}
-          onCollection={function(){setShowHighlight(true);}}
+          onCollection={function(){setArrangeIds(new Set(selectedIds));setShowArrangeModal(true);}}
           onPreview={function(shot){setPreviewShot(shot);}}
+          activeTab={activeTab} onTabChange={setActiveTab}
+          onNewHighlight={function(){setPage("new-highlight");}}
+          onEditHighlight={function(h){setEditTarget(h);setPage("edit-highlight");}}
+          onDeleteHighlight={deleteHighlight}
+          highlights={highlights}
         />
       </div>
       {previewShot&&<PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}} onDiscard={discardShot}/>}
-      {showHighlight&&<HighlightModal selectedIds={selectedIds} onClose={function(){setShowHighlight(false);}}/>}
       {showDlModal&&<DownloadModal selectedIds={selectedIds} onConfirm={function(){setShowDlModal(false);}} onCancel={function(){setShowDlModal(false);}}/>}
+      {showArrangeModal&&<ArrangeModal
+        selectedIds={arrangeIds}
+        onBack={function(){setShowArrangeModal(false);}}
+        onPublish={function(){setShowArrangeModal(false);setActiveTab("Highlights");}}
+      />}
     </div>
   );
 }
+
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
 </script>
 </body>
