@@ -849,7 +849,328 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
   );
 }
 
-// ── Shots Panel ───────────────────────────────────────────────────
+// ── Settings Panel ────────────────────────────────────────────────
+function SettingsSwitch({active,onToggle}){
+  return(
+    <div onClick={onToggle} style={{width:26.7,height:16,borderRadius:999,padding:"2.7px",boxSizing:"border-box",background:active?C.textPrimary:C.bgTertiary,display:"flex",alignItems:"center",justifyContent:active?"flex-end":"flex-start",transition:"background 0.2s",flexShrink:0,cursor:"pointer"}}>
+      <div style={{width:10.7,height:10.7,borderRadius:"50%",background:active?C.bgPage:C.textPrimary,transition:"background 0.2s"}}/>
+    </div>
+  );
+}
+
+function SettingsInputField({label,hint,placeholder,multiline,maxLength}){
+  var [val,setVal]=useState("");
+  var [focused,setFocused]=useState(false);
+  var baseStyle={border:"2px solid "+(focused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,resize:"none"};
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:4,width:"100%"}}>
+      <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{label}</span>
+      {hint&&<span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{hint}</span>}
+      {multiline
+        ?<textarea value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLength}
+            onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}}
+            style={Object.assign({},baseStyle,{height:192,minHeight:128})}/>
+        :<input value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLength}
+            onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}}
+            style={baseStyle}/>
+      }
+    </div>
+  );
+}
+
+// ── Time Picker ───────────────────────────────────────────────────
+function TimeCol({items,selected,onSelect,fmt}){
+  return(
+    <div style={{display:"flex",flexDirection:"column",overflowY:"auto",maxHeight:160,scrollbarWidth:"none",width:52}}>
+      {items.map(function(item){
+        var sel=item===selected;
+        return(
+          <div key={item}
+            onClick={function(e){e.stopPropagation();onSelect(item);}}
+            onMouseEnter={function(e){if(!sel)e.currentTarget.style.background=C.bgTertiary;}}
+            onMouseLeave={function(e){if(!sel)e.currentTarget.style.background="transparent";}}
+            style={{height:32,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8,cursor:"pointer",flexShrink:0,fontFamily:sans,fontSize:16,color:sel?C.bgPage:C.textPrimary,background:sel?C.action:"transparent",transition:"background .15s"}}>
+            {fmt?fmt(item):pad2(item)}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TimePicker({value,onChange}){
+  var [open,setOpen]=useState(false);
+  var ref=useRef(null);
+  useEffect(function(){
+    function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}
+    document.addEventListener("mousedown",h);
+    return function(){document.removeEventListener("mousedown",h);};
+  },[]);
+
+  var parts=(value||"09:00").split(":");
+  var h24=parseInt(parts[0])||0;
+  var min=parseInt(parts[1])||0;
+  var ampm=h24>=12?"PM":"AM";
+  var h12=h24%12||12;
+
+  function setHour(h){onChange(pad2(ampm==="PM"?h%12+12:h%12)+":"+pad2(min));}
+  function setMin(m){onChange(pad2(h24)+":"+pad2(m));}
+  function setAmpm(a){onChange(pad2(a==="PM"?h12%12+12:h12%12)+":"+pad2(min));}
+
+  var hours=[1,2,3,4,5,6,7,8,9,10,11,12];
+  var mins=[0,5,10,15,20,25,30,35,40,45,50,55];
+  var label=pad2(h12)+":"+pad2(min)+" "+ampm;
+
+  return(
+    <div ref={ref} style={{position:"relative"}}>
+      {/* pill — clicking opens custom picker, no native input */}
+      <div
+        onClick={function(e){e.stopPropagation();setOpen(function(v){return !v;});}}
+        style={{background:C.bgSecondary,borderRadius:100,padding:"6px 12px",cursor:"pointer",userSelect:"none",display:"inline-flex",alignItems:"center"}}>
+        <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,whiteSpace:"nowrap"}}>{label}</span>
+      </div>
+      {/* custom column picker — opens upward */}
+      {open&&(
+        <div
+          onClick={function(e){e.stopPropagation();}}
+          style={{position:"absolute",bottom:"calc(100% + 6px)",right:0,background:C.bgSecondary,borderRadius:12,padding:"8px",boxShadow:"0 8px 32px rgba(0,0,0,0.5)",display:"flex",alignItems:"stretch",gap:4,zIndex:400}}>
+          <TimeCol items={hours} selected={h12} onSelect={setHour} fmt={function(v){return pad2(v);}}/>
+          <div style={{width:1,background:C.border,margin:"2px 0"}}/>
+          <TimeCol items={mins} selected={min} onSelect={setMin} fmt={function(v){return pad2(v);}}/>
+          <div style={{width:1,background:C.border,margin:"2px 0"}}/>
+          <TimeCol items={["AM","PM"]} selected={ampm} onSelect={setAmpm} fmt={function(v){return v;}}/>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DateTimePicker({label,hint}){
+  var today=new Date();
+  var [viewYear,setViewYear]=useState(today.getFullYear());
+  var [viewMonth,setViewMonth]=useState(today.getMonth());
+  var [startDate,setStartDate]=useState(null);
+  var [endDate,setEndDate]=useState(null);
+  var [openFor,setOpenFor]=useState(null); // "start" | "end" | null
+  var [timeStr,setTimeStr]=useState("09:00");
+  var ref=useRef(null);
+
+  useEffect(function(){
+    function h(e){if(ref.current&&!ref.current.contains(e.target))setOpenFor(null);}
+    document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};
+  },[]);
+
+  var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var DAYS=["MON","TUE","WED","THU","FRI","SAT","SUN"];
+
+  function prevMonth(){if(viewMonth===0){setViewMonth(11);setViewYear(function(y){return y-1;});}else setViewMonth(function(m){return m-1;});}
+  function nextMonth(){if(viewMonth===11){setViewMonth(0);setViewYear(function(y){return y+1;});}else setViewMonth(function(m){return m+1;});}
+
+  function getDays(){
+    var first=new Date(viewYear,viewMonth,1);
+    var last=new Date(viewYear,viewMonth+1,0);
+    var offset=(first.getDay()+6)%7;
+    var cells=[];
+    for(var i=0;i<offset;i++)cells.push(null);
+    for(var d=1;d<=last.getDate();d++)cells.push(d);
+    while(cells.length%7!==0)cells.push(null);
+    return cells;
+  }
+
+  function selectDay(d){
+    var dt=new Date(viewYear,viewMonth,d);
+    if(openFor==="start"){setStartDate(dt);setOpenFor(null);}
+    else if(openFor==="end"){setEndDate(dt);setOpenFor(null);}
+  }
+
+  function isToday(d){var t=new Date();return d===t.getDate()&&viewMonth===t.getMonth()&&viewYear===t.getFullYear();}
+  function isSel(d,dt){return dt&&d===dt.getDate()&&viewMonth===dt.getMonth()&&viewYear===dt.getFullYear();}
+
+  function fmtDate(dt){if(!dt)return null;return pad2(dt.getDate())+"."+pad2(dt.getMonth()+1)+"."+String(dt.getFullYear()).slice(2);}
+
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:4,flex:1,minWidth:0,position:"relative"}} ref={ref}>
+      <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{label}</span>
+      {hint&&<span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{hint}</span>}
+
+      {/* trigger: Start / End rows stacked */}
+      <div style={{border:"2px solid "+(openFor?C.textPrimary:C.border),borderRadius:16,background:C.bgTertiary,overflow:"hidden",position:"relative"}}>
+        {/* Start row */}
+        <div onClick={function(){setOpenFor(openFor==="start"?null:"start");}}
+          style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",borderBottom:"1px solid "+C.border,cursor:"pointer",background:openFor==="start"?C.bgSecondary:"transparent"}}>
+          <div style={{width:14,height:14,borderRadius:"50%",background:C.textSecondary,flexShrink:0}}/>
+          <span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,flex:1}}>{fmtDate(startDate)||"Start"}</span>
+          {startDate&&<span style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{timeStr}</span>}
+        </div>
+        {/* dotted connector */}
+        <div style={{position:"absolute",left:22,top:40,height:24,borderLeft:"2px dashed "+C.border,zIndex:1}}/>
+        {/* End row */}
+        <div onClick={function(){setOpenFor(openFor==="end"?null:"end");}}
+          style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",cursor:"pointer",background:openFor==="end"?C.bgSecondary:"transparent"}}>
+          <div style={{width:14,height:14,borderRadius:"50%",border:"2px solid "+C.textSecondary,background:"transparent",flexShrink:0}}/>
+          <span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,flex:1}}>{fmtDate(endDate)||"End"}</span>
+          {endDate&&<span style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{timeStr}</span>}
+        </div>
+      </div>
+
+      {/* floating calendar */}
+      {openFor&&(
+        <div style={{position:"absolute",top:"100%",left:0,zIndex:200,marginTop:4,background:C.bgTertiary,borderRadius:12,width:370,boxShadow:"0 10px 60px rgba(0,0,0,0.4)",overflow:"hidden"}}>
+          {/* header */}
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 16px"}}>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>
+              <span style={{fontFamily:sans,fontWeight:800,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{MONTHS[viewMonth]+" "+viewYear}</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:28}}>
+              <div onClick={function(e){e.stopPropagation();prevMonth();}} style={{cursor:"pointer",display:"flex",alignItems:"center",width:24,height:24}}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </div>
+              <div onClick={function(e){e.stopPropagation();nextMonth();}} style={{cursor:"pointer",display:"flex",alignItems:"center",width:24,height:24}}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+          </div>
+
+          {/* day headers */}
+          <div style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:20,alignItems:"center"}}>
+            {DAYS.map(function(d){return(
+              <div key={d} style={{width:44,textAlign:"center",fontFamily:sans,fontSize:12,color:C.textPrimary}}>{d}</div>
+            );})}
+          </div>
+
+          {/* grid */}
+          <div style={{display:"flex",flexDirection:"column",gap:0}}>
+            {(function(){
+              var cells=getDays(),rows=[];
+              for(var i=0;i<cells.length;i+=7)rows.push(cells.slice(i,i+7));
+              return rows.map(function(week,ri){return(
+                <div key={ri} style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:44,alignItems:"center"}}>
+                  {week.map(function(d,di){
+                    var selStart=d&&isSel(d,startDate);
+                    var selEnd=d&&isSel(d,endDate);
+                    var sel=selStart||selEnd;
+                    var tod=d&&isToday(d);
+                    return(
+                      <div key={di} onClick={function(){if(d)selectDay(d);}}
+                        style={{width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",background:sel?"rgba(241,102,92,0.25)":"transparent",cursor:d?"pointer":"default",flexShrink:0}}>
+                        {d&&<span style={{fontFamily:sans,fontSize:20,lineHeight:"28px",fontWeight:sel?600:400,color:sel||tod?C.action:C.textPrimary}}>{d}</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              );});
+            })()}
+          </div>
+
+          {/* time row */}
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",height:52,borderTop:"1px solid "+C.border}}>
+            <span style={{fontFamily:sans,fontSize:16,color:C.textPrimary}}>Time</span>
+            <div style={{background:C.bgSecondary,borderRadius:100,padding:"5px 12px"}}>
+              <input type="time" value={timeStr} onChange={function(e){setTimeStr(e.target.value);}}
+                style={{fontFamily:sans,fontSize:16,color:C.textPrimary,background:"transparent",border:"none",outline:"none",width:90,cursor:"pointer"}}/>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Timezone Picker ───────────────────────────────────────────────
+var TIMEZONES=[
+  {label:"UTC-12:00",value:"UTC-12"},{label:"UTC-11:00",value:"UTC-11"},
+  {label:"UTC-10:00",value:"UTC-10"},{label:"UTC-09:00",value:"UTC-9"},
+  {label:"UTC-08:00",value:"UTC-8"},{label:"UTC-07:00",value:"UTC-7"},
+  {label:"UTC-06:00",value:"UTC-6"},{label:"UTC-05:00",value:"UTC-5"},
+  {label:"UTC-04:00",value:"UTC-4"},{label:"UTC-03:00",value:"UTC-3"},
+  {label:"UTC-02:00",value:"UTC-2"},{label:"UTC-01:00",value:"UTC-1"},
+  {label:"UTC+00:00",value:"UTC+0"},{label:"UTC+01:00",value:"UTC+1"},
+  {label:"UTC+02:00",value:"UTC+2"},{label:"UTC+03:00",value:"UTC+3"},
+  {label:"UTC+04:00",value:"UTC+4"},{label:"UTC+05:00",value:"UTC+5"},
+  {label:"UTC+05:30",value:"UTC+5:30"},{label:"UTC+06:00",value:"UTC+6"},
+  {label:"UTC+07:00",value:"UTC+7"},{label:"UTC+08:00",value:"UTC+8"},
+  {label:"UTC+09:00",value:"UTC+9"},{label:"UTC+09:30",value:"UTC+9:30"},
+  {label:"UTC+10:00",value:"UTC+10"},{label:"UTC+11:00",value:"UTC+11"},
+  {label:"UTC+12:00",value:"UTC+12"},
+];
+
+function TimezonePicker(){
+  var [tz,setTz]=useState("UTC+1");
+  var [open,setOpen]=useState(false);
+  var ref=useRef(null);
+  useEffect(function(){
+    function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}
+    document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};
+  },[]);
+  var current=TIMEZONES.find(function(t){return t.value===tz;})||TIMEZONES[13];
+  return(
+    <div ref={ref} style={{position:"relative",flexShrink:0}}>
+      <div onClick={function(){setOpen(function(v){return !v;});}}
+        style={{display:"flex",alignItems:"center",gap:4,border:"1px solid "+(open?C.textPrimary:C.textPrimary),borderRadius:4,padding:"2px 8px",cursor:"pointer",userSelect:"none",background:open?C.bgTertiary:"transparent",transition:"background .15s"}}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{current.label}</span>
+      </div>
+      {open&&(
+        <div style={{position:"absolute",top:"calc(100% + 4px)",right:0,background:C.bgSecondary,borderRadius:12,padding:4,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",zIndex:200,maxHeight:240,overflowY:"auto",scrollbarWidth:"none",minWidth:130}}>
+          {TIMEZONES.map(function(t){
+            var sel=t.value===tz;
+            return(
+              <div key={t.value} onClick={function(){setTz(t.value);setOpen(false);}}
+                style={{padding:"6px 12px",borderRadius:8,cursor:"pointer",fontFamily:sans,fontSize:14,color:sel?C.bgPage:C.textPrimary,background:sel?C.action:"transparent",transition:"background .15s",whiteSpace:"nowrap"}}
+                onMouseEnter={function(e){if(!sel)e.currentTarget.style.background=C.bgTertiary;}}
+                onMouseLeave={function(e){if(!sel)e.currentTarget.style.background="transparent";}}>
+                {t.label}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SettingsPanel(){
+  var [privateEvent,setPrivateEvent]=useState(false);
+  var [instantSharing,setInstantSharing]=useState(false);
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:24,padding:"8px 24px 24px"}}>
+      <p style={{fontFamily:sans,fontWeight:800,fontSize:24,lineHeight:"30px",color:C.textPrimary,margin:0}}>Event settings</p>
+      <div style={{display:"flex",flexDirection:"column",gap:24,width:"100%"}}>
+        <SettingsInputField label="Event name" hint="60 characters maximum" placeholder="Event name" maxLength={60}/>
+        <SettingsInputField label="Location" placeholder="Event location"/>
+        {/* Date & Time row */}
+        <div style={{display:"flex",alignItems:"flex-start",gap:16,width:"100%"}}>
+          <div style={{flex:1,minWidth:0,position:"relative"}}>
+            <DateTimePicker label="Date & Time" hint="Period the event will be live"/>
+          </div>
+          <div style={{flex:1,minWidth:0,position:"relative"}}>
+            <DateTimePicker label="Video submitting period (optional)" hint="During this time, attendees can upload their videos"/>
+          </div>
+          <TimezonePicker/>
+        </div>
+        <SettingsInputField label="Event description" hint="300 characters maximum" placeholder="Describe your event" multiline={true} maxLength={300}/>
+        {/* Switches */}
+        {[
+          {key:"private",  label:"Private event",           desc:"Content is exclusive to the event, and only you can invite attendees", active:privateEvent,   onToggle:function(){setPrivateEvent(function(v){return !v;});}},
+          {key:"instant",  label:"Instant content sharing", desc:"When enabled, all uploaded videos are instantly shared with attendees",  active:instantSharing, onToggle:function(){setInstantSharing(function(v){return !v;});}},
+        ].map(function(sw){return(
+          <div key={sw.key} style={{display:"flex",flexDirection:"column",gap:4}}>
+            <div style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}>
+              <SettingsSwitch active={sw.active} onToggle={sw.onToggle}/>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{sw.label}</span>
+            </div>
+            <div style={{display:"flex",gap:12}}>
+              <div style={{width:26.7,flexShrink:0}}/>
+              <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{sw.desc}</span>
+            </div>
+          </div>
+        );})}
+      </div>
+      <button style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,cursor:"pointer",alignSelf:"flex-start"}}>Save changes</button>
+    </div>
+  );
+}
 function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onToggleFav,showMeta,onToggleMeta,showFavsOnly,onToggleFavsOnly,rangeLo,rangeHi,onRange,onDownload,onCollection,onPreview,discardedIds,onDiscard,onRecover,onBatchDiscard,activeTab,onTabChange,onNewHighlight,highlights,onEditHighlight,onDeleteHighlight}){
   var [innerTab,setInnerTab]=useState("shots");
   var count=selectedIds.size;
@@ -877,6 +1198,8 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
       </div>
       {activeTab==="Highlights"
         ? <HighlightsPanel onNewHighlight={onNewHighlight} highlights={highlights} onEdit={onEditHighlight} onDelete={onDeleteHighlight}/>
+        : activeTab==="Settings"
+        ? <SettingsPanel/>
         : activeTab!=="Shots"
         ? <div style={{display:"flex",alignItems:"center",justifyContent:"center",padding:"64px 0"}}>
             <span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textMuted,letterSpacing:1}}>— in progress —</span>
