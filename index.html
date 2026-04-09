@@ -494,7 +494,8 @@ function HighlightSuccessCard({name,isEdit,showButton,onGoTo}){
 }
 
 // ── Arrange Modal ──────────────────────────────────────────────────
-function ArrangeModal({selectedIds,onBack,onPublish,isEdit,editName,editFeatured}){
+// source: "shots" = from Shots tab (show button, click-outside stays) | "highlights" = from Highlights page (no button, auto-dismiss)
+function ArrangeModal({selectedIds,onBack,onPublish,isEdit,editName,editFeatured,source}){
   var initialIds=SHOTS.filter(function(s){return selectedIds.has(s.id);}).map(function(s){return s.id;});
   var [order,setOrder]=useState(initialIds);
   var [name,setName]=useState(editName||"");
@@ -506,11 +507,26 @@ function ArrangeModal({selectedIds,onBack,onPublish,isEdit,editName,editFeatured
   var ordered=order.map(function(id){return SHOTS.find(function(s){return s.id===id;});}).filter(Boolean);
   var canPublish=name.trim().length>0;
   function removeShot(id){setOrder(function(prev){return prev.filter(function(i){return i!==id;});});}
-  // success screen — shown inside the modal overlay
+
+  // auto-dismiss for highlights-tab source
+  useEffect(function(){
+    if(!published||source!=="highlights")return;
+    var t=setTimeout(function(){onPublish([],publishedName,false);},2000);
+    return function(){clearTimeout(t);};
+  },[published,source]);
+
+  // success screen inside the overlay
   if(published){
+    // shots source: button to go to highlights, click outside = close without navigating
+    // highlights source: no button, auto-dismisses
     return(
-      <div style={{position:"fixed",inset:0,zIndex:400,background:"rgba(22,20,49,0.85)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
-        <HighlightSuccessCard name={publishedName} isEdit={isEdit} showButton={true} onGoTo={function(){onPublish([],publishedName,false);}}/>
+      <div onClick={source==="shots"?function(){onBack();}:undefined}
+        style={{position:"fixed",inset:0,zIndex:400,background:"rgba(22,20,49,0.85)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+        <div onClick={function(e){e.stopPropagation();}}>
+          <HighlightSuccessCard name={publishedName} isEdit={isEdit}
+            showButton={source==="shots"}
+            onGoTo={function(){onPublish([],publishedName,false);}}/>
+        </div>
       </div>
     );
   }
@@ -852,8 +868,9 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
       {previewShot&&<PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}}/>}
       {showArrange&&(
         <ArrangeModal selectedIds={selectedIds} isEdit={isEdit} editName={isEdit?editHighlight.name:""} editFeatured={isEdit?editHighlight.status==="featured":false}
+          source="highlights"
           onBack={function(){setShowArrange(false);}}
-          onPublish={function(order,n,f){setPublishedName(n);setShowArrange(false);onPublish();}}
+          onPublish={function(order,n,f){setShowArrange(false);onPublish();}}
         />
       )}
     </div>
@@ -1166,6 +1183,7 @@ function App(){
       {previewShot&&<PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}} onDiscard={discardShot}/>}
       {showDlModal&&<DownloadModal selectedIds={selectedIds} onConfirm={function(){setShowDlModal(false);}} onCancel={function(){setShowDlModal(false);}}/>}
       {showArrangeModal&&<ArrangeModal selectedIds={arrangeIds} isEdit={false} editName="" editFeatured={false}
+        source="shots"
         onBack={function(){setShowArrangeModal(false);}}
         onPublish={function(order,n,f){setShowArrangeModal(false);setActiveTab("Highlights");}}
       />}
