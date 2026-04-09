@@ -11,8 +11,8 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{background:#161431;font-family:'Work Sans',sans-serif;}
 #root{max-width:1440px;margin:0 auto;}
-input::placeholder{color:#bbbcd6;}
-input{color:#faf9f9;}
+input::placeholder,textarea::placeholder{color:#bbbcd6;}
+input,textarea{color:#faf9f9;}
 button{font-family:'Work Sans',sans-serif;}
 ::-webkit-scrollbar{display:none;}
 *{scrollbar-width:none;}
@@ -28,7 +28,6 @@ button{font-family:'Work Sans',sans-serif;}
 <script type="text/babel">
 var useState=React.useState,useRef=React.useRef,useEffect=React.useEffect,useCallback=React.useCallback;
 
-// ── Constants ─────────────────────────────────────────────────────
 var VIDEO_LANDSCAPE="https://www.pexels.com/download/video/9005710/";
 var VIDEO_PORTRAIT="https://www.pexels.com/download/video/35110969/";
 var C={bgPage:"#161431",bgSecondary:"#29284b",bgTertiary:"#3e3d64",action:"#f1665c",textPrimary:"#faf9f9",textSecondary:"#bbbcd6",textMuted:"#a1a5b7",border:"#6c6d93"};
@@ -39,40 +38,40 @@ function fmtMs(ms){var d=new Date(ms);return pad2(d.getDate())+"."+pad2(d.getMon
 function fmtSec(s){s=Math.floor(s||0);return pad2(Math.floor(s/60))+":"+pad2(s%60);}
 
 var RAW=[
-  {id:0, orient:"portrait", ts:new Date("2026-03-10T09:20:00").getTime(),img:"https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=260&h=380&fit=crop&q=80", user:"Alice M.", size:"14.2 MB",dur:"0:12"},
-  {id:1, orient:"portrait", ts:new Date("2026-03-10T10:35:00").getTime(),img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=260&h=380&fit=crop&q=80", user:"Bob K.",   size:"22.7 MB",dur:"0:24"},
-  {id:2, orient:"landscape",ts:new Date("2026-03-10T12:00:00").getTime(),img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=780&h=440&fit=crop&q=80", user:"Carol T.", size:"18.1 MB",dur:"0:18"},
-  {id:3, orient:"portrait", ts:new Date("2026-03-10T13:30:00").getTime(),img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=260&h=380&fit=crop&q=80", user:"Dan R.",   size:"31.0 MB",dur:"0:30"},
-  {id:4, orient:"portrait", ts:new Date("2026-03-10T15:30:00").getTime(),img:"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=260&h=380&fit=crop&q=80", user:"Eve S.",   size:"12.5 MB",dur:"0:08"},
-  {id:5, orient:"landscape",ts:new Date("2026-03-10T17:00:00").getTime(),img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=780&h=440&fit=crop&q=80", user:"Frank L.", size:"41.3 MB",dur:"0:36"},
-  {id:6, orient:"portrait", ts:new Date("2026-03-10T19:00:00").getTime(),img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=260&h=380&fit=crop&q=80", user:"Grace W.", size:"19.8 MB",dur:"0:18"},
-  {id:7, orient:"landscape",ts:new Date("2026-03-10T21:00:00").getTime(),img:"https://images.unsplash.com/photo-1468359601543-843bfaef291a?w=780&h=440&fit=crop&q=80", user:"Hank P.",  size:"27.6 MB",dur:"0:22"},
-  {id:8, orient:"portrait", ts:new Date("2026-03-10T23:00:00").getTime(),img:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=260&h=380&fit=crop&q=80", user:"Iris N.",  size:"15.9 MB",dur:"0:10"},
-  {id:9, orient:"portrait", ts:new Date("2026-03-11T01:00:00").getTime(),img:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=260&h=380&fit=crop&q=80", user:"Jack O.",  size:"48.2 MB",dur:"0:42"},
-  {id:10,orient:"landscape",ts:new Date("2026-03-11T05:00:00").getTime(),img:"https://images.unsplash.com/photo-1506157786151-b8491531f063?w=780&h=440&fit=crop&q=80", user:"Kim Y.",   size:"20.4 MB",dur:"0:18"},
-  {id:11,orient:"portrait", ts:new Date("2026-03-11T09:00:00").getTime(),img:"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=260&h=380&fit=crop&q=80", user:"Leo A.",   size:"33.7 MB",dur:"0:28"},
-  {id:12,orient:"portrait", ts:new Date("2026-03-11T13:00:00").getTime(),img:"https://images.unsplash.com/photo-1598387846148-47e82ee120cc?w=260&h=380&fit=crop&q=80", user:"Mia B.",   size:"11.3 MB",dur:"0:09"},
-  {id:13,orient:"landscape",ts:new Date("2026-03-11T16:00:00").getTime(),img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=780&h=440&fit=crop&q=80", user:"Nate C.",  size:"28.9 MB",dur:"0:24"},
+  {id:0,orient:"portrait", ts:new Date("2026-03-10T09:20:00").getTime(),img:"https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=260&h=380&fit=crop&q=80",user:"Alice M.", size:"14.2 MB",dur:"0:12"},
+  {id:1,orient:"portrait", ts:new Date("2026-03-10T10:35:00").getTime(),img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=260&h=380&fit=crop&q=80",user:"Bob K.",   size:"22.7 MB",dur:"0:24"},
+  {id:2,orient:"landscape",ts:new Date("2026-03-10T12:00:00").getTime(),img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=780&h=440&fit=crop&q=80",user:"Carol T.", size:"18.1 MB",dur:"0:18"},
+  {id:3,orient:"portrait", ts:new Date("2026-03-10T13:30:00").getTime(),img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=260&h=380&fit=crop&q=80",user:"Dan R.",   size:"31.0 MB",dur:"0:30"},
+  {id:4,orient:"portrait", ts:new Date("2026-03-10T15:30:00").getTime(),img:"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=260&h=380&fit=crop&q=80",user:"Eve S.",   size:"12.5 MB",dur:"0:08"},
+  {id:5,orient:"landscape",ts:new Date("2026-03-10T17:00:00").getTime(),img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=780&h=440&fit=crop&q=80",user:"Frank L.", size:"41.3 MB",dur:"0:36"},
+  {id:6,orient:"portrait", ts:new Date("2026-03-10T19:00:00").getTime(),img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=260&h=380&fit=crop&q=80",user:"Grace W.", size:"19.8 MB",dur:"0:18"},
+  {id:7,orient:"landscape",ts:new Date("2026-03-10T21:00:00").getTime(),img:"https://images.unsplash.com/photo-1468359601543-843bfaef291a?w=780&h=440&fit=crop&q=80",user:"Hank P.",  size:"27.6 MB",dur:"0:22"},
+  {id:8,orient:"portrait", ts:new Date("2026-03-10T23:00:00").getTime(),img:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=260&h=380&fit=crop&q=80",user:"Iris N.",  size:"15.9 MB",dur:"0:10"},
+  {id:9,orient:"portrait", ts:new Date("2026-03-11T01:00:00").getTime(),img:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=260&h=380&fit=crop&q=80",user:"Jack O.",  size:"48.2 MB",dur:"0:42"},
+  {id:10,orient:"landscape",ts:new Date("2026-03-11T05:00:00").getTime(),img:"https://images.unsplash.com/photo-1506157786151-b8491531f063?w=780&h=440&fit=crop&q=80",user:"Kim Y.",  size:"20.4 MB",dur:"0:18"},
+  {id:11,orient:"portrait", ts:new Date("2026-03-11T09:00:00").getTime(),img:"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=260&h=380&fit=crop&q=80",user:"Leo A.",  size:"33.7 MB",dur:"0:28"},
+  {id:12,orient:"portrait", ts:new Date("2026-03-11T13:00:00").getTime(),img:"https://images.unsplash.com/photo-1598387846148-47e82ee120cc?w=260&h=380&fit=crop&q=80",user:"Mia B.",  size:"11.3 MB",dur:"0:09"},
+  {id:13,orient:"landscape",ts:new Date("2026-03-11T16:00:00").getTime(),img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=780&h=440&fit=crop&q=80",user:"Nate C.", size:"28.9 MB",dur:"0:24"},
 ];
 var TL_START=RAW[0].ts,TL_END=RAW[RAW.length-1].ts,TL_SPAN=TL_END-TL_START;
 var SHOTS=RAW.map(function(s){var d=new Date(s.ts);return Object.assign({},s,{date:pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+String(d.getFullYear()).slice(2),time:pad2(d.getHours())+":"+pad2(d.getMinutes())});});
 function sumMB(ids){return SHOTS.filter(function(s){return ids.has(s.id);}).reduce(function(a,s){return a+parseFloat(s.size);},0).toFixed(1);}
 
 var DL_STEPS=[
-  {label:"Kindly rewinding",          icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>},
-  {label:"Pumping up the volume",     icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>},
-  {label:"Fetching another coffee",   icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>},
-  {label:"Untangling the cables",     icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>},
-  {label:"Counting the pixels",       icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>},
+  {label:"Kindly rewinding",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>},
+  {label:"Pumping up the volume",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>},
+  {label:"Fetching another coffee",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>},
+  {label:"Untangling the cables",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>},
+  {label:"Counting the pixels",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>},
   {label:"Compiling the best moments",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>},
 ];
 var PEEK=12,MAX_VIS=4,STEP_DUR=3200,TOTAL_MS=18000;
 
 var HIGHLIGHTS_SEED=[
-  {id:0,name:"Stage A",             status:"draft",     shots:23,  published:null,           duration:"3m 36s", img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=80&h=120&fit=crop&q=80"},
-  {id:1,name:"Sponsors",            status:"published", shots:34,  published:"11.04.26 16h", duration:"1m 20s", img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=80&h=120&fit=crop&q=80"},
-  {id:2,name:"Best of the audience",status:"featured",  shots:123, published:"11.04.26 16h", duration:"10m 03s",img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=80&h=120&fit=crop&q=80"},
-  {id:3,name:"Stage B",             status:"published", shots:8,   published:"11.04.26 16h", duration:"0m 30s", img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=80&h=120&fit=crop&q=80"},
+  {id:0,name:"Stage A",status:"draft",shots:23,published:null,duration:"3m 36s",img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=80&h=120&fit=crop&q=80"},
+  {id:1,name:"Sponsors",status:"published",shots:34,published:"11.04.26 16h",duration:"1m 20s",img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=80&h=120&fit=crop&q=80"},
+  {id:2,name:"Best of the audience",status:"featured",shots:123,published:"11.04.26 16h",duration:"10m 03s",img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=80&h=120&fit=crop&q=80"},
+  {id:3,name:"Stage B",status:"published",shots:8,published:"11.04.26 16h",duration:"0m 30s",img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=80&h=120&fit=crop&q=80"},
 ];
 
 // ── Icons ─────────────────────────────────────────────────────────
@@ -102,11 +101,10 @@ function IPause({color=C.textPrimary,size=22}){return <svg width={size} height={
 function IDots({color=C.textPrimary,size=14}){return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>;}
 function IEdit({color=C.textPrimary,size=16}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;}
 function IPlus({color=C.textPrimary,size=24}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;}
+function IGlobe({color=C.textPrimary,size=12}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;}
 
-// ── Primitives ────────────────────────────────────────────────────
-function Tag({icon,label}){
-  return <div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{icon}<span style={{fontFamily:sans,fontWeight:400,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{label}</span></div>;
-}
+// ── Primitives ─────────────────────────────────────────────────────
+function Tag({icon,label}){return <div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{icon}<span style={{fontFamily:sans,fontWeight:400,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{label}</span></div>;}
 function Toggle({active,onToggle,label}){
   return(
     <div onClick={onToggle} style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}}>
@@ -134,9 +132,7 @@ function CheckboxField({checked,onClick,label}){
     </div>
   );
 }
-function CardChip({onClick,children}){
-  return <div onClick={onClick} style={{background:C.bgPage,borderRadius:"50%",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>{children}</div>;
-}
+function CardChip({onClick,children}){return <div onClick={onClick} style={{background:C.bgPage,borderRadius:"50%",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>{children}</div>;}
 function ModalChip({onClick,tip,children}){
   var [hov,setHov]=useState(false);
   return <div onClick={onClick} title={tip} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{width:36,height:36,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,opacity:hov?0.8:1,transition:"opacity 0.15s"}}>{children}</div>;
@@ -146,7 +142,7 @@ function IconBtn({onClick,children}){
   return <div onClick={onClick} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{padding:8,borderRadius:"50%",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:hov?C.bgTertiary:"transparent",transition:"background 0.15s"}}>{children}</div>;
 }
 
-// ── Sidebar ───────────────────────────────────────────────────────
+// ── Sidebar ────────────────────────────────────────────────────────
 function Sidebar(){
   return(
     <div style={{background:C.bgSecondary,width:241,minWidth:241,flexShrink:0,borderRadius:"0 32px 32px 0",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"24px 16px 12px",boxSizing:"border-box",position:"sticky",top:0,height:"100vh",overflow:"hidden"}}>
@@ -157,7 +153,7 @@ function Sidebar(){
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
           <div style={{display:"flex",flexDirection:"column"}}>
             {[
-              {label:"Events", icon:<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>},
+              {label:"Events",icon:<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>},
               {label:"Account",icon:<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>},
             ].map(function(item){return(
               <div key={item.label} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0"}}>
@@ -189,57 +185,43 @@ function Sidebar(){
   );
 }
 
-// ── Event Status Dropdown ─────────────────────────────────────────
+// ── Event Status Dropdown ──────────────────────────────────────────
 var STATUS_OPTIONS=[
-  {value:"published",label:"Published",bg:C.action,        textColor:C.bgPage,      icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>},
-  {value:"draft",     label:"Draft",     bg:"#a3a19f",       textColor:C.bgPage,      icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>},
-  {value:"ended",     label:"Ended",     bg:C.bgTertiary,    textColor:C.textPrimary, icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>},
-  {value:"cancelled", label:"Cancelled", bg:"#750000",       textColor:C.textPrimary, icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>},
+  {value:"published",label:"Published",bg:C.action,textColor:C.bgPage,icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>},
+  {value:"draft",label:"Draft",bg:"#a3a19f",textColor:C.bgPage,icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>},
+  {value:"ended",label:"Ended",bg:C.bgTertiary,textColor:C.textPrimary,icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>},
+  {value:"cancelled",label:"Cancelled",bg:"#750000",textColor:C.textPrimary,icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>},
 ];
-
 function EventStatusDropdown(){
   var [status,setStatus]=useState("published");
   var [open,setOpen]=useState(false);
   var ref=useRef(null);
-  useEffect(function(){
-    function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}
-    document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};
-  },[]);
+  useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);
   var current=STATUS_OPTIONS.find(function(o){return o.value===status;})||STATUS_OPTIONS[0];
-  var chevronColor=current.textColor;
   return(
     <div ref={ref} style={{position:"relative",width:241,flexShrink:0}}>
-      <div onClick={function(){setOpen(function(v){return !v;});}}
-        style={{background:current.bg,borderRadius:open?"8px 8px 0 0":"8px",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"4px 8px 4px 12px",cursor:"pointer",userSelect:"none"}}>
+      <div onClick={function(){setOpen(function(v){return !v;});}} style={{background:current.bg,borderRadius:open?"8px 8px 0 0":"8px",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"4px 8px 4px 12px",cursor:"pointer",userSelect:"none"}}>
         <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:current.textColor}}>{current.label}</span>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={chevronColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-          style={{transition:"transform .2s",transform:open?"rotate(180deg)":"rotate(0deg)"}}>
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={current.textColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{transition:"transform .2s",transform:open?"rotate(180deg)":"rotate(0deg)"}}><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       {open&&(
         <div style={{position:"absolute",top:"100%",left:0,width:241,background:C.bgTertiary,borderRadius:"0 0 8px 8px",zIndex:50,overflow:"hidden",boxShadow:"0 8px 24px rgba(0,0,0,0.3)"}}>
-          {STATUS_OPTIONS.map(function(opt){
-            var isActive=opt.value===status;
-            return(
-              <div key={opt.value} onClick={function(){setStatus(opt.value);setOpen(false);}}
-                style={{display:"flex",alignItems:"center",gap:4,padding:"4px 8px",cursor:"pointer",background:isActive?"rgba(187,188,214,0.75)":"transparent",transition:"background .15s"}}
-                onMouseEnter={function(e){if(!isActive)e.currentTarget.style.background="rgba(187,188,214,0.15)";}}
-                onMouseLeave={function(e){if(!isActive)e.currentTarget.style.background="transparent";}}>
-                <div style={{width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:isActive?C.bgPage:C.textPrimary}}>
-                  {opt.icon}
-                </div>
-                <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:isActive?C.bgPage:C.textPrimary}}>{opt.label}</span>
-              </div>
-            );
-          })}
+          {STATUS_OPTIONS.map(function(opt){var isActive=opt.value===status;return(
+            <div key={opt.value} onClick={function(){setStatus(opt.value);setOpen(false);}}
+              style={{display:"flex",alignItems:"center",gap:4,padding:"4px 8px",cursor:"pointer",background:isActive?"rgba(187,188,214,0.75)":"transparent",transition:"background .15s"}}
+              onMouseEnter={function(e){if(!isActive)e.currentTarget.style.background="rgba(187,188,214,0.15)";}}
+              onMouseLeave={function(e){if(!isActive)e.currentTarget.style.background="transparent";}}>
+              <div style={{width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:isActive?C.bgPage:C.textPrimary}}>{opt.icon}</div>
+              <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:isActive?C.bgPage:C.textPrimary}}>{opt.label}</span>
+            </div>
+          );})}
         </div>
       )}
     </div>
   );
 }
 
-// ── Event Summary ─────────────────────────────────────────────────
+// ── Event Summary ──────────────────────────────────────────────────
 function EventSummary(){
   var stats=[{v:"55",l:"Joined users",muted:true},{v:"33",l:"Shots uploaded"},{v:"20.04",l:"Duration (min)"},{v:"890",l:"Size (MB)"}];
   return(
@@ -273,7 +255,7 @@ function EventSummary(){
   );
 }
 
-// ── Preview Modal ─────────────────────────────────────────────────
+// ── Preview Modal ──────────────────────────────────────────────────
 function PreviewModal({shot,onClose,onDiscard}){
   var vidRef=useRef(null),trackRef=useRef(null);
   var [playing,setPlaying]=useState(false);
@@ -339,7 +321,7 @@ function PreviewModal({shot,onClose,onDiscard}){
   );
 }
 
-// ── Range Slider ──────────────────────────────────────────────────
+// ── Range Slider ───────────────────────────────────────────────────
 function RangeSlider({lo,hi,onChange,gridRef,containerW}){
   var trackRef=useRef(null),dragging=useRef(null);
   var [sliderW,setSliderW]=useState(null);
@@ -373,7 +355,7 @@ function RangeSlider({lo,hi,onChange,gridRef,containerW}){
   );
 }
 
-// ── Shot Card ─────────────────────────────────────────────────────
+// ── Shot Card ──────────────────────────────────────────────────────
 function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onToggleFav,onDiscard,onRecover,highlightMode}){
   var videoSrc=shot.orient==="landscape"?VIDEO_LANDSCAPE:VIDEO_PORTRAIT;
   var vidRef=useRef(null),scrubRef=useRef(null);
@@ -407,14 +389,12 @@ function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onTog
             <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(22,20,49,0.72)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><IPlay size={18}/></div>
           </div>
         )}
-        {/* checkbox */}
         <div onClick={function(e){e.stopPropagation();if(clickTimer.current){clearTimeout(clickTimer.current);clickTimer.current=null;}onToggle();}}
           style={{position:"absolute",top:8,left:8,opacity:(hovering||selected)?1:0,transition:"opacity 0.15s",pointerEvents:(hovering||selected)?"auto":"none"}}>
           <div style={{width:20,height:20,borderRadius:4,background:selected?C.action:"rgba(22,20,49,0.6)",border:"2px solid "+(selected?C.action:C.textPrimary),display:"flex",alignItems:"center",justifyContent:"center",transition:"background 0.15s",backdropFilter:"blur(2px)"}}>
             {selected&&<ICheck/>}
           </div>
         </div>
-        {/* right chips */}
         <div style={{position:"absolute",top:10,right:8,display:"flex",flexDirection:"column",gap:8}}>
           {(hovering||fav)&&onToggleFav&&<CardChip onClick={function(e){e.stopPropagation();onToggleFav();}}><IHeart size={15} color={C.action} filled={fav}/></CardChip>}
           {hovering&&!highlightMode&&onToggleFav&&<CardChip onClick={function(e){e.stopPropagation();}}><IDownload color={C.action} size={15}/></CardChip>}
@@ -428,9 +408,7 @@ function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onTog
         <div style={{padding:12}}>
           <div style={{display:"flex",flexWrap:"wrap",gap:2}}>
             <div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>
-              {shot.orient==="landscape"
-                ?<svg width="14" height="10" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>
-                :<svg width="10" height="14" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>}
+              {shot.orient==="landscape"?<svg width="14" height="10" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>:<svg width="10" height="14" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>}
             </div>
             <Tag icon={<ICalendar/>} label={shot.date}/>
             <Tag icon={<IClock/>} label={shot.time}/>
@@ -444,54 +422,146 @@ function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onTog
   );
 }
 
-// ── Arrange Modal ─────────────────────────────────────────────────
-function ArrangeModal({selectedIds,onBack,onPublish}){
+// ── Arrange Shot Card ──────────────────────────────────────────────
+function ArrangeShotCard({shot,onRemove,onDragStart,onDragOver,onDragEnd}){
+  var vidRef=useRef(null),scrubRef=useRef(null);
+  var [hovering,setHovering]=useState(false);
+  var [scrubPct,setScrubPct]=useState(0);
+  var videoSrc=shot.orient==="landscape"?VIDEO_LANDSCAPE:VIDEO_PORTRAIT;
+  useEffect(function(){var v=vidRef.current;if(!v)return;if(hovering){v.currentTime=0;v.play().catch(function(){});}else{v.pause();v.currentTime=0;}},[hovering]);
+  useEffect(function(){
+    if(!hovering){setScrubPct(0);if(scrubRef.current)cancelAnimationFrame(scrubRef.current);return;}
+    var start=null,dur=4000;
+    function tick(ts){if(!start)start=ts;var el=(ts-start)%dur;setScrubPct((el/dur)*100);scrubRef.current=requestAnimationFrame(tick);}
+    scrubRef.current=requestAnimationFrame(tick);
+    return function(){if(scrubRef.current)cancelAnimationFrame(scrubRef.current);};
+  },[hovering]);
+  return(
+    <div draggable onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}
+      onMouseEnter={function(){setHovering(true);}} onMouseLeave={function(){setHovering(false);}}
+      style={{background:C.bgTertiary,borderRadius:8,overflow:"hidden",cursor:"grab",userSelect:"none",position:"relative"}}>
+      <div style={{position:"relative",width:"100%",paddingBottom:"150%"}}>
+        <img src={shot.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",pointerEvents:"none",transition:"opacity 0.2s",opacity:hovering?0:1}}/>
+        <video ref={vidRef} src={videoSrc} muted playsInline loop preload="none"
+          style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",pointerEvents:"none",transition:"opacity 0.2s",opacity:hovering?1:0}}/>
+        <div style={{position:"absolute",bottom:0,left:0,right:0,height:3,background:"rgba(187,188,214,0.2)",opacity:hovering?1:0,transition:"opacity 0.2s"}}>
+          <div style={{height:"100%",width:scrubPct+"%",background:C.textSecondary,borderRadius:1}}/>
+        </div>
+        <div style={{position:"absolute",top:6,left:6,opacity:hovering?0:0.75,transition:"opacity 0.15s"}}><IDots/></div>
+        {hovering&&(
+          <div onClick={function(e){e.stopPropagation();onRemove();}}
+            style={{position:"absolute",top:8,right:8,width:28,height:28,borderRadius:"50%",background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,0.4)"}}>
+            <IX color={C.action} size={14}/>
+          </div>
+        )}
+      </div>
+      <div style={{padding:"6px 8px",display:"flex",flexWrap:"wrap",gap:4}}>
+        <div style={{display:"flex",alignItems:"center",gap:3}}><ITimer size={10}/><span style={{fontFamily:sans,fontSize:11,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.dur}</span></div>
+        <div style={{display:"flex",alignItems:"center",gap:3}}><IUser size={10}/><span style={{fontFamily:sans,fontSize:11,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.user}</span></div>
+      </div>
+    </div>
+  );
+}
+
+// ── Highlight Success Card ─────────────────────────────────────────
+function HighlightSuccessCard({name,isEdit,showButton,onGoTo}){
+  return(
+    <div style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,alignItems:"center",width:420,textAlign:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}>
+      {/* party popper chip */}
+      <div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center",width:"100%"}}>
+        <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          {/* party popper SVG */}
+          <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/>
+            <path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/>
+            <path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11c-.11.7-.72 1.22-1.43 1.22H17"/>
+            <path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"/>
+            <path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/>
+          </svg>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:4,width:"100%"}}>
+          <p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>{isEdit?"Changes saved!":"Highlight created!"}</p>
+          <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>{isEdit?'"'+name+'" has been updated.':"Event attendees are now able to see the reel."}</p>
+        </div>
+      </div>
+      {showButton&&(
+        <button onClick={onGoTo} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"28px",color:C.bgPage,cursor:"pointer"}}>
+          Go to highlights panel
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ── Arrange Modal ──────────────────────────────────────────────────
+function ArrangeModal({selectedIds,onBack,onPublish,isEdit,editName,editFeatured}){
   var initialIds=SHOTS.filter(function(s){return selectedIds.has(s.id);}).map(function(s){return s.id;});
   var [order,setOrder]=useState(initialIds);
+  var [name,setName]=useState(editName||"");
+  var [nameFocused,setNameFocused]=useState(false);
+  var [featured,setFeatured]=useState(!!editFeatured);
+  var [published,setPublished]=useState(false);
+  var [publishedName,setPublishedName]=useState("");
   var dragSrc=useRef(null);
   var ordered=order.map(function(id){return SHOTS.find(function(s){return s.id===id;});}).filter(Boolean);
+  var canPublish=name.trim().length>0;
+  function removeShot(id){setOrder(function(prev){return prev.filter(function(i){return i!==id;});});}
+  // success screen — shown inside the modal overlay
+  if(published){
+    return(
+      <div style={{position:"fixed",inset:0,zIndex:400,background:"rgba(22,20,49,0.85)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+        <HighlightSuccessCard name={publishedName} isEdit={isEdit} showButton={true} onGoTo={function(){onPublish([],publishedName,false);}}/>
+      </div>
+    );
+  }
   return(
     <div style={{position:"fixed",inset:0,zIndex:400,background:"rgba(22,20,49,0.85)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
-      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",flexDirection:"column",gap:24,width:620,maxHeight:"90vh",overflowY:"auto",scrollbarWidth:"none"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <div style={{display:"flex",flexDirection:"column",gap:4}}>
-            <p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Arrange shots</p>
-            <p style={{fontFamily:sans,fontSize:15,color:C.textSecondary,margin:0}}>Drag and drop to set the order they'll appear in the highlight.</p>
+      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:620,maxHeight:"90vh",display:"flex",flexDirection:"column",overflow:"hidden",boxShadow:"0 24px 64px rgba(0,0,0,0.5)"}}>
+        <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>{isEdit?"Edit highlight":"New highlight"}</p>
+            <button onClick={onBack} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4}}><IX size={20}/></button>
           </div>
-          <button onClick={onBack} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,flexShrink:0}}><IX size={20}/></button>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Highlight name</span>
+            <input value={name} onChange={function(e){setName(e.target.value);}}
+              onFocus={function(){setNameFocused(true);}} onBlur={function(){setNameFocused(false);}}
+              placeholder="e.g. Best moments of the night"
+              style={{border:"2px solid "+(nameFocused?C.textPrimary:C.border),borderRadius:12,padding:"10px 20px",fontFamily:sans,fontSize:16,background:C.bgTertiary,outline:"none",width:"100%"}}/>
+          </div>
+          <p style={{fontFamily:sans,fontSize:15,color:C.textSecondary,margin:0}}>Drag and drop to set the order they'll appear in the highlight.</p>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
-          {ordered.map(function(shot){return(
-            <div key={shot.id} draggable
-              onDragStart={function(){dragSrc.current=shot.id;}}
-              onDragOver={function(e){
-                e.preventDefault();
-                if(dragSrc.current===null||dragSrc.current===shot.id)return;
-                setOrder(function(prev){var next=prev.slice(),from=next.indexOf(dragSrc.current),to=next.indexOf(shot.id);next.splice(from,1);next.splice(to,0,dragSrc.current);return next;});
-              }}
-              onDragEnd={function(){dragSrc.current=null;}}
-              style={{background:C.bgTertiary,borderRadius:8,overflow:"hidden",cursor:"grab",userSelect:"none"}}>
-              <div style={{position:"relative",width:"100%",paddingBottom:"150%"}}>
-                <img src={shot.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block",pointerEvents:"none"}}/>
-                <div style={{position:"absolute",top:6,left:6,opacity:0.75}}><IDots/></div>
-              </div>
-              <div style={{padding:"6px 8px",display:"flex",flexWrap:"wrap",gap:4}}>
-                <div style={{display:"flex",alignItems:"center",gap:3}}><ITimer size={10}/><span style={{fontFamily:sans,fontSize:11,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.dur}</span></div>
-                <div style={{display:"flex",alignItems:"center",gap:3}}><IUser size={10}/><span style={{fontFamily:sans,fontSize:11,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.user}</span></div>
-              </div>
-            </div>
-          );})}
+        <div style={{flex:1,overflowY:"auto",scrollbarWidth:"none",padding:24}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+            {ordered.map(function(shot){return(
+              <ArrangeShotCard key={shot.id} shot={shot}
+                onRemove={function(){removeShot(shot.id);}}
+                onDragStart={function(){dragSrc.current=shot.id;}}
+                onDragOver={function(e){e.preventDefault();if(dragSrc.current===null||dragSrc.current===shot.id)return;setOrder(function(prev){var next=prev.slice(),from=next.indexOf(dragSrc.current),to=next.indexOf(shot.id);next.splice(from,1);next.splice(to,0,dragSrc.current);return next;});}}
+                onDragEnd={function(){dragSrc.current=null;}}
+              />
+            );})}
+          </div>
         </div>
-        <div style={{display:"flex",gap:12}}>
-          <button onClick={onBack} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 24px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Back</button>
-          <button onClick={function(){onPublish(order);}} style={{flex:2,background:C.action,border:"none",borderRadius:999,padding:"14px 24px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Publish highlight</button>
+        <div style={{padding:"16px 24px 24px",display:"flex",flexDirection:"column",gap:16}}>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            <Toggle active={featured} onToggle={function(){setFeatured(function(v){return !v;});}} label="Featured highlight"/>
+            <span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary,paddingLeft:38}}>Featured highlights appear on the attendees' home screen in the app.</span>
+          </div>
+          <div style={{display:"flex",gap:12}}>
+            <button onClick={onBack} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 24px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Back</button>
+            <button onClick={function(){if(canPublish){setPublishedName(name);setPublished(true);}}}
+              style={{flex:2,background:canPublish?C.action:C.bgTertiary,border:"none",borderRadius:999,padding:"14px 24px",fontFamily:sans,fontWeight:600,fontSize:18,color:canPublish?C.bgPage:C.textMuted,cursor:canPublish?"pointer":"not-allowed",transition:"background .2s,color .2s"}}>
+              {isEdit?"Save changes":"Publish highlight"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// ── Download Modal ────────────────────────────────────────────────
+// ── Download Modal ─────────────────────────────────────────────────
 function DownloadModal({selectedIds,onCancel,onConfirm}){
   var count=selectedIds.size,mb=sumMB(selectedIds);
   var [phase,setPhase]=useState("pre");
@@ -502,8 +572,7 @@ function DownloadModal({selectedIds,onCancel,onConfirm}){
   var runningRef=useRef(false),barTimerRef=useRef(null),loopTimerRef=useRef(null);
   useEffect(function(){return function(){runningRef.current=false;clearInterval(barTimerRef.current);clearTimeout(loopTimerRef.current);};},[]);
   function startDownload(){
-    setPhase("loading");setCards([]);setProgPct(0);setProgVisible(true);
-    runningRef.current=true;
+    setPhase("loading");setCards([]);setProgPct(0);setProgVisible(true);runningRef.current=true;
     var start=Date.now(),end=start+TOTAL_MS;
     barTimerRef.current=setInterval(function(){setProgPct(Math.min(((Date.now()-start)/TOTAL_MS)*92,92));if(Date.now()>=end)clearInterval(barTimerRef.current);},200);
     var idx=0;
@@ -586,14 +655,14 @@ function DownloadModal({selectedIds,onCancel,onConfirm}){
   );
 }
 
-// ── Batch Dropdown ────────────────────────────────────────────────
+// ── Batch Dropdown ─────────────────────────────────────────────────
 function BatchDropdown({count,onDownload,onCollection,onDiscard}){
   var [open,setOpen]=useState(false),ref=useRef(null);
   useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);
   var items=[
-    {label:"Download videos",  color:C.textPrimary,action:function(){setOpen(false);onDownload();},  icon:<IDownload color={C.textPrimary} size={16}/>},
-    {label:"Create highlight", color:C.textPrimary,action:function(){setOpen(false);onCollection();},icon:<IStar color={C.textPrimary} size={16}/>},
-    {label:"Discard selected", color:C.action,     action:function(){setOpen(false);onDiscard();},   icon:<ITrash color={C.action} size={16}/>},
+    {label:"Download videos",color:C.textPrimary,action:function(){setOpen(false);onDownload();},icon:<IDownload color={C.textPrimary} size={16}/>},
+    {label:"Create highlight",color:C.textPrimary,action:function(){setOpen(false);onCollection();},icon:<IStar color={C.textPrimary} size={16}/>},
+    {label:"Discard selected",color:C.action,action:function(){setOpen(false);onDiscard();},icon:<ITrash color={C.action} size={16}/>},
   ];
   return(
     <div ref={ref} style={{position:"relative"}}>
@@ -618,15 +687,15 @@ function BatchDropdown({count,onDownload,onCollection,onDiscard}){
   );
 }
 
-// ── Status Tag ────────────────────────────────────────────────────
+// ── Status Tag ─────────────────────────────────────────────────────
 function StatusTag({status}){
-  if(status==="draft")     return <div style={{border:"1px solid "+C.textPrimary,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>Draft</span></div>;
-  if(status==="published") return <div style={{background:C.action,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.bgPage}}>Published</span></div>;
-  if(status==="featured")  return <div style={{background:C.textPrimary,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center",gap:4}}><IStar color={C.bgPage} size={12}/><span style={{fontFamily:sans,fontSize:14,color:C.bgPage}}>Featured</span></div>;
+  if(status==="draft")return <div style={{border:"1px solid "+C.textPrimary,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>Draft</span></div>;
+  if(status==="published")return <div style={{background:C.action,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.bgPage}}>Published</span></div>;
+  if(status==="featured")return <div style={{background:C.textPrimary,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center",gap:4}}><IStar color={C.bgPage} size={12}/><span style={{fontFamily:sans,fontSize:14,color:C.bgPage}}>Featured</span></div>;
   return null;
 }
 
-// ── Highlights Panel ──────────────────────────────────────────────
+// ── Highlights Panel ───────────────────────────────────────────────
 function HighlightsPanel({onNewHighlight,highlights,onEdit,onDelete}){
   var [deleteTarget,setDeleteTarget]=useState(null);
   var cols=[{key:"cover",w:79,label:"COVER"},{key:"name",w:200,label:"HIGHLIGHT NAME"},{key:"status",w:84,label:"STATUS"},{key:"shots",w:116,label:"SHOTS"},{key:"published",w:136,label:"PUBLISHED"},{key:"duration",w:116,label:"DURATION"},{key:"actions",w:112,label:"ACTIONS"}];
@@ -656,7 +725,7 @@ function HighlightsPanel({onNewHighlight,highlights,onEdit,onDelete}){
         </button>
       </div>
       {highlights.length===0
-        ? <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"64px 0",gap:16}}>
+        ?<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"64px 0",gap:16}}>
             <div style={{width:64,height:64,borderRadius:"50%",background:C.bgSecondary,display:"flex",alignItems:"center",justifyContent:"center"}}><IStar color={C.textMuted} size={28}/></div>
             <div style={{textAlign:"center",display:"flex",flexDirection:"column",gap:4}}>
               <p style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary,margin:0}}>No highlights yet</p>
@@ -664,7 +733,7 @@ function HighlightsPanel({onNewHighlight,highlights,onEdit,onDelete}){
             </div>
             <button onClick={onNewHighlight} style={{background:"none",border:"1px solid "+C.action,borderRadius:999,padding:"10px 24px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.action,cursor:"pointer"}}>Create your first highlight</button>
           </div>
-        : <>
+        :<>
             <div style={{display:"flex",flexDirection:"column",gap:2}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingBottom:8}}>
                 {cols.map(function(col){return <div key={col.key} style={{width:col.w,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,lineHeight:"20px",color:C.textSecondary,whiteSpace:"nowrap"}}>{col.label}</span></div>;})}
@@ -693,12 +762,9 @@ function HighlightsPanel({onNewHighlight,highlights,onEdit,onDelete}){
   );
 }
 
-// ── New / Edit Highlight Page ─────────────────────────────────────
+// ── New Highlight Page ─────────────────────────────────────────────
 function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight}){
   var isEdit=!!editHighlight;
-  var [name,setName]=useState(isEdit?editHighlight.name:"");
-  var [nameFocused,setNameFocused]=useState(false);
-  var [featured,setFeatured]=useState(isEdit?editHighlight.status==="featured":false);
   var [selectedIds,setSelectedIds]=useState(isEdit?new Set(editHighlight.selectedIds||[]):new Set());
   var [showMeta,setShowMeta]=useState(true);
   var [showFavsOnly,setShowFavsOnly]=useState(false);
@@ -707,50 +773,22 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
   var [previewShot,setPreviewShot]=useState(null);
   var [confirmDiscard,setConfirmDiscard]=useState(false);
   var [showArrange,setShowArrange]=useState(false);
-  var [done,setDone]=useState(false);
-
-  useEffect(function(){
-    if(!done)return;
-    var t=setTimeout(function(){onPublish();},3000);
-    return function(){clearTimeout(t);};
-  },[done]);
-
+  var [publishedName,setPublishedName]=useState("");
   var loMs=TL_START+rangeLo*TL_SPAN,hiMs=TL_START+rangeHi*TL_SPAN;
   var visible=SHOTS.filter(function(s){return s.ts>=loMs&&s.ts<=hiMs;}).filter(function(s){return !showFavsOnly||favIds.has(s.id);});
   var allSel=visible.length>0&&visible.every(function(s){return selectedIds.has(s.id);});
   var someSel=!allSel&&visible.some(function(s){return selectedIds.has(s.id);});
   var checkState=allSel?true:someSel?"indeterminate":false;
-
   function toggleShot(id){setSelectedIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
   function handleSelectAll(){if(allSel){setSelectedIds(function(p){var n=new Set(p);visible.forEach(function(s){n.delete(s.id);});return n;});}else{setSelectedIds(function(p){var n=new Set(p);visible.forEach(function(s){n.add(s.id);});return n;});}}
   var handleRange=useCallback(function(lo,hi){setRangeLo(lo);setRangeHi(hi);},[]);
-  var canPublish=name.trim()&&selectedIds.size>0;
-  function handleBack(){if(name.trim()||selectedIds.size>0){setConfirmDiscard(true);}else{onCancel();}}
-
-  if(done){
-    return(
-      <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage}}>
-        <Sidebar/>
-        <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh"}}>
-          <div style={{background:C.bgSecondary,borderRadius:24,padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,width:420,textAlign:"center",animation:"fadeUp .4s ease both"}}>
-            <div style={{background:C.action,borderRadius:"50%",width:72,height:72,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              <p style={{fontFamily:sans,fontWeight:600,fontSize:28,color:C.textPrimary,margin:0}}>{isEdit?"Changes saved!":"Highlight created!"}</p>
-              <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>{isEdit?'"'+name+'" has been updated.':'"'+name+'" has been published'+(featured?" and featured on the event page":"")+"."}
-              </p>
-              <p style={{fontFamily:sans,fontSize:14,color:C.textMuted,margin:0}}>Taking you to the panel…</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  var canProceed=selectedIds.size>0;
+  function handleBack(){if(selectedIds.size>0){setConfirmDiscard(true);}else{onCancel();}}
 
   return(
     <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage}}>
       <Sidebar/>
       <div style={{flex:1,display:"flex",flexDirection:"column",gap:10,padding:"24px 16px",overflowY:"auto",boxSizing:"border-box"}}>
-
         {confirmDiscard&&(
           <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(22,20,49,0.8)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
             <div style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:400,textAlign:"center"}}>
@@ -758,7 +796,7 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
                 <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
                 <div style={{display:"flex",flexDirection:"column",gap:4}}>
                   <p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Discard progress?</p>
-                  <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>You will lose your changes.</p>
+                  <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>You will lose your shot selection.</p>
                 </div>
               </div>
               <div style={{display:"flex",gap:16}}>
@@ -768,43 +806,14 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
             </div>
           </div>
         )}
-
-        {/* Header */}
         <div style={{background:C.bgSecondary,borderRadius:12,padding:"16px 24px",display:"flex",alignItems:"center",gap:16}}>
-          <button onClick={handleBack} style={{background:C.bgTertiary,border:"none",borderRadius:"50%",width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>
-            <IArrowLeft color={C.textPrimary} size={20}/>
-          </button>
+          <button onClick={handleBack} style={{background:C.bgTertiary,border:"none",borderRadius:"50%",width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}><IArrowLeft color={C.textPrimary} size={20}/></button>
           <p style={{flex:1,fontFamily:sans,fontWeight:600,fontSize:20,color:C.textPrimary,margin:0}}>{isEdit?"Edit highlight":"New highlight"}</p>
-          <div style={{display:"flex",gap:12,alignItems:"center"}}>
-            <button onClick={function(){if(name.trim())setShowArrange(true);}}
-              style={{background:"transparent",border:"1px solid "+C.border,borderRadius:999,padding:"11px 24px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.textSecondary,cursor:"pointer"}}>
-              Save as draft
-            </button>
-            <button onClick={function(){if(canPublish)setShowArrange(true);}}
-              style={{background:canPublish?C.action:C.bgTertiary,border:"none",borderRadius:999,padding:"12px 24px",fontFamily:sans,fontWeight:600,fontSize:16,color:canPublish?C.bgPage:C.textMuted,cursor:canPublish?"pointer":"not-allowed",transition:"background .2s,color .2s"}}>
-              Publish
-            </button>
-          </div>
+          <button onClick={function(){if(canProceed)setShowArrange(true);}}
+            style={{background:canProceed?C.action:C.bgTertiary,border:"none",borderRadius:999,padding:"12px 24px",fontFamily:sans,fontWeight:600,fontSize:16,color:canProceed?C.bgPage:C.textMuted,cursor:canProceed?"pointer":"not-allowed",transition:"background .2s,color .2s"}}>
+            Continue
+          </button>
         </div>
-
-        {/* Name + Featured */}
-        <div style={{background:C.bgSecondary,borderRadius:12,padding:"20px 24px",display:"flex",flexDirection:"column",gap:16}}>
-          <div style={{display:"flex",flexDirection:"column",gap:6,maxWidth:480}}>
-            <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Highlight name</span>
-            <input value={name}
-              onChange={function(e){setName(e.target.value);}}
-              onFocus={function(){setNameFocused(true);}}
-              onBlur={function(){setNameFocused(false);}}
-              placeholder="e.g. Best moments of the night"
-              style={{border:"2px solid "+(nameFocused?C.textPrimary:C.border),borderRadius:12,padding:"10px 20px",fontFamily:sans,fontSize:16,background:C.bgTertiary,outline:"none",width:"100%"}}/>
-          </div>
-          <div style={{display:"flex",flexDirection:"column",gap:6}}>
-            <Toggle active={featured} onToggle={function(){setFeatured(function(v){return !v;});}} label="Featured highlight"/>
-            <span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary,paddingLeft:38}}>Featured highlights appear on the attendees' home screen in the app.</span>
-          </div>
-        </div>
-
-        {/* Shot selection */}
         <div style={{background:C.bgSecondary,borderRadius:12,padding:"16px 24px",display:"flex",flexDirection:"column",gap:16}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,flexWrap:"wrap"}}>
             <div style={{display:"flex",flexDirection:"column",gap:6}}>
@@ -817,76 +826,48 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
               <CheckboxField checked={checkState} onClick={handleSelectAll} label={"Select all ("+visible.length+")"}/>
             </div>
           </div>
+          {selectedIds.size>0&&(
+            <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:C.bgTertiary,borderRadius:10}}>
+              <div style={{background:C.action,borderRadius:999,minWidth:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 8px"}}>
+                <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.bgPage}}>{selectedIds.size}</span>
+              </div>
+              <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{selectedIds.size===1?"shot selected":"shots selected"}</span>
+            </div>
+          )}
           {visible.length>0
-            ? <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>
+            ?<div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>
                 {visible.map(function(shot){return(
                   <ShotCard key={shot.id} shot={shot}
-                    selected={selectedIds.has(shot.id)}
-                    onToggle={function(){toggleShot(shot.id);}}
+                    selected={selectedIds.has(shot.id)} onToggle={function(){toggleShot(shot.id);}}
                     onPreview={function(){setPreviewShot(shot);}}
-                    fav={favIds.has(shot.id)}
-                    onToggleFav={function(){onToggleFav(shot.id);}}
-                    showMeta={showMeta}
-                    discarded={false}
-                    highlightMode={true}
+                    fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}}
+                    showMeta={showMeta} discarded={false} highlightMode={true}
                   />
                 );})}
               </div>
-            : <div style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>No shots in this time range.</div>
+            :<div style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>No shots in this time range.</div>
           }
         </div>
       </div>
-
       {previewShot&&<PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}}/>}
       {showArrange&&(
-        <ArrangeModal
-          selectedIds={selectedIds}
+        <ArrangeModal selectedIds={selectedIds} isEdit={isEdit} editName={isEdit?editHighlight.name:""} editFeatured={isEdit?editHighlight.status==="featured":false}
           onBack={function(){setShowArrange(false);}}
-          onPublish={function(){setShowArrange(false);setDone(true);}}
+          onPublish={function(order,n,f){setPublishedName(n);setShowArrange(false);onPublish();}}
         />
       )}
     </div>
   );
 }
 
-// ── Settings Panel ────────────────────────────────────────────────
-function SettingsSwitch({active,onToggle}){
-  return(
-    <div onClick={onToggle} style={{width:26.7,height:16,borderRadius:999,padding:"2.7px",boxSizing:"border-box",background:active?C.textPrimary:C.bgTertiary,display:"flex",alignItems:"center",justifyContent:active?"flex-end":"flex-start",transition:"background 0.2s",flexShrink:0,cursor:"pointer"}}>
-      <div style={{width:10.7,height:10.7,borderRadius:"50%",background:active?C.bgPage:C.textPrimary,transition:"background 0.2s"}}/>
-    </div>
-  );
-}
-
-function SettingsInputField({label,hint,placeholder,multiline,maxLength}){
-  var [val,setVal]=useState("");
-  var [focused,setFocused]=useState(false);
-  var baseStyle={border:"2px solid "+(focused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,resize:"none"};
-  return(
-    <div style={{display:"flex",flexDirection:"column",gap:4,width:"100%"}}>
-      <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{label}</span>
-      {hint&&<span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{hint}</span>}
-      {multiline
-        ?<textarea value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLength}
-            onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}}
-            style={Object.assign({},baseStyle,{height:192,minHeight:128})}/>
-        :<input value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLength}
-            onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}}
-            style={baseStyle}/>
-      }
-    </div>
-  );
-}
-
-// ── Time Picker ───────────────────────────────────────────────────
+// ── Time Col ───────────────────────────────────────────────────────
 function TimeCol({items,selected,onSelect,fmt}){
   return(
     <div style={{display:"flex",flexDirection:"column",overflowY:"auto",maxHeight:160,scrollbarWidth:"none",width:52}}>
       {items.map(function(item){
         var sel=item===selected;
         return(
-          <div key={item}
-            onClick={function(e){e.stopPropagation();onSelect(item);}}
+          <div key={item} onClick={function(e){e.stopPropagation();onSelect(item);}}
             onMouseEnter={function(e){if(!sel)e.currentTarget.style.background=C.bgTertiary;}}
             onMouseLeave={function(e){if(!sel)e.currentTarget.style.background="transparent";}}
             style={{height:32,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8,cursor:"pointer",flexShrink:0,fontFamily:sans,fontSize:16,color:sel?C.bgPage:C.textPrimary,background:sel?C.action:"transparent",transition:"background .15s"}}>
@@ -898,42 +879,26 @@ function TimeCol({items,selected,onSelect,fmt}){
   );
 }
 
+// ── Time Picker ────────────────────────────────────────────────────
 function TimePicker({value,onChange}){
   var [open,setOpen]=useState(false);
   var ref=useRef(null);
-  useEffect(function(){
-    function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}
-    document.addEventListener("mousedown",h);
-    return function(){document.removeEventListener("mousedown",h);};
-  },[]);
-
+  useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);
   var parts=(value||"09:00").split(":");
-  var h24=parseInt(parts[0])||0;
-  var min=parseInt(parts[1])||0;
-  var ampm=h24>=12?"PM":"AM";
-  var h12=h24%12||12;
-
+  var h24=parseInt(parts[0])||0,min=parseInt(parts[1])||0;
+  var ampm=h24>=12?"PM":"AM",h12=h24%12||12;
   function setHour(h){onChange(pad2(ampm==="PM"?h%12+12:h%12)+":"+pad2(min));}
   function setMin(m){onChange(pad2(h24)+":"+pad2(m));}
   function setAmpm(a){onChange(pad2(a==="PM"?h12%12+12:h12%12)+":"+pad2(min));}
-
-  var hours=[1,2,3,4,5,6,7,8,9,10,11,12];
-  var mins=[0,5,10,15,20,25,30,35,40,45,50,55];
+  var hours=[1,2,3,4,5,6,7,8,9,10,11,12],mins=[0,5,10,15,20,25,30,35,40,45,50,55];
   var label=pad2(h12)+":"+pad2(min)+" "+ampm;
-
   return(
     <div ref={ref} style={{position:"relative"}}>
-      {/* pill — clicking opens custom picker, no native input */}
-      <div
-        onClick={function(e){e.stopPropagation();setOpen(function(v){return !v;});}}
-        style={{background:C.bgSecondary,borderRadius:100,padding:"6px 12px",cursor:"pointer",userSelect:"none",display:"inline-flex",alignItems:"center"}}>
+      <div onClick={function(e){e.stopPropagation();setOpen(function(v){return !v;});}} style={{background:C.bgSecondary,borderRadius:100,padding:"6px 12px",cursor:"pointer",userSelect:"none",display:"inline-flex",alignItems:"center"}}>
         <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,whiteSpace:"nowrap"}}>{label}</span>
       </div>
-      {/* custom column picker — opens upward */}
       {open&&(
-        <div
-          onClick={function(e){e.stopPropagation();}}
-          style={{position:"absolute",bottom:"calc(100% + 6px)",right:0,background:C.bgSecondary,borderRadius:12,padding:"8px",boxShadow:"0 8px 32px rgba(0,0,0,0.5)",display:"flex",alignItems:"stretch",gap:4,zIndex:400}}>
+        <div onClick={function(e){e.stopPropagation();}} style={{position:"absolute",bottom:"calc(100% + 6px)",right:0,background:C.bgSecondary,borderRadius:12,padding:"8px",boxShadow:"0 8px 32px rgba(0,0,0,0.5)",display:"flex",alignItems:"stretch",gap:4,zIndex:400}}>
           <TimeCol items={hours} selected={h12} onSelect={setHour} fmt={function(v){return pad2(v);}}/>
           <div style={{width:1,background:C.border,margin:"2px 0"}}/>
           <TimeCol items={mins} selected={min} onSelect={setMin} fmt={function(v){return pad2(v);}}/>
@@ -945,131 +910,64 @@ function TimePicker({value,onChange}){
   );
 }
 
+// ── Date Time Picker ───────────────────────────────────────────────
 function DateTimePicker({label,hint}){
   var today=new Date();
   var [viewYear,setViewYear]=useState(today.getFullYear());
   var [viewMonth,setViewMonth]=useState(today.getMonth());
   var [startDate,setStartDate]=useState(null);
   var [endDate,setEndDate]=useState(null);
-  var [openFor,setOpenFor]=useState(null); // "start" | "end" | null
+  var [openFor,setOpenFor]=useState(null);
   var [timeStr,setTimeStr]=useState("09:00");
   var ref=useRef(null);
-
-  useEffect(function(){
-    function h(e){if(ref.current&&!ref.current.contains(e.target))setOpenFor(null);}
-    document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};
-  },[]);
-
+  useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpenFor(null);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);
   var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
   var DAYS=["MON","TUE","WED","THU","FRI","SAT","SUN"];
-
   function prevMonth(){if(viewMonth===0){setViewMonth(11);setViewYear(function(y){return y-1;});}else setViewMonth(function(m){return m-1;});}
   function nextMonth(){if(viewMonth===11){setViewMonth(0);setViewYear(function(y){return y+1;});}else setViewMonth(function(m){return m+1;});}
-
-  function getDays(){
-    var first=new Date(viewYear,viewMonth,1);
-    var last=new Date(viewYear,viewMonth+1,0);
-    var offset=(first.getDay()+6)%7;
-    var cells=[];
-    for(var i=0;i<offset;i++)cells.push(null);
-    for(var d=1;d<=last.getDate();d++)cells.push(d);
-    while(cells.length%7!==0)cells.push(null);
-    return cells;
-  }
-
-  function selectDay(d){
-    var dt=new Date(viewYear,viewMonth,d);
-    if(openFor==="start"){setStartDate(dt);setOpenFor(null);}
-    else if(openFor==="end"){setEndDate(dt);setOpenFor(null);}
-  }
-
+  function getDays(){var first=new Date(viewYear,viewMonth,1),last=new Date(viewYear,viewMonth+1,0),offset=(first.getDay()+6)%7,cells=[];for(var i=0;i<offset;i++)cells.push(null);for(var d=1;d<=last.getDate();d++)cells.push(d);while(cells.length%7!==0)cells.push(null);return cells;}
+  function selectDay(d){var dt=new Date(viewYear,viewMonth,d);if(openFor==="start"){setStartDate(dt);setOpenFor(null);}else if(openFor==="end"){setEndDate(dt);setOpenFor(null);}}
   function isToday(d){var t=new Date();return d===t.getDate()&&viewMonth===t.getMonth()&&viewYear===t.getFullYear();}
   function isSel(d,dt){return dt&&d===dt.getDate()&&viewMonth===dt.getMonth()&&viewYear===dt.getFullYear();}
-
   function fmtDate(dt){if(!dt)return null;return pad2(dt.getDate())+"."+pad2(dt.getMonth()+1)+"."+String(dt.getFullYear()).slice(2);}
-
   return(
     <div style={{display:"flex",flexDirection:"column",gap:4,flex:1,minWidth:0,position:"relative"}} ref={ref}>
       <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{label}</span>
       {hint&&<span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{hint}</span>}
-
-      {/* trigger: Start / End rows stacked */}
       <div style={{border:"2px solid "+(openFor?C.textPrimary:C.border),borderRadius:16,background:C.bgTertiary,overflow:"hidden",position:"relative"}}>
-        {/* Start row */}
-        <div onClick={function(){setOpenFor(openFor==="start"?null:"start");}}
-          style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",borderBottom:"1px solid "+C.border,cursor:"pointer",background:openFor==="start"?C.bgSecondary:"transparent"}}>
+        <div onClick={function(){setOpenFor(openFor==="start"?null:"start");}} style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",borderBottom:"1px solid "+C.border,cursor:"pointer",background:openFor==="start"?C.bgSecondary:"transparent"}}>
           <div style={{width:14,height:14,borderRadius:"50%",background:C.textSecondary,flexShrink:0}}/>
           <span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,flex:1}}>{fmtDate(startDate)||"Start"}</span>
           {startDate&&<span style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{timeStr}</span>}
         </div>
-        {/* dotted connector */}
         <div style={{position:"absolute",left:22,top:40,height:24,borderLeft:"2px dashed "+C.border,zIndex:1}}/>
-        {/* End row */}
-        <div onClick={function(){setOpenFor(openFor==="end"?null:"end");}}
-          style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",cursor:"pointer",background:openFor==="end"?C.bgSecondary:"transparent"}}>
+        <div onClick={function(){setOpenFor(openFor==="end"?null:"end");}} style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",cursor:"pointer",background:openFor==="end"?C.bgSecondary:"transparent"}}>
           <div style={{width:14,height:14,borderRadius:"50%",border:"2px solid "+C.textSecondary,background:"transparent",flexShrink:0}}/>
           <span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,flex:1}}>{fmtDate(endDate)||"End"}</span>
           {endDate&&<span style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{timeStr}</span>}
         </div>
       </div>
-
-      {/* floating calendar */}
       {openFor&&(
         <div style={{position:"absolute",top:"100%",left:0,zIndex:200,marginTop:4,background:C.bgTertiary,borderRadius:12,width:370,boxShadow:"0 10px 60px rgba(0,0,0,0.4)",overflow:"hidden"}}>
-          {/* header */}
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 16px"}}>
             <div style={{display:"flex",alignItems:"center",gap:4}}>
               <span style={{fontFamily:sans,fontWeight:800,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{MONTHS[viewMonth]+" "+viewYear}</span>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:28}}>
-              <div onClick={function(e){e.stopPropagation();prevMonth();}} style={{cursor:"pointer",display:"flex",alignItems:"center",width:24,height:24}}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-              </div>
-              <div onClick={function(e){e.stopPropagation();nextMonth();}} style={{cursor:"pointer",display:"flex",alignItems:"center",width:24,height:24}}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </div>
+              <div onClick={function(e){e.stopPropagation();prevMonth();}} style={{cursor:"pointer",display:"flex",alignItems:"center",width:24,height:24}}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+              <div onClick={function(e){e.stopPropagation();nextMonth();}} style={{cursor:"pointer",display:"flex",alignItems:"center",width:24,height:24}}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
             </div>
           </div>
-
-          {/* day headers */}
           <div style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:20,alignItems:"center"}}>
-            {DAYS.map(function(d){return(
-              <div key={d} style={{width:44,textAlign:"center",fontFamily:sans,fontSize:12,color:C.textPrimary}}>{d}</div>
-            );})}
+            {DAYS.map(function(d){return <div key={d} style={{width:44,textAlign:"center",fontFamily:sans,fontSize:12,color:C.textPrimary}}>{d}</div>;})}
           </div>
-
-          {/* grid */}
-          <div style={{display:"flex",flexDirection:"column",gap:0}}>
-            {(function(){
-              var cells=getDays(),rows=[];
-              for(var i=0;i<cells.length;i+=7)rows.push(cells.slice(i,i+7));
-              return rows.map(function(week,ri){return(
-                <div key={ri} style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:44,alignItems:"center"}}>
-                  {week.map(function(d,di){
-                    var selStart=d&&isSel(d,startDate);
-                    var selEnd=d&&isSel(d,endDate);
-                    var sel=selStart||selEnd;
-                    var tod=d&&isToday(d);
-                    return(
-                      <div key={di} onClick={function(){if(d)selectDay(d);}}
-                        style={{width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",background:sel?"rgba(241,102,92,0.25)":"transparent",cursor:d?"pointer":"default",flexShrink:0}}>
-                        {d&&<span style={{fontFamily:sans,fontSize:20,lineHeight:"28px",fontWeight:sel?600:400,color:sel||tod?C.action:C.textPrimary}}>{d}</span>}
-                      </div>
-                    );
-                  })}
-                </div>
-              );});
-            })()}
+          <div style={{display:"flex",flexDirection:"column"}}>
+            {(function(){var cells=getDays(),rows=[];for(var i=0;i<cells.length;i+=7)rows.push(cells.slice(i,i+7));return rows.map(function(week,ri){return(<div key={ri} style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:44,alignItems:"center"}}>{week.map(function(d,di){var sel=(isSel(d,startDate)||isSel(d,endDate)),tod=d&&isToday(d);return(<div key={di} onClick={function(){if(d)selectDay(d);}} style={{width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",background:sel?"rgba(241,102,92,0.25)":"transparent",cursor:d?"pointer":"default",flexShrink:0}}>{d&&<span style={{fontFamily:sans,fontSize:20,lineHeight:"28px",fontWeight:sel?600:400,color:sel||tod?C.action:C.textPrimary}}>{d}</span>}</div>);})}</div>);});})()}
           </div>
-
-          {/* time row */}
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",height:52,borderTop:"1px solid "+C.border}}>
             <span style={{fontFamily:sans,fontSize:16,color:C.textPrimary}}>Time</span>
-            <div style={{background:C.bgSecondary,borderRadius:100,padding:"5px 12px"}}>
-              <input type="time" value={timeStr} onChange={function(e){setTimeStr(e.target.value);}}
-                style={{fontFamily:sans,fontSize:16,color:C.textPrimary,background:"transparent",border:"none",outline:"none",width:90,cursor:"pointer"}}/>
-            </div>
+            <TimePicker value={timeStr} onChange={function(v){setTimeStr(v);}}/>
           </div>
         </div>
       )}
@@ -1077,100 +975,74 @@ function DateTimePicker({label,hint}){
   );
 }
 
-// ── Timezone Picker ───────────────────────────────────────────────
-var TIMEZONES=[
-  {label:"UTC-12:00",value:"UTC-12"},{label:"UTC-11:00",value:"UTC-11"},
-  {label:"UTC-10:00",value:"UTC-10"},{label:"UTC-09:00",value:"UTC-9"},
-  {label:"UTC-08:00",value:"UTC-8"},{label:"UTC-07:00",value:"UTC-7"},
-  {label:"UTC-06:00",value:"UTC-6"},{label:"UTC-05:00",value:"UTC-5"},
-  {label:"UTC-04:00",value:"UTC-4"},{label:"UTC-03:00",value:"UTC-3"},
-  {label:"UTC-02:00",value:"UTC-2"},{label:"UTC-01:00",value:"UTC-1"},
-  {label:"UTC+00:00",value:"UTC+0"},{label:"UTC+01:00",value:"UTC+1"},
-  {label:"UTC+02:00",value:"UTC+2"},{label:"UTC+03:00",value:"UTC+3"},
-  {label:"UTC+04:00",value:"UTC+4"},{label:"UTC+05:00",value:"UTC+5"},
-  {label:"UTC+05:30",value:"UTC+5:30"},{label:"UTC+06:00",value:"UTC+6"},
-  {label:"UTC+07:00",value:"UTC+7"},{label:"UTC+08:00",value:"UTC+8"},
-  {label:"UTC+09:00",value:"UTC+9"},{label:"UTC+09:30",value:"UTC+9:30"},
-  {label:"UTC+10:00",value:"UTC+10"},{label:"UTC+11:00",value:"UTC+11"},
-  {label:"UTC+12:00",value:"UTC+12"},
-];
-
+// ── Timezone Picker ────────────────────────────────────────────────
+var TIMEZONES=["UTC-12","UTC-11","UTC-10","UTC-9","UTC-8","UTC-7","UTC-6","UTC-5","UTC-4","UTC-3","UTC-2","UTC-1","UTC+0","UTC+1","UTC+2","UTC+3","UTC+4","UTC+5","UTC+5:30","UTC+6","UTC+7","UTC+8","UTC+9","UTC+9:30","UTC+10","UTC+11","UTC+12"].map(function(v){return{value:v,label:v.replace("UTC","UTC").replace(/([+-])(\d)/,"$1$2").padEnd(8)};});
 function TimezonePicker(){
-  var [tz,setTz]=useState("UTC+1");
+  var [tz,setTz]=useState("UTC+1"),ref=useRef(null);
   var [open,setOpen]=useState(false);
-  var ref=useRef(null);
-  useEffect(function(){
-    function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}
-    document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};
-  },[]);
+  useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);
   var current=TIMEZONES.find(function(t){return t.value===tz;})||TIMEZONES[13];
   return(
     <div ref={ref} style={{position:"relative",flexShrink:0}}>
-      <div onClick={function(){setOpen(function(v){return !v;});}}
-        style={{display:"flex",alignItems:"center",gap:4,border:"1px solid "+(open?C.textPrimary:C.textPrimary),borderRadius:4,padding:"2px 8px",cursor:"pointer",userSelect:"none",background:open?C.bgTertiary:"transparent",transition:"background .15s"}}>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{current.label}</span>
+      <div onClick={function(){setOpen(function(v){return !v;});}} style={{display:"flex",alignItems:"center",gap:4,border:"1px solid "+C.textPrimary,borderRadius:4,padding:"2px 8px",cursor:"pointer",userSelect:"none"}}>
+        <IGlobe color={C.textPrimary} size={12}/>
+        <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{current.value}</span>
       </div>
       {open&&(
         <div style={{position:"absolute",top:"calc(100% + 4px)",right:0,background:C.bgSecondary,borderRadius:12,padding:4,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",zIndex:200,maxHeight:240,overflowY:"auto",scrollbarWidth:"none",minWidth:130}}>
-          {TIMEZONES.map(function(t){
-            var sel=t.value===tz;
-            return(
-              <div key={t.value} onClick={function(){setTz(t.value);setOpen(false);}}
-                style={{padding:"6px 12px",borderRadius:8,cursor:"pointer",fontFamily:sans,fontSize:14,color:sel?C.bgPage:C.textPrimary,background:sel?C.action:"transparent",transition:"background .15s",whiteSpace:"nowrap"}}
-                onMouseEnter={function(e){if(!sel)e.currentTarget.style.background=C.bgTertiary;}}
-                onMouseLeave={function(e){if(!sel)e.currentTarget.style.background="transparent";}}>
-                {t.label}
-              </div>
-            );
-          })}
+          {TIMEZONES.map(function(t){var sel=t.value===tz;return(
+            <div key={t.value} onClick={function(){setTz(t.value);setOpen(false);}}
+              style={{padding:"6px 12px",borderRadius:8,cursor:"pointer",fontFamily:sans,fontSize:14,color:sel?C.bgPage:C.textPrimary,background:sel?C.action:"transparent",transition:"background .15s",whiteSpace:"nowrap"}}
+              onMouseEnter={function(e){if(!sel)e.currentTarget.style.background=C.bgTertiary;}}
+              onMouseLeave={function(e){if(!sel)e.currentTarget.style.background="transparent";}}>
+              {t.value}
+            </div>
+          );})}
         </div>
       )}
     </div>
   );
 }
 
+// ── Settings Panel ─────────────────────────────────────────────────
+function SettingsInputField({label,hint,placeholder,multiline,maxLength}){
+  var [val,setVal]=useState("");
+  var [focused,setFocused]=useState(false);
+  var baseStyle={border:"2px solid "+(focused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,resize:"none"};
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:4,width:"100%"}}>
+      <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{label}</span>
+      {hint&&<span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{hint}</span>}
+      {multiline?<textarea value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLength} onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}} style={Object.assign({},baseStyle,{height:192,minHeight:128})}/>:<input value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLength} onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}} style={baseStyle}/>}
+    </div>
+  );
+}
 function SettingsPanel(){
   var [privateEvent,setPrivateEvent]=useState(false);
   var [instantSharing,setInstantSharing]=useState(false);
+  var [saved,setSaved]=useState(false);
+  function handleSave(){setSaved(true);setTimeout(function(){setSaved(false);},3000);}
   return(
     <div style={{display:"flex",flexDirection:"column",gap:24,padding:"8px 24px 24px"}}>
+      {saved&&(<div style={{position:"fixed",top:24,left:"50%",transform:"translateX(-50%)",zIndex:900,background:C.bgSecondary,borderRadius:12,padding:"12px 24px",display:"flex",alignItems:"center",gap:10,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",animation:"fadeUp .3s ease both"}}><div style={{width:20,height:20,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span style={{fontFamily:sans,fontSize:15,color:C.textPrimary,whiteSpace:"nowrap"}}>Settings saved successfully</span></div>)}
       <p style={{fontFamily:sans,fontWeight:800,fontSize:24,lineHeight:"30px",color:C.textPrimary,margin:0}}>Event settings</p>
       <div style={{display:"flex",flexDirection:"column",gap:24,width:"100%"}}>
         <SettingsInputField label="Event name" hint="60 characters maximum" placeholder="Event name" maxLength={60}/>
         <SettingsInputField label="Location" placeholder="Event location"/>
-        {/* Date & Time row */}
         <div style={{display:"flex",alignItems:"flex-start",gap:16,width:"100%"}}>
-          <div style={{flex:1,minWidth:0,position:"relative"}}>
-            <DateTimePicker label="Date & Time" hint="Period the event will be live"/>
-          </div>
-          <div style={{flex:1,minWidth:0,position:"relative"}}>
-            <DateTimePicker label="Video submitting period (optional)" hint="During this time, attendees can upload their videos"/>
-          </div>
-          <TimezonePicker/>
+          <div style={{flex:1,minWidth:0,position:"relative"}}><DateTimePicker label="Date & Time" hint="Period the event will be live"/></div>
+          <div style={{flex:1,minWidth:0,position:"relative"}}><DateTimePicker label="Video submitting period (optional)" hint="During this time, attendees can upload their videos"/></div>
+          <div style={{marginTop:36,flexShrink:0}}><TimezonePicker/></div>
         </div>
         <SettingsInputField label="Event description" hint="300 characters maximum" placeholder="Describe your event" multiline={true} maxLength={300}/>
-        {/* Switches */}
-        {[
-          {key:"private",  label:"Private event",           desc:"Content is exclusive to the event, and only you can invite attendees", active:privateEvent,   onToggle:function(){setPrivateEvent(function(v){return !v;});}},
-          {key:"instant",  label:"Instant content sharing", desc:"When enabled, all uploaded videos are instantly shared with attendees",  active:instantSharing, onToggle:function(){setInstantSharing(function(v){return !v;});}},
-        ].map(function(sw){return(
-          <div key={sw.key} style={{display:"flex",flexDirection:"column",gap:4}}>
-            <div style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}>
-              <SettingsSwitch active={sw.active} onToggle={sw.onToggle}/>
-              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{sw.label}</span>
-            </div>
-            <div style={{display:"flex",gap:12}}>
-              <div style={{width:26.7,flexShrink:0}}/>
-              <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{sw.desc}</span>
-            </div>
-          </div>
-        );})}
+        {[{key:"private",label:"Private event",desc:"Content is exclusive to the event, and only you can invite attendees",active:privateEvent,onToggle:function(){setPrivateEvent(function(v){return !v;});}},{key:"instant",label:"Instant content sharing",desc:"When enabled, all uploaded videos are instantly shared with attendees",active:instantSharing,onToggle:function(){setInstantSharing(function(v){return !v;});}}].map(function(sw){return(<div key={sw.key} style={{display:"flex",flexDirection:"column",gap:4}}><div style={{display:"flex",alignItems:"center",gap:12}}><Toggle active={sw.active} onToggle={sw.onToggle} label={sw.label}/></div><div style={{display:"flex",gap:12}}><div style={{width:26.7,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{sw.desc}</span></div></div>);})}
       </div>
-      <button style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,cursor:"pointer",alignSelf:"flex-start"}}>Save changes</button>
+      <button onClick={handleSave} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,cursor:"pointer",alignSelf:"flex-start"}}>Save changes</button>
     </div>
   );
 }
+
+// ── Shots Panel ────────────────────────────────────────────────────
 function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onToggleFav,showMeta,onToggleMeta,showFavsOnly,onToggleFavsOnly,rangeLo,rangeHi,onRange,onDownload,onCollection,onPreview,discardedIds,onDiscard,onRecover,onBatchDiscard,activeTab,onTabChange,onNewHighlight,highlights,onEditHighlight,onDeleteHighlight}){
   var [innerTab,setInnerTab]=useState("shots");
   var count=selectedIds.size;
@@ -1187,24 +1059,15 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
   return(
     <div style={{background:C.bgSecondary,borderRadius:12,padding:"8px 24px 16px",display:"flex",flexDirection:"column",gap:12}}>
       <div style={{display:"flex",alignItems:"center",gap:12,padding:"8px 12px"}}>
-        {tabs.map(function(t){
-          var active=t===activeTab;
-          return(
-            <div key={t} onClick={function(){onTabChange(t);}} style={{minWidth:128,padding:8,textAlign:"center",cursor:"pointer",borderBottom:active?"2px solid "+C.textPrimary:"2px solid transparent"}}>
-              <span style={{fontFamily:sans,fontWeight:600,fontSize:16,lineHeight:"24px",color:active?C.textPrimary:C.textSecondary}}>{t}</span>
-            </div>
-          );
-        })}
+        {tabs.map(function(t){var active=t===activeTab;return(<div key={t} onClick={function(){onTabChange(t);}} style={{minWidth:128,padding:8,textAlign:"center",cursor:"pointer",borderBottom:active?"2px solid "+C.textPrimary:"2px solid transparent"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:16,lineHeight:"24px",color:active?C.textPrimary:C.textSecondary}}>{t}</span></div>);})}
       </div>
       {activeTab==="Highlights"
-        ? <HighlightsPanel onNewHighlight={onNewHighlight} highlights={highlights} onEdit={onEditHighlight} onDelete={onDeleteHighlight}/>
-        : activeTab==="Settings"
-        ? <SettingsPanel/>
-        : activeTab!=="Shots"
-        ? <div style={{display:"flex",alignItems:"center",justifyContent:"center",padding:"64px 0"}}>
-            <span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textMuted,letterSpacing:1}}>— in progress —</span>
-          </div>
-        : <>
+        ?<HighlightsPanel onNewHighlight={onNewHighlight} highlights={highlights} onEdit={onEditHighlight} onDelete={onDeleteHighlight}/>
+        :activeTab==="Settings"
+        ?<SettingsPanel/>
+        :activeTab!=="Shots"
+        ?<div style={{display:"flex",alignItems:"center",justifyContent:"center",padding:"64px 0"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textMuted,letterSpacing:1}}>— in progress —</span></div>
+        :<>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,padding:"12px 0"}}>
               <div style={{display:"flex",flexDirection:"column",gap:6}}>
                 <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Filter by date</span>
@@ -1222,38 +1085,18 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
               <Toggle active={showMeta} onToggle={onToggleMeta} label="Show shot metadata"/>
               <Toggle active={showFavsOnly} onToggle={onToggleFavsOnly} label="Favorites only"/>
               <CheckboxField checked={checkState} onClick={handleCheckbox} label={"Select all ("+visible.length+")"}/>
-              <div onClick={function(){setInnerTab(function(t){return t==="shots"?"discarded":"shots";});}}
-                style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"4px 12px",borderRadius:8,background:innerTab==="discarded"?C.bgTertiary:"transparent",transition:"background 0.15s",userSelect:"none",marginLeft:"auto"}}>
+              <div onClick={function(){setInnerTab(function(t){return t==="shots"?"discarded":"shots";});}} style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"4px 12px",borderRadius:8,background:innerTab==="discarded"?C.bgTertiary:"transparent",transition:"background 0.15s",userSelect:"none",marginLeft:"auto"}}>
                 <ITrash color={innerTab==="discarded"?C.textPrimary:C.textMuted} size={14}/>
                 <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:innerTab==="discarded"?C.textPrimary:C.textMuted,whiteSpace:"nowrap"}}>Discarded shots</span>
-                {discardedShots.length>0&&(
-                  <div style={{background:C.action,borderRadius:999,minWidth:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 5px"}}>
-                    <span style={{fontFamily:mono,fontWeight:700,fontSize:10,color:C.bgPage}}>{discardedShots.length}</span>
-                  </div>
-                )}
+                {discardedShots.length>0&&(<div style={{background:C.action,borderRadius:999,minWidth:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 5px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:10,color:C.bgPage}}>{discardedShots.length}</span></div>)}
               </div>
             </div>
-            {innerTab==="discarded"&&(
-              <div style={{display:"flex",flexDirection:"column",gap:4,padding:"12px 16px",background:C.bgTertiary,borderRadius:12}}>
-                <span style={{fontFamily:sans,fontWeight:600,fontSize:15,color:C.textPrimary}}>Discarded shots</span>
-                <span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>These shots have been removed from the event view. They'll be kept here for 30 days, then permanently deleted.</span>
-              </div>
-            )}
+            {innerTab==="discarded"&&(<div style={{display:"flex",flexDirection:"column",gap:4,padding:"12px 16px",background:C.bgTertiary,borderRadius:12}}><span style={{fontFamily:sans,fontWeight:600,fontSize:15,color:C.textPrimary}}>Discarded shots</span><span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>These shots have been removed from the event view. They'll be kept here for 30 days, then permanently deleted.</span></div>)}
             {visible.length>0
-              ? <div ref={gridRef} style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>
-                  {visible.map(function(shot){return(
-                    <ShotCard key={shot.id} shot={shot}
-                      selected={selectedIds.has(shot.id)} onToggle={function(){onToggle(shot.id);}}
-                      onPreview={function(){onPreview(shot);}}
-                      fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}}
-                      showMeta={showMeta} discarded={discardedIds.has(shot.id)}
-                      onDiscard={function(){onDiscard(shot.id);}} onRecover={function(){onRecover(shot.id);}}
-                    />
-                  );})}
+              ?<div ref={gridRef} style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>
+                  {visible.map(function(shot){return(<ShotCard key={shot.id} shot={shot} selected={selectedIds.has(shot.id)} onToggle={function(){onToggle(shot.id);}} onPreview={function(){onPreview(shot);}} fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}} showMeta={showMeta} discarded={discardedIds.has(shot.id)} onDiscard={function(){onDiscard(shot.id);}} onRecover={function(){onRecover(shot.id);}}/>);})}
                 </div>
-              : <div ref={gridRef} style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>
-                  {innerTab==="discarded"?"No discarded shots.":"No shots in this time range."}
-                </div>
+              :<div ref={gridRef} style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>{innerTab==="discarded"?"No discarded shots.":"No shots in this time range."}</div>
             }
           </>
       }
@@ -1261,7 +1104,7 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
   );
 }
 
-// ── App ───────────────────────────────────────────────────────────
+// ── App ────────────────────────────────────────────────────────────
 function App(){
   var [page,setPage]=useState("main");
   var [editTarget,setEditTarget]=useState(null);
@@ -1293,9 +1136,7 @@ function App(){
     return <NewHighlightPage
       onCancel={function(){setPage("main");setEditTarget(null);}}
       onPublish={function(){setActiveTab("Highlights");setPage("main");setEditTarget(null);}}
-      favIds={favIds}
-      onToggleFav={toggleFav}
-      editHighlight={editTarget}
+      favIds={favIds} onToggleFav={toggleFav} editHighlight={editTarget}
     />;
   }
 
@@ -1324,10 +1165,9 @@ function App(){
       </div>
       {previewShot&&<PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}} onDiscard={discardShot}/>}
       {showDlModal&&<DownloadModal selectedIds={selectedIds} onConfirm={function(){setShowDlModal(false);}} onCancel={function(){setShowDlModal(false);}}/>}
-      {showArrangeModal&&<ArrangeModal
-        selectedIds={arrangeIds}
+      {showArrangeModal&&<ArrangeModal selectedIds={arrangeIds} isEdit={false} editName="" editFeatured={false}
         onBack={function(){setShowArrangeModal(false);}}
-        onPublish={function(){setShowArrangeModal(false);setActiveTab("Highlights");}}
+        onPublish={function(order,n,f){setShowArrangeModal(false);setActiveTab("Highlights");}}
       />}
     </div>
   );
