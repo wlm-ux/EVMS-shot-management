@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>EVMS – Event Shots</title>
+<title>SureShot EVMS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Work+Sans:wght@400;600;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:#161431;font-family:'Work Sans',sans-serif;}
+body{background:#161431;font-family:"Work Sans",sans-serif;}
 #root{max-width:1440px;margin:0 auto;}
 input::placeholder,textarea::placeholder{color:#bbbcd6;}
 input,textarea{color:#faf9f9;}
-button{font-family:'Work Sans',sans-serif;}
+button{font-family:"Work Sans",sans-serif;}
 ::-webkit-scrollbar{display:none;}
 *{scrollbar-width:none;}
 @keyframes slideIn{from{opacity:0;transform:translateY(-28px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
@@ -35,56 +35,83 @@ function pad2(n){return String(n).padStart(2,"0");}
 function fmtMs(ms){var d=new Date(ms);return pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+String(d.getFullYear()).slice(2)+" "+pad2(d.getHours())+":"+pad2(d.getMinutes());}
 function fmtSec(s){s=Math.floor(s||0);return pad2(Math.floor(s/60))+":"+pad2(s%60);}
 
+// ── Events list constants ──────────────────────────────────────────
+var PAGE_SIZE=7;
+var LIST_STATUS={
+  draft:    {label:"Draft",         bg:"transparent",border:C.textPrimary, color:C.textPrimary,dot:false},
+  upcoming: {label:"Upcoming",      bg:"transparent",border:C.action,      color:C.action,     dot:false},
+  live:     {label:"Live",          bg:C.action,     border:C.action,      color:C.bgPage,     dot:true},
+  period:   {label:"Period active", bg:C.action,     border:C.action,      color:C.bgPage,     dot:false},
+  ended:    {label:"Ended",         bg:C.bgPage,     border:C.bgPage,      color:C.action,     dot:false},
+};
+var EVENTS=[
+  {id:0, name:"Live show this weekend! (copy)",status:"draft",   cover:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=120&h=74&fit=crop&q=80",location:"Nørreport Station, Copenhagen", time:"11.04.26 16h – 22h"},
+  {id:1, name:"Live show this weekend!",       status:"upcoming",cover:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=120&h=74&fit=crop&q=80",location:"Nørreport Station, Copenhagen", time:"14.04.26 18h – 23h"},
+  {id:2, name:"Neon Nights Festival",          status:"live",    cover:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=120&h=74&fit=crop&q=80",location:"Refshaleøen, Copenhagen",       time:"13.04.26 20h – 04h"},
+  {id:3, name:"Outdoor Summer Concert",        status:"period",  cover:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=120&h=74&fit=crop&q=80",location:"Fælledparken, Copenhagen",      time:"05.04.26 14h – 20h"},
+  {id:4, name:"Jazz in the Park",              status:"ended",   cover:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120&h=74&fit=crop&q=80",location:"Kongens Have, Copenhagen",      time:"28.03.26 16h – 21h"},
+  {id:5, name:"Techno Warehouse Rave",         status:"ended",   cover:"https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=120&h=74&fit=crop&q=80",location:"Vesterbro, Copenhagen",         time:"22.03.26 22h – 06h"},
+  {id:6, name:"Spring Music Festival",         status:"ended",   cover:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=120&h=74&fit=crop&q=80",location:"Amager Strandpark, Copenhagen", time:"15.03.26 12h – 22h"},
+  {id:7, name:"Club Night: Deep House",        status:"ended",   cover:"https://images.unsplash.com/photo-1468359601543-843bfaef291a?w=120&h=74&fit=crop&q=80",location:"Distortion Club, Copenhagen",   time:"08.03.26 23h – 06h"},
+  {id:8, name:"Acoustic Sessions Vol.4",       status:"ended",   cover:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&h=74&fit=crop&q=80",location:"Vega, Copenhagen",              time:"01.03.26 19h – 23h"},
+  {id:9, name:"Electronic Music Summit",       status:"ended",   cover:"https://images.unsplash.com/photo-1506157786151-b8491531f063?w=120&h=74&fit=crop&q=80",location:"DR Koncerthuset, Copenhagen",   time:"21.02.26 18h – 00h"},
+  {id:10,name:"Rooftop Sessions",              status:"ended",   cover:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=120&h=74&fit=crop&q=80",location:"Tivoli, Copenhagen",            time:"14.02.26 17h – 21h"},
+  {id:11,name:"New Year's Eve Bash",           status:"ended",   cover:"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=120&h=74&fit=crop&q=80",location:"Rådhuspladsen, Copenhagen",     time:"31.12.25 21h – 03h"},
+];
+
+// ── Hub constants ──────────────────────────────────────────────────
 var RAW=[
-  {id:0,orient:"portrait",ts:new Date("2026-03-10T09:20:00").getTime(),img:"https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=260&h=380&fit=crop&q=80",user:"Alice M.",size:"14.2 MB",dur:"0:12"},
-  {id:1,orient:"portrait",ts:new Date("2026-03-10T10:35:00").getTime(),img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=260&h=380&fit=crop&q=80",user:"Bob K.",size:"22.7 MB",dur:"0:24"},
-  {id:2,orient:"landscape",ts:new Date("2026-03-10T12:00:00").getTime(),img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=780&h=440&fit=crop&q=80",user:"Carol T.",size:"18.1 MB",dur:"0:18"},
-  {id:3,orient:"portrait",ts:new Date("2026-03-10T13:30:00").getTime(),img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=260&h=380&fit=crop&q=80",user:"Dan R.",size:"31.0 MB",dur:"0:30"},
-  {id:4,orient:"portrait",ts:new Date("2026-03-10T15:30:00").getTime(),img:"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=260&h=380&fit=crop&q=80",user:"Eve S.",size:"12.5 MB",dur:"0:08"},
-  {id:5,orient:"landscape",ts:new Date("2026-03-10T17:00:00").getTime(),img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=780&h=440&fit=crop&q=80",user:"Frank L.",size:"41.3 MB",dur:"0:36"},
-  {id:6,orient:"portrait",ts:new Date("2026-03-10T19:00:00").getTime(),img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=260&h=380&fit=crop&q=80",user:"Grace W.",size:"19.8 MB",dur:"0:18"},
-  {id:7,orient:"landscape",ts:new Date("2026-03-10T21:00:00").getTime(),img:"https://images.unsplash.com/photo-1468359601543-843bfaef291a?w=780&h=440&fit=crop&q=80",user:"Hank P.",size:"27.6 MB",dur:"0:22"},
-  {id:8,orient:"portrait",ts:new Date("2026-03-10T23:00:00").getTime(),img:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=260&h=380&fit=crop&q=80",user:"Iris N.",size:"15.9 MB",dur:"0:10"},
-  {id:9,orient:"portrait",ts:new Date("2026-03-11T01:00:00").getTime(),img:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=260&h=380&fit=crop&q=80",user:"Jack O.",size:"48.2 MB",dur:"0:42"},
-  {id:10,orient:"landscape",ts:new Date("2026-03-11T05:00:00").getTime(),img:"https://images.unsplash.com/photo-1506157786151-b8491531f063?w=780&h=440&fit=crop&q=80",user:"Kim Y.",size:"20.4 MB",dur:"0:18"},
-  {id:11,orient:"portrait",ts:new Date("2026-03-11T09:00:00").getTime(),img:"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=260&h=380&fit=crop&q=80",user:"Leo A.",size:"33.7 MB",dur:"0:28"},
-  {id:12,orient:"portrait",ts:new Date("2026-03-11T13:00:00").getTime(),img:"https://images.unsplash.com/photo-1598387846148-47e82ee120cc?w=260&h=380&fit=crop&q=80",user:"Mia B.",size:"11.3 MB",dur:"0:09"},
-  {id:13,orient:"landscape",ts:new Date("2026-03-11T16:00:00").getTime(),img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=780&h=440&fit=crop&q=80",user:"Nate C.",size:"28.9 MB",dur:"0:24"},
+  {id:0, orient:"portrait", ts:new Date("2026-03-10T09:20:00").getTime(),img:"https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=260&h=380&fit=crop&q=80",user:"Alice M.", size:"14.2 MB",dur:"0:12"},
+  {id:1, orient:"portrait", ts:new Date("2026-03-10T10:35:00").getTime(),img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=260&h=380&fit=crop&q=80",user:"Bob K.",   size:"22.7 MB",dur:"0:24"},
+  {id:2, orient:"landscape",ts:new Date("2026-03-10T12:00:00").getTime(),img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=780&h=440&fit=crop&q=80",user:"Carol T.", size:"18.1 MB",dur:"0:18"},
+  {id:3, orient:"portrait", ts:new Date("2026-03-10T13:30:00").getTime(),img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=260&h=380&fit=crop&q=80",user:"Dan R.",   size:"31.0 MB",dur:"0:30"},
+  {id:4, orient:"portrait", ts:new Date("2026-03-10T15:30:00").getTime(),img:"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=260&h=380&fit=crop&q=80",user:"Eve S.",   size:"12.5 MB",dur:"0:08"},
+  {id:5, orient:"landscape",ts:new Date("2026-03-10T17:00:00").getTime(),img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=780&h=440&fit=crop&q=80",user:"Frank L.", size:"41.3 MB",dur:"0:36"},
+  {id:6, orient:"portrait", ts:new Date("2026-03-10T19:00:00").getTime(),img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=260&h=380&fit=crop&q=80",user:"Grace W.", size:"19.8 MB",dur:"0:18"},
+  {id:7, orient:"landscape",ts:new Date("2026-03-10T21:00:00").getTime(),img:"https://images.unsplash.com/photo-1468359601543-843bfaef291a?w=780&h=440&fit=crop&q=80",user:"Hank P.",  size:"27.6 MB",dur:"0:22"},
+  {id:8, orient:"portrait", ts:new Date("2026-03-10T23:00:00").getTime(),img:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=260&h=380&fit=crop&q=80",user:"Iris N.",  size:"15.9 MB",dur:"0:10"},
+  {id:9, orient:"portrait", ts:new Date("2026-03-11T01:00:00").getTime(),img:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=260&h=380&fit=crop&q=80",user:"Jack O.",  size:"48.2 MB",dur:"0:42"},
+  {id:10,orient:"landscape",ts:new Date("2026-03-11T05:00:00").getTime(),img:"https://images.unsplash.com/photo-1506157786151-b8491531f063?w=780&h=440&fit=crop&q=80",user:"Kim Y.",   size:"20.4 MB",dur:"0:18"},
+  {id:11,orient:"portrait", ts:new Date("2026-03-11T09:00:00").getTime(),img:"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=260&h=380&fit=crop&q=80",user:"Leo A.",   size:"33.7 MB",dur:"0:28"},
+  {id:12,orient:"portrait", ts:new Date("2026-03-11T13:00:00").getTime(),img:"https://images.unsplash.com/photo-1598387846148-47e82ee120cc?w=260&h=380&fit=crop&q=80",user:"Mia B.",   size:"11.3 MB",dur:"0:09"},
+  {id:13,orient:"landscape",ts:new Date("2026-03-11T16:00:00").getTime(),img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=780&h=440&fit=crop&q=80",user:"Nate C.",  size:"28.9 MB",dur:"0:24"},
 ];
 var TL_START=RAW[0].ts,TL_END=RAW[RAW.length-1].ts,TL_SPAN=TL_END-TL_START;
 var SHOTS=RAW.map(function(s){var d=new Date(s.ts);return Object.assign({},s,{date:pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+String(d.getFullYear()).slice(2),time:pad2(d.getHours())+":"+pad2(d.getMinutes())});});
 function sumMB(ids){return SHOTS.filter(function(s){return ids.has(s.id);}).reduce(function(a,s){return a+parseFloat(s.size);},0).toFixed(1);}
 
 var DL_STEPS=[
-  {label:"Kindly rewinding",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>},
-  {label:"Pumping up the volume",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>},
-  {label:"Fetching another coffee",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>},
-  {label:"Untangling the cables",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>},
-  {label:"Counting the pixels",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>},
+  {label:"Kindly rewinding",         icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>},
+  {label:"Pumping up the volume",    icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>},
+  {label:"Fetching another coffee",  icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>},
+  {label:"Untangling the cables",    icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>},
+  {label:"Counting the pixels",      icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>},
   {label:"Compiling the best moments",icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>},
 ];
 var PEEK=12,MAX_VIS=4,STEP_DUR=3200,TOTAL_MS=18000;
 
 var HIGHLIGHTS_SEED=[
-  {id:0,name:"Stage A",status:"draft",shots:23,published:null,duration:"3m 36s",img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=80&h=120&fit=crop&q=80"},
-  {id:1,name:"Sponsors",status:"published",shots:34,published:"11.04.26 16h",duration:"1m 20s",img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=80&h=120&fit=crop&q=80"},
-  {id:2,name:"Best of the audience",status:"featured",shots:123,published:"11.04.26 16h",duration:"10m 03s",img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=80&h=120&fit=crop&q=80"},
-  {id:3,name:"Stage B",status:"published",shots:8,published:"11.04.26 16h",duration:"0m 30s",img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=80&h=120&fit=crop&q=80"},
+  {id:0,name:"Stage A",            status:"draft",    shots:23, published:null,          duration:"3m 36s", img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=80&h=120&fit=crop&q=80",shotIds:[0,1,3,6]},
+  {id:1,name:"Sponsors",           status:"published",shots:34, published:"11.04.26 16h",duration:"1m 20s", img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=80&h=120&fit=crop&q=80",shotIds:[2,5,7,10,13]},
+  {id:2,name:"Best of the audience",status:"featured",shots:123,published:"11.04.26 16h",duration:"10m 03s",img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=80&h=120&fit=crop&q=80",shotIds:[1,2,3,4,6,8,9,11]},
+  {id:3,name:"Stage B",            status:"published",shots:8,  published:"11.04.26 16h",duration:"0m 30s", img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=80&h=120&fit=crop&q=80",shotIds:[5,7,12]},
 ];
 
 var ATTENDEES=[
-  {id:0,name:"Sophie Andersen",handle:"@sophiea",avatar:"https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=96&h=96&fit=crop&q=80",joined:"10.03.26 09:22h",shots:5},
-  {id:1,name:"Marcus Webb",handle:"@marcusw",avatar:"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=96&h=96&fit=crop&q=80",joined:"10.03.26 10:41h",shots:10},
-  {id:2,name:"Lena Hoffmann",handle:"@lenahoff",avatar:"https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=96&h=96&fit=crop&q=80",joined:"10.03.26 11:05h",shots:8},
-  {id:3,name:"Daniel Ferreira",handle:"@dani_f",avatar:"https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=96&h=96&fit=crop&q=80",joined:"10.03.26 12:17h",shots:35},
-  {id:4,name:"Camille Rousseau",handle:"@camilleR",avatar:"https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=96&h=96&fit=crop&q=80",joined:"10.03.26 13:30h",shots:12},
-  {id:5,name:"Yuki Tanaka",handle:"@yukitan",avatar:"https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=96&h=96&fit=crop&q=80",joined:"10.03.26 14:02h",shots:3},
-  {id:6,name:"Oliver Müller",handle:"@olliemu",avatar:"https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=96&h=96&fit=crop&q=80",joined:"10.03.26 14:55h",shots:7},
-  {id:7,name:"Priya Nair",handle:"@priyanair",avatar:"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=96&h=96&fit=crop&q=80",joined:"10.03.26 15:20h",shots:21},
-  {id:8,name:"Lucas Bergström",handle:"@lucasb",avatar:"https://images.unsplash.com/photo-1488161628813-04466f872be2?w=96&h=96&fit=crop&q=80",joined:"10.03.26 16:10h",shots:14},
-  {id:9,name:"Elena Vasquez",handle:"@elenav",avatar:"https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=96&h=96&fit=crop&q=80",joined:"10.03.26 17:45h",shots:9},
+  {id:0,name:"Sophie Andersen", handle:"@sophiea",  avatar:"https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=96&h=96&fit=crop&q=80",joined:"10.03.26 09:22h",shots:5},
+  {id:1,name:"Marcus Webb",     handle:"@marcusw",  avatar:"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=96&h=96&fit=crop&q=80",joined:"10.03.26 10:41h",shots:10},
+  {id:2,name:"Lena Hoffmann",   handle:"@lenahoff", avatar:"https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=96&h=96&fit=crop&q=80",joined:"10.03.26 11:05h",shots:8},
+  {id:3,name:"Daniel Ferreira", handle:"@dani_f",   avatar:"https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=96&h=96&fit=crop&q=80",joined:"10.03.26 12:17h",shots:35},
+  {id:4,name:"Camille Rousseau",handle:"@camilleR", avatar:"https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=96&h=96&fit=crop&q=80",joined:"10.03.26 13:30h",shots:12},
+  {id:5,name:"Yuki Tanaka",     handle:"@yukitan",  avatar:"https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=96&h=96&fit=crop&q=80",joined:"10.03.26 14:02h",shots:3},
+  {id:6,name:"Oliver Müller",   handle:"@olliemu",  avatar:"https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=96&h=96&fit=crop&q=80",joined:"10.03.26 14:55h",shots:7},
+  {id:7,name:"Priya Nair",      handle:"@priyanair",avatar:"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=96&h=96&fit=crop&q=80",joined:"10.03.26 15:20h",shots:21},
+  {id:8,name:"Lucas Bergström", handle:"@lucasb",   avatar:"https://images.unsplash.com/photo-1488161628813-04466f872be2?w=96&h=96&fit=crop&q=80",joined:"10.03.26 16:10h",shots:14},
+  {id:9,name:"Elena Vasquez",   handle:"@elenav",   avatar:"https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=96&h=96&fit=crop&q=80",joined:"10.03.26 17:45h",shots:9},
 ];
 var ATTENDEES_PAGE_SIZE=10;
+
+var LOGO_PATH="M143.174 32.3203C140.694 34.6036 137.384 36 133.746 36C130.108 36 126.799 34.6036 124.318 32.3203H143.174ZM143.174 28.2432C140.694 30.5264 137.384 31.9228 133.746 31.9229C130.108 31.9229 126.799 30.5265 124.318 28.2432H143.174ZM123.503 27.627C121.22 25.1468 119.823 21.8369 119.823 18.1992C119.823 14.5615 121.22 11.2517 123.503 8.77148V27.627ZM45.96 13.3711C46.8615 13.3711 47.7006 13.517 48.4775 13.8076C49.2605 14.0923 49.9431 14.5223 50.5244 15.0977C51.1116 15.673 51.5683 16.3967 51.8945 17.2686C52.2207 18.1346 52.3838 19.1489 52.3838 20.3115V21.3525H43.0771V21.3613C43.0771 22.0375 43.2011 22.6219 43.4502 23.1143C43.7053 23.6066 44.0647 23.986 44.5273 24.2529C44.99 24.5199 45.5391 24.6533 46.1738 24.6533C46.5948 24.6533 46.9802 24.5942 47.3301 24.4756C47.68 24.3569 47.9794 24.1787 48.2285 23.9414C48.4776 23.7041 48.6674 23.4134 48.7979 23.0693L52.3037 23.3008C52.1258 24.1431 51.7606 24.879 51.209 25.5078C50.6633 26.1305 49.9577 26.6169 49.0918 26.9668C48.2318 27.3108 47.2383 27.4834 46.1113 27.4834C44.7055 27.4834 43.4948 27.1984 42.4805 26.6289C41.4722 26.0535 40.6951 25.2403 40.1494 24.1904C39.6039 23.1348 39.3311 21.8864 39.3311 20.4453C39.3311 19.0395 39.6037 17.805 40.1494 16.7432C40.6951 15.6814 41.4635 14.8539 42.4541 14.2607C43.4506 13.6676 44.6194 13.3711 45.96 13.3711ZM90.8311 13.3711C92.2131 13.3711 93.4058 13.6676 94.4082 14.2607C95.4165 14.848 96.1936 15.6727 96.7393 16.7344C97.2849 17.7901 97.5576 19.024 97.5576 20.4355C97.5576 21.8355 97.285 23.0671 96.7393 24.1289C96.1936 25.1846 95.4165 26.0094 94.4082 26.6025C93.4058 27.1898 92.2131 27.4834 90.8311 27.4834C89.449 27.4834 88.2535 27.1897 87.2451 26.6025C86.2427 26.0094 85.4686 25.1846 84.9229 24.1289C84.3771 23.0671 84.1045 21.8355 84.1045 20.4355C84.1045 19.024 84.3772 17.7901 84.9229 16.7344C85.4686 15.6726 86.2427 14.848 87.2451 14.2607C88.2535 13.6676 89.449 13.3711 90.8311 13.3711ZM7.38477 8.74414C8.73721 8.74414 9.91835 8.97579 10.9268 9.43848C11.9409 9.90112 12.7295 10.5448 13.293 11.3691C13.8565 12.1937 14.1472 13.1489 14.165 14.2344H10.4727C10.4015 13.5166 10.0955 12.959 9.55566 12.5615C9.0159 12.1642 8.28358 11.9658 7.3584 11.9658C6.72963 11.9658 6.19865 12.0545 5.76562 12.2324C5.33271 12.4044 5.00085 12.6448 4.76953 12.9531C4.54413 13.2616 4.43067 13.6114 4.43066 14.0029C4.4188 14.3292 4.48745 14.6142 4.63574 14.8574C4.78996 15.1005 5.00072 15.3114 5.26758 15.4893C5.53433 15.6611 5.84271 15.812 6.19238 15.9424C6.54222 16.0669 6.91622 16.1737 7.31348 16.2627L8.95117 16.6543C9.74591 16.8322 10.4754 17.0697 11.1396 17.3662C11.804 17.6628 12.3798 18.0279 12.8662 18.4609C13.3525 18.8939 13.7292 19.404 13.9961 19.9912C14.2689 20.5784 14.4081 21.2516 14.4141 22.0107C14.4081 23.1257 14.1238 24.0927 13.5605 24.9111C13.003 25.7238 12.1955 26.3558 11.1396 26.8066C10.0898 27.2515 8.8236 27.4746 7.34082 27.4746C5.86983 27.4746 4.58847 27.2486 3.49707 26.7979C2.41156 26.347 1.56312 25.6797 0.952148 24.7959C0.347144 23.9062 0.0296933 22.8059 0 21.4951H3.72852C3.77007 22.106 3.94453 22.6162 4.25293 23.0254C4.56731 23.4288 4.98582 23.7338 5.50781 23.9414C6.03568 24.1431 6.63163 24.2441 7.2959 24.2441C7.94816 24.2441 8.51475 24.1496 8.99512 23.96C9.48152 23.7701 9.85905 23.5061 10.126 23.168C10.3929 22.8299 10.5264 22.4409 10.5264 22.002C10.5263 21.5927 10.4043 21.2485 10.1611 20.9697C9.92386 20.691 9.57394 20.4535 9.11133 20.2578C8.65463 20.0621 8.09395 19.8848 7.42969 19.7246L5.44531 19.2256C3.90906 18.8519 2.69638 18.2675 1.80664 17.4727C0.916872 16.6778 0.474537 15.6073 0.480469 14.2607C0.474586 13.1575 0.768197 12.1936 1.36133 11.3691C1.96044 10.5446 2.7822 9.90115 3.82617 9.43848C4.87005 8.97587 6.05622 8.74418 7.38477 8.74414ZM60.9746 8.74414C62.3271 8.74414 63.5082 8.97579 64.5166 9.43848C65.5307 9.90113 66.3194 10.5448 66.8828 11.3691C67.4463 12.1937 67.7371 13.1489 67.7549 14.2344H64.0625C63.9913 13.5166 63.6853 12.959 63.1455 12.5615C62.6057 12.1642 61.8735 11.9648 60.9482 11.9648C60.3195 11.9648 59.7885 12.0545 59.3555 12.2324C58.9225 12.4044 58.5907 12.6447 58.3594 12.9531C58.134 13.2616 58.0205 13.6114 58.0205 14.0029C58.0087 14.3291 58.0773 14.6142 58.2256 14.8574C58.3798 15.1005 58.5906 15.3114 58.8574 15.4893C59.1242 15.6611 59.4326 15.812 59.7822 15.9424C60.1321 16.0669 60.5061 16.1737 60.9033 16.2627L62.541 16.6543C63.3358 16.8322 64.0652 17.0697 64.7295 17.3662C65.3939 17.6628 65.9696 18.0279 66.4561 18.4609C66.9423 18.8939 67.3191 19.4041 67.5859 19.9912C67.8587 20.5784 67.998 21.2516 68.0039 22.0107C67.998 23.1257 67.7137 24.0926 67.1504 24.9111C66.5928 25.7238 65.7854 26.3558 64.7295 26.8066C63.6797 27.2514 62.4134 27.4736 60.9307 27.4736C59.4597 27.4736 58.1783 27.2486 57.0869 26.7979C56.0014 26.3471 55.153 25.6797 54.542 24.7959C53.937 23.9062 53.6196 22.8059 53.5898 21.4951H57.3184C57.3599 22.1059 57.5344 22.6162 57.8428 23.0254C58.1572 23.4287 58.5757 23.7338 59.0977 23.9414C59.6255 24.1431 60.2215 24.2441 60.8857 24.2441C61.5381 24.2441 62.1045 24.1487 62.585 23.959C63.0713 23.7692 63.4489 23.506 63.7158 23.168C63.9827 22.8299 64.1162 22.4409 64.1162 22.002C64.1162 21.5927 63.9942 21.2485 63.751 20.9697C63.5137 20.691 63.1638 20.4535 62.7012 20.2578C62.2444 20.0621 61.6839 19.8838 61.0195 19.7236L59.0352 19.2256C57.4989 18.8519 56.2862 18.2675 55.3965 17.4727C54.5067 16.6778 54.0644 15.6073 54.0703 14.2607C54.0644 13.1575 54.358 12.1936 54.9512 11.3691C55.5503 10.5446 56.372 9.90116 57.416 9.43848C58.4599 8.97585 59.646 8.74418 60.9746 8.74414ZM119.426 27.4277C117.142 24.9475 115.746 21.6378 115.746 18C115.746 14.3622 117.142 11.0525 119.426 8.57227V27.4277ZM143.989 8.57227C146.273 11.0525 147.669 14.3622 147.669 18L147.664 18.3379C147.58 21.8417 146.201 25.023 143.989 27.4258V8.57227ZM148.066 8.57227C150.35 11.0525 151.746 14.3622 151.746 18L151.742 18.3379C151.658 21.8417 150.278 25.023 148.066 27.4258V8.57227ZM103.969 13.5488H106.54V16.3965H103.969V23.0166C103.969 23.3665 104.022 23.6393 104.129 23.835C104.236 24.0246 104.384 24.1582 104.573 24.2354C104.769 24.3125 104.995 24.3506 105.25 24.3506C105.428 24.3506 105.606 24.3363 105.784 24.3066C105.962 24.2711 106.099 24.2443 106.193 24.2266L106.789 27.0469C106.599 27.1062 106.332 27.1748 105.988 27.252C105.644 27.335 105.226 27.3855 104.733 27.4033C103.82 27.4389 103.019 27.3168 102.331 27.0381C101.649 26.7593 101.118 26.3264 100.738 25.7393C100.359 25.152 100.172 24.4103 100.178 23.5146V16.3965H98.3096V13.5488H100.178V10.2744H103.969V13.5488ZM19.9736 21.5742C19.9796 22.3809 20.1969 23.0187 20.624 23.4873C21.0511 23.9557 21.6232 24.1904 22.3408 24.1904C22.7975 24.1904 23.2247 24.0865 23.6221 23.8789C24.0195 23.6654 24.3398 23.3508 24.583 22.9355C24.8321 22.5204 24.9541 22.0074 24.9482 21.3965V13.5488H28.7383V27.2158H25.0986V24.7334H24.957C24.6486 25.5341 24.1347 26.1777 23.417 26.6641C22.7053 27.1503 21.8365 27.3935 20.8105 27.3936C19.8971 27.3936 19.0934 27.1857 18.3994 26.7705C17.7054 26.3553 17.162 25.7652 16.7705 25C16.385 24.2348 16.1895 23.3177 16.1836 22.25V13.5488H19.9736V21.5742ZM38.1191 13.3535C38.3088 13.3535 38.5132 13.365 38.7324 13.3887C38.9519 13.4124 39.1454 13.4448 39.3115 13.4863V16.8496C39.1336 16.7962 38.8867 16.7495 38.5723 16.708C38.2582 16.6665 37.9708 16.6455 37.71 16.6455C37.1525 16.6455 36.6537 16.7666 36.2148 17.0098C35.7818 17.247 35.4377 17.5797 35.1826 18.0068C34.9336 18.4338 34.8086 18.926 34.8086 19.4834V27.2158H31.0186V13.5488H34.6934V15.9336H34.8359C35.085 15.0855 35.5028 14.4447 36.0898 14.0117C36.6771 13.5728 37.3539 13.3535 38.1191 13.3535ZM73.4561 15.9609H73.6162C73.9247 15.1542 74.4232 14.5222 75.1113 14.0654C75.7993 13.6028 76.6623 13.3711 77.7002 13.3711C78.6492 13.3711 79.4768 13.579 80.1826 13.9941C80.8944 14.4034 81.4464 14.9936 81.8379 15.7646C82.2353 16.5299 82.4307 17.4469 82.4248 18.5146V27.2158H78.6348V19.1904C78.6407 18.3481 78.4272 17.6922 77.9941 17.2236C77.5672 16.7553 76.968 16.5216 76.1973 16.5215C75.6812 16.5215 75.2236 16.6311 74.8262 16.8506C74.4348 17.0701 74.1267 17.3905 73.9014 17.8115C73.6819 18.2267 73.5694 18.7282 73.5635 19.3154V27.2158H69.7725V8.99414H73.4561V15.9609ZM90.8486 16.2627C90.214 16.2627 89.6801 16.4438 89.2471 16.8057C88.82 17.1675 88.4968 17.6604 88.2773 18.2832C88.0639 18.9059 87.957 19.6145 87.957 20.4092C87.957 21.204 88.0638 21.9133 88.2773 22.5361C88.4968 23.1588 88.8201 23.6509 89.2471 24.0127C89.6801 24.3686 90.214 24.5469 90.8486 24.5469C91.4774 24.5469 92.0027 24.3686 92.4238 24.0127C92.8449 23.6509 93.1625 23.1588 93.376 22.5361C93.5955 21.9133 93.7051 21.204 93.7051 20.4092C93.7051 19.6146 93.5953 18.9059 93.376 18.2832C93.1624 17.6604 92.8449 17.1675 92.4238 16.8057C92.0027 16.4438 91.4774 16.2627 90.8486 16.2627ZM133.746 14.4004C135.834 14.4005 137.526 16.0923 137.526 18.1797C137.526 20.2673 135.834 21.9599 133.746 21.96C131.658 21.96 129.966 20.2673 129.966 18.1797C129.966 16.0922 131.659 14.4004 133.746 14.4004ZM46.0225 16.2002C45.4471 16.2002 44.9361 16.3337 44.4912 16.6006C44.0523 16.8616 43.7091 17.2153 43.46 17.6602C43.2301 18.0652 43.1048 18.513 43.082 19.0039H48.8164C48.8164 18.4582 48.6972 17.9739 48.46 17.5527C48.2227 17.1318 47.8936 16.8026 47.4727 16.5654C47.0575 16.3223 46.574 16.2003 46.0225 16.2002ZM133.745 4.07715C137.382 4.07745 140.692 5.47376 143.172 7.75684H124.318C126.798 5.47371 130.108 4.07736 133.745 4.07715ZM133.746 0C137.384 4.16696e-05 140.694 1.3964 143.172 3.67969H124.318C126.799 1.39637 130.108 0 133.746 0Z";
 
 // ── Icons ──────────────────────────────────────────────────────────
 function ITrash({color=C.textPrimary,size=14}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;}
@@ -118,6 +145,9 @@ function IBubble({color=C.action,size=16}){return <svg width={size} height={size
 function IUserPlus({color=C.bgPage,size=20}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>;}
 function ISearch({color=C.textSecondary,size=20}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>;}
 function IShare({color=C.textSecondary,size=16}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>;}
+function ICopy({color=C.textPrimary,size=16}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>;}
+function IExternalLink({color=C.textPrimary,size=16}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>;}
+function IDot({color=C.bgPage,size=8}){return <svg width={size} height={size} viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill={color}/></svg>;}
 
 // ── Primitives ─────────────────────────────────────────────────────
 function Tag({icon,label}){return <div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{icon}<span style={{fontFamily:sans,fontWeight:400,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{label}</span></div>;}
@@ -126,36 +156,189 @@ function Checkbox({checked,onClick}){var isChecked=checked===true,isIndet=checke
 function CheckboxField({checked,onClick,label}){return(<div onClick={onClick} style={{display:"flex",alignItems:"center",gap:12,minWidth:120,cursor:"pointer",userSelect:"none"}}><Checkbox checked={checked}/><span style={{fontFamily:sans,fontWeight:400,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>{label}</span></div>);}
 function CardChip({onClick,children}){return <div onClick={onClick} style={{background:C.bgPage,borderRadius:"50%",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>{children}</div>;}
 function ModalChip({onClick,tip,children}){var [hov,setHov]=useState(false);return <div onClick={onClick} title={tip} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{width:36,height:36,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,opacity:hov?0.8:1,transition:"opacity 0.15s"}}>{children}</div>;}
-function IconBtn({onClick,children}){var [hov,setHov]=useState(false);return <div onClick={onClick} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{padding:8,borderRadius:"50%",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:hov?C.bgTertiary:"transparent",transition:"background 0.15s"}}>{children}</div>;}
+function IconBtn({onClick,title,children}){var [hov,setHov]=useState(false);return <div onClick={onClick} title={title} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{padding:8,borderRadius:"50%",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:hov?C.bgTertiary:"transparent",transition:"background 0.15s"}}>{children}</div>;}
+
+// ── Status Tags (two variants — do not merge) ──────────────────────
+// Used in events list table
+function ListStatusTag({status}){
+  var s=LIST_STATUS[status]||LIST_STATUS.draft;
+  return(<div style={{display:"inline-flex",alignItems:"center",gap:4,background:s.bg,border:"1px solid "+s.border,borderRadius:4,padding:"2px 8px",flexShrink:0}}>{s.dot&&<IDot color={s.color}/>}<span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:s.color,whiteSpace:"nowrap"}}>{s.label}</span></div>);
+}
+// Used in highlights table inside hub
+function HubStatusTag({status}){
+  if(status==="draft")return <div style={{border:"1px solid "+C.textPrimary,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>Draft</span></div>;
+  if(status==="published")return <div style={{background:C.action,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.bgPage}}>Published</span></div>;
+  if(status==="featured")return <div style={{background:C.textPrimary,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center",gap:4}}><IStar color={C.bgPage} size={12}/><span style={{fontFamily:sans,fontSize:14,color:C.bgPage}}>Featured</span></div>;
+  return null;
+}
 
 // ── Sidebar ────────────────────────────────────────────────────────
-function Sidebar(){return(
-  <div style={{background:C.bgSecondary,width:241,minWidth:241,flexShrink:0,borderRadius:"0 32px 32px 0",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"24px 16px 12px",boxSizing:"border-box",position:"sticky",top:0,height:"100vh",overflow:"hidden"}}>
-    <div style={{display:"flex",flexDirection:"column",gap:32}}>
-      <div style={{height:36,display:"flex",alignItems:"center"}}>
-        <svg width="152" height="36" viewBox="0 0 152 36" fill="none"><path d="M143.174 32.3203C140.694 34.6036 137.384 36 133.746 36C130.108 36 126.799 34.6036 124.318 32.3203H143.174ZM143.174 28.2432C140.694 30.5264 137.384 31.9228 133.746 31.9229C130.108 31.9229 126.799 30.5265 124.318 28.2432H143.174ZM123.503 27.627C121.22 25.1468 119.823 21.8369 119.823 18.1992C119.823 14.5615 121.22 11.2517 123.503 8.77148V27.627ZM45.96 13.3711C46.8615 13.3711 47.7006 13.517 48.4775 13.8076C49.2605 14.0923 49.9431 14.5223 50.5244 15.0977C51.1116 15.673 51.5683 16.3967 51.8945 17.2686C52.2207 18.1346 52.3838 19.1489 52.3838 20.3115V21.3525H43.0771V21.3613C43.0771 22.0375 43.2011 22.6219 43.4502 23.1143C43.7053 23.6066 44.0647 23.986 44.5273 24.2529C44.99 24.5199 45.5391 24.6533 46.1738 24.6533C46.5948 24.6533 46.9802 24.5942 47.3301 24.4756C47.68 24.3569 47.9794 24.1787 48.2285 23.9414C48.4776 23.7041 48.6674 23.4134 48.7979 23.0693L52.3037 23.3008C52.1258 24.1431 51.7606 24.879 51.209 25.5078C50.6633 26.1305 49.9577 26.6169 49.0918 26.9668C48.2318 27.3108 47.2383 27.4834 46.1113 27.4834C44.7055 27.4834 43.4948 27.1984 42.4805 26.6289C41.4722 26.0535 40.6951 25.2403 40.1494 24.1904C39.6039 23.1348 39.3311 21.8864 39.3311 20.4453C39.3311 19.0395 39.6037 17.805 40.1494 16.7432C40.6951 15.6814 41.4635 14.8539 42.4541 14.2607C43.4506 13.6676 44.6194 13.3711 45.96 13.3711ZM90.8311 13.3711C92.2131 13.3711 93.4058 13.6676 94.4082 14.2607C95.4165 14.848 96.1936 15.6727 96.7393 16.7344C97.2849 17.7901 97.5576 19.024 97.5576 20.4355C97.5576 21.8355 97.285 23.0671 96.7393 24.1289C96.1936 25.1846 95.4165 26.0094 94.4082 26.6025C93.4058 27.1898 92.2131 27.4834 90.8311 27.4834C89.449 27.4834 88.2535 27.1897 87.2451 26.6025C86.2427 26.0094 85.4686 25.1846 84.9229 24.1289C84.3771 23.0671 84.1045 21.8355 84.1045 20.4355C84.1045 19.024 84.3772 17.7901 84.9229 16.7344C85.4686 15.6726 86.2427 14.848 87.2451 14.2607C88.2535 13.6676 89.449 13.3711 90.8311 13.3711ZM7.38477 8.74414C8.73721 8.74414 9.91835 8.97579 10.9268 9.43848C11.9409 9.90112 12.7295 10.5448 13.293 11.3691C13.8565 12.1937 14.1472 13.1489 14.165 14.2344H10.4727C10.4015 13.5166 10.0955 12.959 9.55566 12.5615C9.0159 12.1642 8.28358 11.9658 7.3584 11.9658C6.72963 11.9658 6.19865 12.0545 5.76562 12.2324C5.33271 12.4044 5.00085 12.6448 4.76953 12.9531C4.54413 13.2616 4.43067 13.6114 4.43066 14.0029C4.4188 14.3292 4.48745 14.6142 4.63574 14.8574C4.78996 15.1005 5.00072 15.3114 5.26758 15.4893C5.53433 15.6611 5.84271 15.812 6.19238 15.9424C6.54222 16.0669 6.91622 16.1737 7.31348 16.2627L8.95117 16.6543C9.74591 16.8322 10.4754 17.0697 11.1396 17.3662C11.804 17.6628 12.3798 18.0279 12.8662 18.4609C13.3525 18.8939 13.7292 19.404 13.9961 19.9912C14.2689 20.5784 14.4081 21.2516 14.4141 22.0107C14.4081 23.1257 14.1238 24.0927 13.5605 24.9111C13.003 25.7238 12.1955 26.3558 11.1396 26.8066C10.0898 27.2515 8.8236 27.4746 7.34082 27.4746C5.86983 27.4746 4.58847 27.2486 3.49707 26.7979C2.41156 26.347 1.56312 25.6797 0.952148 24.7959C0.347144 23.9062 0.0296933 22.8059 0 21.4951H3.72852C3.77007 22.106 3.94453 22.6162 4.25293 23.0254C4.56731 23.4288 4.98582 23.7338 5.50781 23.9414C6.03568 24.1431 6.63163 24.2441 7.2959 24.2441C7.94816 24.2441 8.51475 24.1496 8.99512 23.96C9.48152 23.7701 9.85905 23.5061 10.126 23.168C10.3929 22.8299 10.5264 22.4409 10.5264 22.002C10.5263 21.5927 10.4043 21.2485 10.1611 20.9697C9.92386 20.691 9.57394 20.4535 9.11133 20.2578C8.65463 20.0621 8.09395 19.8848 7.42969 19.7246L5.44531 19.2256C3.90906 18.8519 2.69638 18.2675 1.80664 17.4727C0.916872 16.6778 0.474537 15.6073 0.480469 14.2607C0.474586 13.1575 0.768197 12.1936 1.36133 11.3691C1.96044 10.5446 2.7822 9.90115 3.82617 9.43848C4.87005 8.97587 6.05622 8.74418 7.38477 8.74414ZM60.9746 8.74414C62.3271 8.74414 63.5082 8.97579 64.5166 9.43848C65.5307 9.90113 66.3194 10.5448 66.8828 11.3691C67.4463 12.1937 67.7371 13.1489 67.7549 14.2344H64.0625C63.9913 13.5166 63.6853 12.959 63.1455 12.5615C62.6057 12.1642 61.8735 11.9648 60.9482 11.9648C60.3195 11.9648 59.7885 12.0545 59.3555 12.2324C58.9225 12.4044 58.5907 12.6447 58.3594 12.9531C58.134 13.2616 58.0205 13.6114 58.0205 14.0029C58.0087 14.3291 58.0773 14.6142 58.2256 14.8574C58.3798 15.1005 58.5906 15.3114 58.8574 15.4893C59.1242 15.6611 59.4326 15.812 59.7822 15.9424C60.1321 16.0669 60.5061 16.1737 60.9033 16.2627L62.541 16.6543C63.3358 16.8322 64.0652 17.0697 64.7295 17.3662C65.3939 17.6628 65.9696 18.0279 66.4561 18.4609C66.9423 18.8939 67.3191 19.4041 67.5859 19.9912C67.8587 20.5784 67.998 21.2516 68.0039 22.0107C67.998 23.1257 67.7137 24.0926 67.1504 24.9111C66.5928 25.7238 65.7854 26.3558 64.7295 26.8066C63.6797 27.2514 62.4134 27.4736 60.9307 27.4736C59.4597 27.4736 58.1783 27.2486 57.0869 26.7979C56.0014 26.3471 55.153 25.6797 54.542 24.7959C53.937 23.9062 53.6196 22.8059 53.5898 21.4951H57.3184C57.3599 22.1059 57.5344 22.6162 57.8428 23.0254C58.1572 23.4287 58.5757 23.7338 59.0977 23.9414C59.6255 24.1431 60.2215 24.2441 60.8857 24.2441C61.5381 24.2441 62.1045 24.1487 62.585 23.959C63.0713 23.7692 63.4489 23.506 63.7158 23.168C63.9827 22.8299 64.1162 22.4409 64.1162 22.002C64.1162 21.5927 63.9942 21.2485 63.751 20.9697C63.5137 20.691 63.1638 20.4535 62.7012 20.2578C62.2444 20.0621 61.6839 19.8838 61.0195 19.7236L59.0352 19.2256C57.4989 18.8519 56.2862 18.2675 55.3965 17.4727C54.5067 16.6778 54.0644 15.6073 54.0703 14.2607C54.0644 13.1575 54.358 12.1936 54.9512 11.3691C55.5503 10.5446 56.372 9.90116 57.416 9.43848C58.4599 8.97585 59.646 8.74418 60.9746 8.74414ZM119.426 27.4277C117.142 24.9475 115.746 21.6378 115.746 18C115.746 14.3622 117.142 11.0525 119.426 8.57227V27.4277ZM143.989 8.57227C146.273 11.0525 147.669 14.3622 147.669 18L147.664 18.3379C147.58 21.8417 146.201 25.023 143.989 27.4258V8.57227ZM148.066 8.57227C150.35 11.0525 151.746 14.3622 151.746 18L151.742 18.3379C151.658 21.8417 150.278 25.023 148.066 27.4258V8.57227ZM103.969 13.5488H106.54V16.3965H103.969V23.0166C103.969 23.3665 104.022 23.6393 104.129 23.835C104.236 24.0246 104.384 24.1582 104.573 24.2354C104.769 24.3125 104.995 24.3506 105.25 24.3506C105.428 24.3506 105.606 24.3363 105.784 24.3066C105.962 24.2711 106.099 24.2443 106.193 24.2266L106.789 27.0469C106.599 27.1062 106.332 27.1748 105.988 27.252C105.644 27.335 105.226 27.3855 104.733 27.4033C103.82 27.4389 103.019 27.3168 102.331 27.0381C101.649 26.7593 101.118 26.3264 100.738 25.7393C100.359 25.152 100.172 24.4103 100.178 23.5146V16.3965H98.3096V13.5488H100.178V10.2744H103.969V13.5488ZM19.9736 21.5742C19.9796 22.3809 20.1969 23.0187 20.624 23.4873C21.0511 23.9557 21.6232 24.1904 22.3408 24.1904C22.7975 24.1904 23.2247 24.0865 23.6221 23.8789C24.0195 23.6654 24.3398 23.3508 24.583 22.9355C24.8321 22.5204 24.9541 22.0074 24.9482 21.3965V13.5488H28.7383V27.2158H25.0986V24.7334H24.957C24.6486 25.5341 24.1347 26.1777 23.417 26.6641C22.7053 27.1503 21.8365 27.3935 20.8105 27.3936C19.8971 27.3936 19.0934 27.1857 18.3994 26.7705C17.7054 26.3553 17.162 25.7652 16.7705 25C16.385 24.2348 16.1895 23.3177 16.1836 22.25V13.5488H19.9736V21.5742ZM38.1191 13.3535C38.3088 13.3535 38.5132 13.365 38.7324 13.3887C38.9519 13.4124 39.1454 13.4448 39.3115 13.4863V16.8496C39.1336 16.7962 38.8867 16.7495 38.5723 16.708C38.2582 16.6665 37.9708 16.6455 37.71 16.6455C37.1525 16.6455 36.6537 16.7666 36.2148 17.0098C35.7818 17.247 35.4377 17.5797 35.1826 18.0068C34.9336 18.4338 34.8086 18.926 34.8086 19.4834V27.2158H31.0186V13.5488H34.6934V15.9336H34.8359C35.085 15.0855 35.5028 14.4447 36.0898 14.0117C36.6771 13.5728 37.3539 13.3535 38.1191 13.3535ZM73.4561 15.9609H73.6162C73.9247 15.1542 74.4232 14.5222 75.1113 14.0654C75.7993 13.6028 76.6623 13.3711 77.7002 13.3711C78.6492 13.3711 79.4768 13.579 80.1826 13.9941C80.8944 14.4034 81.4464 14.9936 81.8379 15.7646C82.2353 16.5299 82.4307 17.4469 82.4248 18.5146V27.2158H78.6348V19.1904C78.6407 18.3481 78.4272 17.6922 77.9941 17.2236C77.5672 16.7553 76.968 16.5216 76.1973 16.5215C75.6812 16.5215 75.2236 16.6311 74.8262 16.8506C74.4348 17.0701 74.1267 17.3905 73.9014 17.8115C73.6819 18.2267 73.5694 18.7282 73.5635 19.3154V27.2158H69.7725V8.99414H73.4561V15.9609ZM90.8486 16.2627C90.214 16.2627 89.6801 16.4438 89.2471 16.8057C88.82 17.1675 88.4968 17.6604 88.2773 18.2832C88.0639 18.9059 87.957 19.6145 87.957 20.4092C87.957 21.204 88.0638 21.9133 88.2773 22.5361C88.4968 23.1588 88.8201 23.6509 89.2471 24.0127C89.6801 24.3686 90.214 24.5469 90.8486 24.5469C91.4774 24.5469 92.0027 24.3686 92.4238 24.0127C92.8449 23.6509 93.1625 23.1588 93.376 22.5361C93.5955 21.9133 93.7051 21.204 93.7051 20.4092C93.7051 19.6146 93.5953 18.9059 93.376 18.2832C93.1624 17.6604 92.8449 17.1675 92.4238 16.8057C92.0027 16.4438 91.4774 16.2627 90.8486 16.2627ZM133.746 14.4004C135.834 14.4005 137.526 16.0923 137.526 18.1797C137.526 20.2673 135.834 21.9599 133.746 21.96C131.658 21.96 129.966 20.2673 129.966 18.1797C129.966 16.0922 131.659 14.4004 133.746 14.4004ZM46.0225 16.2002C45.4471 16.2002 44.9361 16.3337 44.4912 16.6006C44.0523 16.8616 43.7091 17.2153 43.46 17.6602C43.2301 18.0652 43.1048 18.513 43.082 19.0039H48.8164C48.8164 18.4582 48.6972 17.9739 48.46 17.5527C48.2227 17.1318 47.8936 16.8026 47.4727 16.5654C47.0575 16.3223 46.574 16.2003 46.0225 16.2002ZM133.745 4.07715C137.382 4.07745 140.692 5.47376 143.172 7.75684H124.318C126.798 5.47371 130.108 4.07736 133.745 4.07715ZM133.746 0C137.384 4.16696e-05 140.694 1.3964 143.172 3.67969H124.318C126.799 1.39637 130.108 0 133.746 0Z" fill="#F1665C"/></svg>
-      </div>
-      <div style={{display:"flex",flexDirection:"column",gap:12}}>
-        <div style={{display:"flex",flexDirection:"column"}}>
-          {[{label:"Events",icon:<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>},{label:"Account",icon:<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}].map(function(item){return(<div key={item.label} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0"}}><div style={{background:C.bgPage,borderRadius:999,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{item.icon}</div><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{item.label}</span></div>);})}
+// mode="events"  → events list (Events highlighted)
+// mode="accounts"→ events list (Account highlighted)
+// mode="hub"     → hub (back to Events + active event name)
+// Sidebar — unified, never changes. activeScreen = "dashboard"|"events"|"accounts"
+function Sidebar({activeScreen,onNav}){
+  var Logo=<svg width="152" height="36" viewBox="0 0 152 36" fill="none"><path d={LOGO_PATH} fill="#F1665C"/></svg>;
+  var navItems=[
+    {key:"dashboard", label:"Dashboard", icon:function(col){return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={col} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="9" width="7" height="12" rx="1"/><rect x="14" y="3" width="7" height="18" rx="1"/><rect x="3" y="3" width="7" height="4" rx="1"/></svg>;}},
+    {key:"events",    label:"Events",    icon:function(col){return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={col} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;}},
+    {key:"accounts",  label:"Account",   icon:function(col){return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={col} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;}},
+  ];
+  return(
+    <div style={{background:C.bgSecondary,width:241,minWidth:241,flexShrink:0,borderRadius:"0 32px 32px 0",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"24px 16px 12px",boxSizing:"border-box",position:"sticky",top:0,height:"100vh",overflow:"hidden"}}>
+      <div style={{display:"flex",flexDirection:"column",gap:32}}>
+        <div style={{height:36,display:"flex",alignItems:"center"}}>{Logo}</div>
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          <div style={{display:"flex",flexDirection:"column"}}>
+            {navItems.map(function(item){
+              var active=activeScreen===item.key;
+              var col=active?C.textPrimary:C.textSecondary;
+              return(<div key={item.key} onClick={function(){onNav&&onNav(item.key);}} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",cursor:"pointer"}}>
+                <div style={{background:active?"rgba(241,102,92,0.15)":C.bgPage,borderRadius:999,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,border:active?"1px solid "+C.action:"none",transition:"background 0.15s"}}>{item.icon(col)}</div>
+                <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:col,fontWeight:active?600:400}}>{item.label}</span>
+              </div>);
+            })}
+          </div>
+          <div onClick={function(){onNav&&onNav("create");}} style={{border:"1px solid "+C.textPrimary,borderRadius:999,display:"flex",alignItems:"center",gap:8,padding:"4px 12px",alignSelf:"flex-start",cursor:"pointer"}}>
+            <IPlus color={C.textPrimary} size={16}/>
+            <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,whiteSpace:"nowrap"}}>Create new event</span>
+          </div>
         </div>
-        <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,display:"flex",alignItems:"center",gap:8,padding:"4px 12px",alignSelf:"flex-start",cursor:"pointer"}}><IPlus color={C.textPrimary} size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,whiteSpace:"nowrap"}}>Create new event</span></div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:20}}>
+        <div style={{display:"flex",alignItems:"center"}}>
+          <div style={{flex:1,display:"flex",alignItems:"center",gap:8,height:42}}>
+            <div style={{width:32,height:32,borderRadius:"50%",background:C.action,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:13,color:C.bgPage}}>JD</span></div>
+            <div style={{display:"flex",flexDirection:"column",gap:2}}><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>John Doe</span><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>@username</span></div>
+          </div>
+          <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><IArrowRight size={13}/></div>
+        </div>
+        <span style={{fontFamily:mono,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>© 2026 SURESHOT APS</span>
       </div>
     </div>
-    <div style={{display:"flex",flexDirection:"column",gap:20}}>
-      <div style={{display:"flex",alignItems:"center"}}>
-        <div style={{flex:1,display:"flex",alignItems:"center",gap:8,height:42}}>
-          <div style={{width:32,height:32,borderRadius:"50%",background:C.action,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:13,color:C.bgPage}}>JD</span></div>
-          <div style={{display:"flex",flexDirection:"column",gap:2}}><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>John Doe</span><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>@username</span></div>
-        </div>
-        <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><IArrowRight size={13}/></div>
-      </div>
-      <span style={{fontFamily:mono,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>© 2026 SURESHOT APS</span>
-    </div>
-  </div>
-);}
+  );
+}
 
-// ── Event Status Dropdown ──────────────────────────────────────────
+// ── Dashboard Page ─────────────────────────────────────────────────
+function DashboardPage({onNav}){
+  var stats=[
+    {v:"3",   l:"Events created"},
+    {v:"14",  l:"Shots received"},
+    {v:"8",   l:"Attendees"},
+    {v:"3",   l:"Highlights"},
+    {v:"1.5", l:"Total size (GB)"},
+    {v:"8",   l:"Duration (min)"},
+  ];
+  return(
+    <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
+      <Sidebar activeScreen="dashboard" onNav={onNav}/>
+      <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,padding:"24px 16px",boxSizing:"border-box"}}>
+        {/* welcome banner */}
+        <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",alignItems:"center",justifyContent:"space-between",gap:24}}>
+          <div style={{display:"flex",flexDirection:"column",gap:8,flex:1}}>
+            <span style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"30px",color:C.textPrimary}}>Hey there, Nicolai</span>
+            <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,margin:0,maxWidth:740}}>
+              Welcome to <strong style={{fontFamily:sans,fontWeight:800}}>SureShot</strong>'s online platform, your go-to for managing events and shots. You can easily create and oversee your events, plus share highlight reels and updates with your attendees.
+            </p>
+          </div>
+          <div style={{flexShrink:0}}>
+            <svg width="178" height="135" viewBox="0 0 178 135" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M76.097 95.367C61.684 95.367 49.9999 83.5836 49.9999 69.0482C49.9999 54.5127 61.684 42.7294 76.097 42.7294C90.51 42.7294 102.194 54.5127 102.194 69.0482C102.194 83.5836 90.51 95.367 76.097 95.367Z" fill="#F1665C"/><path d="M147.553 68.4289C147.553 94.1164 136.943 117.486 119.592 135V1.8578C136.943 19.3713 147.553 42.7414 147.553 68.4289Z" fill="#F1665C"/><path d="M178 66.5711C178 92.2586 168.333 115.629 152.524 133.142V0C168.333 17.5135 178 40.8836 178 66.5711Z" fill="#F1665C"/></svg>
+          </div>
+        </div>
+        {/* stat cards */}
+        <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
+          {stats.map(function(s){return(
+            <div key={s.l} style={{flex:"1 0 128px",background:C.bgSecondary,borderRadius:16,padding:"12px 16px",display:"flex",flexDirection:"column",alignItems:"center",gap:8,textAlign:"center"}}>
+              <span style={{fontFamily:sans,fontWeight:800,fontSize:28,lineHeight:"34px",color:C.action}}>{s.v}</span>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,whiteSpace:"nowrap"}}>{s.l}</span>
+            </div>
+          );})}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Events List Page ───────────────────────────────────────────────
+function EventsListPage({onOpenEvent,onNav}){
+  var [query,setQuery]=useState("");
+  var [queryFocused,setQueryFocused]=useState(false);
+  var [page,setPage]=useState(0);
+  var [events,setEvents]=useState(EVENTS);
+  var [toast,setToast]=useState(null);
+
+  function showToast(msg){setToast(msg);setTimeout(function(){setToast(null);},2200);}
+  function handleShare(ev){var url="https://sureshot.app/e/"+ev.name.toLowerCase().replace(/[^a-z0-9]+/g,"-");if(navigator.share){navigator.share({title:ev.name,url:url}).catch(function(){});}else{navigator.clipboard&&navigator.clipboard.writeText(url);showToast("Link copied!");}}
+  function handleDuplicate(ev){var copy=Object.assign({},ev,{id:Date.now(),name:ev.name+" (copy)",status:"draft"});setEvents(function(prev){return [copy].concat(prev);});showToast('"'+ev.name+'" duplicated as draft.');setPage(0);}
+
+  var filtered=events.filter(function(e){var q=query.toLowerCase();return !q||e.name.toLowerCase().includes(q)||e.location.toLowerCase().includes(q);});
+  var totalPages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
+  var currentPage=Math.min(page,totalPages-1);
+  var visible=filtered.slice(currentPage*PAGE_SIZE,(currentPage+1)*PAGE_SIZE);
+  var cols=[{key:"cover",label:"COVER",w:96},{key:"name",label:"EVENT NAME",flex:1},{key:"status",label:"STATUS",w:130},{key:"location",label:"LOCATION",w:220},{key:"time",label:"TIME",w:220},{key:"actions",label:"ACTIONS",w:112}];
+
+  return(
+    <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
+      <Sidebar activeScreen="events" onNav={onNav}/>
+      {toast&&<div style={{position:"fixed",top:24,left:"50%",transform:"translateX(-50%)",zIndex:900,background:C.bgSecondary,borderRadius:12,padding:"12px 24px",display:"flex",alignItems:"center",gap:10,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",animation:"fadeUp .3s ease both",whiteSpace:"nowrap"}}><div style={{width:20,height:20,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span style={{fontFamily:sans,fontSize:15,color:C.textPrimary}}>{toast}</span></div>}
+      <div style={{flex:1,display:"flex",flexDirection:"column",gap:16,padding:"24px 16px",boxSizing:"border-box"}}>
+        {/* header */}
+        <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <span style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary}}>Events</span>
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="10" fill="none" stroke={C.action} strokeWidth="2.5"/><circle cx="24" cy="24" r="4" fill={C.action}/><ellipse cx="24" cy="24" rx="18" ry="10" fill="none" stroke={C.action} strokeWidth="1.5" strokeDasharray="3 3" opacity="0.5"/></svg>
+        </div>
+        {/* list panel */}
+        <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",flexDirection:"column",gap:24}}>
+          {/* toolbar */}
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
+            <div style={{border:"2px solid "+(queryFocused?C.textPrimary:C.border),borderRadius:16,background:C.bgTertiary,display:"flex",alignItems:"center",gap:12,padding:"10px 20px",width:280,transition:"border-color 0.15s"}}>
+              <ISearch/>
+              <input value={query} onChange={function(e){setQuery(e.target.value);setPage(0);}} onFocus={function(){setQueryFocused(true);}} onBlur={function(){setQueryFocused(false);}} placeholder="Search events" style={{background:"none",border:"none",outline:"none",fontFamily:sans,fontSize:16,color:C.textPrimary,flex:1,minWidth:0}}/>
+            </div>
+            <button style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+              <IPlus color={C.bgPage} size={20}/>
+              <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,whiteSpace:"nowrap"}}>Create new event</span>
+            </button>
+          </div>
+          {/* table */}
+          <div style={{display:"flex",flexDirection:"column"}}>
+            <div style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingBottom:8}}>
+              {cols.map(function(col){return(<div key={col.key} style={{width:col.w,flex:col.flex,flexShrink:0,padding:"0 4px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{col.label}</span></div>);})}
+            </div>
+            {visible.length===0
+              ?<div style={{textAlign:"center",padding:"48px 0",fontFamily:sans,fontSize:16,color:C.textSecondary}}>No events found.</div>
+              :visible.map(function(ev){return(
+                <div key={ev.id} style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8}}>
+                  <div style={{width:96,flexShrink:0,padding:"0 4px"}}><div style={{width:80,height:50,borderRadius:4,overflow:"hidden",background:C.bgTertiary}}><img src={ev.cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/></div></div>
+                  <div style={{flex:1,minWidth:0,padding:"0 4px"}}>
+                    <span onClick={function(){onOpenEvent(ev);}} style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block",paddingRight:8,cursor:"pointer",textDecoration:"underline",textDecorationColor:"rgba(250,249,249,0.3)"}} onMouseEnter={function(e){e.currentTarget.style.textDecorationColor=C.textPrimary;}} onMouseLeave={function(e){e.currentTarget.style.textDecorationColor="rgba(250,249,249,0.3)";}}>
+                      {ev.name}
+                    </span>
+                  </div>
+                  <div style={{width:130,flexShrink:0,padding:"0 10px"}}><ListStatusTag status={ev.status}/></div>
+                  <div style={{width:220,flexShrink:0,padding:"0 10px"}}><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block"}}>{ev.location}</span></div>
+                  <div style={{width:220,flexShrink:0,padding:"0 10px"}}><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{ev.time}</span></div>
+                  <div style={{width:112,flexShrink:0,display:"flex",alignItems:"center",gap:0}}>
+                    <IconBtn title="Share event" onClick={function(){handleShare(ev);}}><IShare color={C.textPrimary} size={16}/></IconBtn>
+                    <IconBtn title="Edit event settings" onClick={function(){onOpenEvent(ev,"Settings");}}><IEdit color={C.textPrimary} size={16}/></IconBtn>
+                    <IconBtn title="Duplicate event" onClick={function(){handleDuplicate(ev);}}><ICopy color={C.textPrimary} size={16}/></IconBtn>
+                  </div>
+                </div>
+              );})}
+          </div>
+          {/* pagination */}
+          <div style={{display:"flex",alignItems:"center",gap:12,paddingLeft:11}}>
+            <div onClick={function(){setPage(function(p){return Math.max(0,p-1);});}} style={{cursor:currentPage>0?"pointer":"default",opacity:currentPage>0?1:0.35,display:"flex"}}><IChevLeft color={C.textSecondary}/></div>
+            {Array.from({length:totalPages},function(_,i){return(<div key={i} onClick={function(){setPage(i);}} style={{width:32,height:32,borderRadius:256,background:i===currentPage?C.bgPage:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,transition:"background 0.15s"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{i+1}</span></div>);})}
+            <div onClick={function(){setPage(function(p){return Math.min(totalPages-1,p+1);});}} style={{cursor:currentPage<totalPages-1?"pointer":"default",opacity:currentPage<totalPages-1?1:0.35,display:"flex"}}><IChevRight color={C.textSecondary}/></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Hub: Event Status Dropdown ─────────────────────────────────────
 var STATUS_OPTIONS=[{value:"published",label:"Published",bg:C.action,textColor:C.bgPage},{value:"draft",label:"Draft",bg:"#a3a19f",textColor:C.bgPage},{value:"ended",label:"Ended",bg:C.bgTertiary,textColor:C.textPrimary},{value:"cancelled",label:"Cancelled",bg:"#750000",textColor:C.textPrimary}];
 function EventStatusDropdown(){
   var [status,setStatus]=useState("published");
@@ -171,26 +354,28 @@ function EventStatusDropdown(){
     {open&&<div style={{position:"absolute",top:"100%",left:0,width:241,background:C.bgTertiary,borderRadius:"0 0 8px 8px",zIndex:50,overflow:"hidden",boxShadow:"0 8px 24px rgba(0,0,0,0.3)"}}>
       {STATUS_OPTIONS.map(function(opt){var isActive=opt.value===status;return(<div key={opt.value} onClick={function(){setStatus(opt.value);setOpen(false);}} style={{padding:"8px 12px",cursor:"pointer",background:isActive?"rgba(187,188,214,0.15)":"transparent"}} onMouseEnter={function(e){e.currentTarget.style.background="rgba(187,188,214,0.15)";}} onMouseLeave={function(e){e.currentTarget.style.background=isActive?"rgba(187,188,214,0.15)":"transparent";}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{opt.label}</span></div>);})}
     </div>}
-  </div>);
-}
+  </div>);}
 
-// ── Event Summary ──────────────────────────────────────────────────
-function EventSummary(){
+// ── Hub: Event Summary ─────────────────────────────────────────────
+function EventSummary({event}){
   var stats=[{v:"55",l:"Joined users",muted:true},{v:"33",l:"Shots uploaded"},{v:"20.04",l:"Duration (min)"},{v:"890",l:"Size (MB)"}];
+  var cover=event?event.cover:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?q=80&w=2340&auto=format&fit=crop";
+  var name=event?event.name:"Neon Nights Festival";
+  var location=event?event.location:"Location name";
   return(<div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px"}}>
     <div style={{display:"flex",alignItems:"center",gap:24,padding:"12px 0"}}>
       <div style={{display:"flex",flexDirection:"column",gap:12,flexShrink:0}}>
-        <div style={{width:241,height:128,borderRadius:16,overflow:"hidden"}}><img src="https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?q=80&w=2340&auto=format&fit=crop" alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/></div>
+        <div style={{width:241,height:128,borderRadius:16,overflow:"hidden"}}><img src={cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/></div>
         <EventStatusDropdown/>
       </div>
       <div style={{flex:1,display:"flex",flexDirection:"column",gap:12}}>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>Neon Nights Festival</span>
+          <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{name}</span>
           <div title="Share event" style={{cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,opacity:0.7,transition:"opacity 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.opacity=1;}} onMouseLeave={function(e){e.currentTarget.style.opacity=0.7;}}><IShare/></div>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
           <div style={{display:"flex",alignItems:"center",gap:4}}><IUsers size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>4498</span></div>
-          <div style={{display:"flex",alignItems:"center",gap:4}}><IPin size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Location name</span></div>
+          <div style={{display:"flex",alignItems:"center",gap:4}}><IPin size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>{location}</span></div>
           <div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Start</span><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>10.03.26 09:00h</span></div>
           <div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Finish</span><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>11.03.26 17:00h</span></div>
         </div>
@@ -199,10 +384,9 @@ function EventSummary(){
         </div>
       </div>
     </div>
-  </div>);
-}
+  </div>);}
 
-// ── Preview Modal ──────────────────────────────────────────────────
+// ── Hub: Preview Modal ─────────────────────────────────────────────
 function PreviewModal({shot,onClose,onDiscard}){
   var vidRef=useRef(null),trackRef=useRef(null);
   var [playing,setPlaying]=useState(false);
@@ -236,10 +420,9 @@ function PreviewModal({shot,onClose,onDiscard}){
         </div>
       </div>
     </div>
-  </div>);
-}
+  </div>);}
 
-// ── Range Slider ───────────────────────────────────────────────────
+// ── Hub: Range Slider ──────────────────────────────────────────────
 function RangeSlider({lo,hi,onChange,gridRef,containerW}){
   var trackRef=useRef(null),dragging=useRef(null);
   var [sliderW,setSliderW]=useState(null);
@@ -251,10 +434,9 @@ function RangeSlider({lo,hi,onChange,gridRef,containerW}){
   return(<div style={{display:"flex",flexDirection:"column",gap:8,width:w}}>
     <div ref={trackRef} style={{position:"relative",height:6,borderRadius:3,background:"rgba(187,188,214,0.25)"}}><div style={{position:"absolute",top:0,height:"100%",borderRadius:3,left:(lo*100)+"%",width:((hi-lo)*100)+"%",background:C.textSecondary}}/><div style={ts(lo)} onMouseDown={function(e){e.preventDefault();dragging.current="lo";}}/><div style={ts(hi)} onMouseDown={function(e){e.preventDefault();dragging.current="hi";}}/></div>
     <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{fmtMs(TL_START+lo*TL_SPAN)}</span><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{fmtMs(TL_START+hi*TL_SPAN)}</span></div>
-  </div>);
-}
+  </div>);}
 
-// ── Shot Card ──────────────────────────────────────────────────────
+// ── Hub: Shot Card ─────────────────────────────────────────────────
 function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onToggleFav,onDiscard,onRecover,highlightMode}){
   var videoSrc=shot.orient==="landscape"?VIDEO_LANDSCAPE:VIDEO_PORTRAIT;
   var vidRef=useRef(null),scrubRef=useRef(null);
@@ -278,10 +460,9 @@ function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onTog
       </div>
     </div>
     {showMeta&&<div style={{padding:12}}><div style={{display:"flex",flexWrap:"wrap",gap:2}}><div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{shot.orient==="landscape"?<svg width="14" height="10" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>:<svg width="10" height="14" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>}</div><Tag icon={<ICalendar/>} label={shot.date}/><Tag icon={<IClock/>} label={shot.time}/><Tag icon={<ITimer/>} label={shot.dur}/><Tag icon={<IUser/>} label={shot.user}/><Tag icon={<IFile/>} label={shot.size}/></div></div>}
-  </div>);
-}
+  </div>);}
 
-// ── Arrange Shot Card ──────────────────────────────────────────────
+// ── Hub: Arrange Shot Card ─────────────────────────────────────────
 function ArrangeShotCard({shot,onRemove,onDragStart,onDragOver,onDragEnd}){
   var vidRef=useRef(null),scrubRef=useRef(null);
   var [hovering,setHovering]=useState(false);
@@ -298,10 +479,9 @@ function ArrangeShotCard({shot,onRemove,onDragStart,onDragOver,onDragEnd}){
       {hovering&&<div onClick={function(e){e.stopPropagation();onRemove();}} style={{position:"absolute",top:8,right:8,width:28,height:28,borderRadius:"50%",background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,0.4)"}}><IX color={C.action} size={14}/></div>}
     </div>
     <div style={{padding:"6px 8px",display:"flex",flexWrap:"wrap",gap:4}}><div style={{display:"flex",alignItems:"center",gap:3}}><ITimer size={10}/><span style={{fontFamily:sans,fontSize:11,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.dur}</span></div><div style={{display:"flex",alignItems:"center",gap:3}}><IUser size={10}/><span style={{fontFamily:sans,fontSize:11,color:C.textPrimary,whiteSpace:"nowrap"}}>{shot.user}</span></div></div>
-  </div>);
-}
+  </div>);}
 
-// ── Highlight Success Card ─────────────────────────────────────────
+// ── Hub: Highlight Success Card ────────────────────────────────────
 function HighlightSuccessCard({name,isEdit,showButton,onGoTo}){
   return(<div style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,alignItems:"center",width:420,textAlign:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}>
     <div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center",width:"100%"}}>
@@ -314,10 +494,9 @@ function HighlightSuccessCard({name,isEdit,showButton,onGoTo}){
       </div>
     </div>
     {showButton&&<button onClick={onGoTo} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"28px",color:C.bgPage,cursor:"pointer"}}>Go to highlights panel</button>}
-  </div>);
-}
+  </div>);}
 
-// ── Arrange Modal ──────────────────────────────────────────────────
+// ── Hub: Arrange Modal ─────────────────────────────────────────────
 function ArrangeModal({selectedIds,onBack,onPublish,isEdit,editName,editFeatured,source}){
   var initialIds=SHOTS.filter(function(s){return selectedIds.has(s.id);}).map(function(s){return s.id;});
   var [order,setOrder]=useState(initialIds);
@@ -348,10 +527,9 @@ function ArrangeModal({selectedIds,onBack,onPublish,isEdit,editName,editFeatured
         </div>
       </div>
     </div>
-  </div>);
-}
+  </div>);}
 
-// ── Download Modal ─────────────────────────────────────────────────
+// ── Hub: Download Modal ────────────────────────────────────────────
 function DownloadModal({selectedIds,onCancel,onConfirm}){
   var count=selectedIds.size,mb=sumMB(selectedIds);
   var [phase,setPhase]=useState("pre");
@@ -368,10 +546,9 @@ function DownloadModal({selectedIds,onCancel,onConfirm}){
       {phase==="loading"&&(<><div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><IDownload color={C.bgPage} size={28}/></div><p style={{fontFamily:sans,fontWeight:600,fontSize:32,color:C.textPrimary,margin:0,textAlign:"center"}}>Compiling…</p></div><div style={{display:"flex",flexDirection:"column",gap:32,opacity:progVisible?1:0,transform:progVisible?"scale(1)":"scale(0.97)",transition:"opacity .4s,transform .4s"}}><div style={{position:"relative",height:108,flexShrink:0,overflow:"visible"}}>{cards.slice(0,MAX_VIS).map(function(step,i){var opacity=i===0?1:i===1?0.5:i===2?0.25:0.1;return(<div key={step._id} style={{position:"absolute",left:0,right:0,height:72,background:C.bgTertiary,borderRadius:16,display:"flex",alignItems:"center",padding:"0 20px",gap:14,top:i*PEEK,zIndex:MAX_VIS-i,opacity:opacity,transform:"scale("+(1-i*0.03)+")",transition:"top .45s cubic-bezier(.4,0,.2,1),opacity .45s,transform .45s",animation:i===0?"slideIn .45s cubic-bezier(.4,0,.2,1) both":"none"}}><div style={{width:40,height:40,background:C.bgSecondary,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:C.action}}>{step.icon}</div><span style={{flex:1,fontFamily:sans,fontSize:14,fontWeight:600,color:C.textPrimary}}>{step.label}</span></div>);})}</div><div style={{width:"100%",height:6,background:C.bgTertiary,borderRadius:999,overflow:"hidden"}}><div style={{height:"100%",width:progPct.toFixed(1)+"%",background:C.action,borderRadius:999,transition:"width 1s cubic-bezier(.4,0,.2,1)"}}/></div></div></>)}
       {phase==="done"&&(<div style={{display:"flex",flexDirection:"column",gap:16,animation:"fadeUp .45s cubic-bezier(.34,1.1,.64,1) both"}}><div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div style={{textAlign:"center"}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,color:C.textPrimary,margin:0}}>Ready!</p><p style={{fontFamily:sans,fontSize:16,color:C.textSecondary,margin:0}}>Your shots are ready for downloading.</p></div></div><button onClick={onConfirm} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}><IDownload color={C.bgPage} size={20}/> Download</button><button onClick={function(){setCopyToast(true);setTimeout(function(){setCopyToast(false);},2200);}} style={{width:"100%",background:"transparent",border:"1px solid rgba(187,188,214,.4)",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.textSecondary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy download link</button><p style={{textAlign:"center",fontFamily:sans,fontSize:13,fontWeight:600,color:C.textPrimary,opacity:copyToast?1:0,transition:"opacity .25s",margin:0}}>Link copied to clipboard!</p></div>)}
     </div>
-  </div>);
-}
+  </div>);}
 
-// ── Batch Dropdown ─────────────────────────────────────────────────
+// ── Hub: Batch Dropdown ────────────────────────────────────────────
 function BatchDropdown({count,onDownload,onCollection,onDiscard}){
   var [open,setOpen]=useState(false),ref=useRef(null);
   useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);
@@ -379,18 +556,9 @@ function BatchDropdown({count,onDownload,onCollection,onDiscard}){
   return(<div ref={ref} style={{position:"relative"}}>
     <button onClick={function(){setOpen(function(v){return !v;});}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 12px 8px 16px",display:"flex",alignItems:"center",gap:8,cursor:"pointer"}}><ILayers color={C.bgPage} size={20}/><span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage}}>{"Batch ("+count+")"}</span><IChevDown color={C.bgPage} size={18}/></button>
     {open&&<div style={{position:"absolute",top:"calc(100% + 6px)",right:0,zIndex:50,background:C.bgSecondary,borderRadius:12,padding:6,boxShadow:"0 8px 24px rgba(0,0,0,0.35)",minWidth:200}}>{items.map(function(item){return(<div key={item.label} onClick={item.action} onMouseEnter={function(e){e.currentTarget.style.background=C.bgTertiary;}} onMouseLeave={function(e){e.currentTarget.style.background="transparent";}} style={{padding:"10px 16px",display:"flex",alignItems:"center",gap:10,borderRadius:8,cursor:"pointer",fontFamily:sans,fontSize:15,color:item.color,whiteSpace:"nowrap",background:"transparent"}}>{item.icon}{item.label}</div>);})}</div>}
-  </div>);
-}
+  </div>);}
 
-// ── Status Tag ─────────────────────────────────────────────────────
-function StatusTag({status}){
-  if(status==="draft")return <div style={{border:"1px solid "+C.textPrimary,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>Draft</span></div>;
-  if(status==="published")return <div style={{background:C.action,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.bgPage}}>Published</span></div>;
-  if(status==="featured")return <div style={{background:C.textPrimary,borderRadius:4,padding:"2px 8px",display:"inline-flex",alignItems:"center",gap:4}}><IStar color={C.bgPage} size={12}/><span style={{fontFamily:sans,fontSize:14,color:C.bgPage}}>Featured</span></div>;
-  return null;
-}
-
-// ── Highlights Panel ───────────────────────────────────────────────
+// ── Hub: Highlights Panel ──────────────────────────────────────────
 function HighlightsPanel({onNewHighlight,highlights,onEdit,onDelete}){
   var [deleteTarget,setDeleteTarget]=useState(null);
   var cols=[{key:"cover",w:79,label:"COVER"},{key:"name",w:200,label:"HIGHLIGHT NAME"},{key:"status",w:84,label:"STATUS"},{key:"shots",w:116,label:"SHOTS"},{key:"published",w:136,label:"PUBLISHED"},{key:"duration",w:116,label:"DURATION"},{key:"actions",w:112,label:"ACTIONS"}];
@@ -399,11 +567,10 @@ function HighlightsPanel({onNewHighlight,highlights,onEdit,onDelete}){
     <div style={{display:"flex",justifyContent:"flex-end"}}><button onClick={onNewHighlight} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}><IPlus color={C.bgPage} size={24}/><span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage}}>New highlight</span></button></div>
     {highlights.length===0
       ?<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"64px 0",gap:16}}><div style={{width:64,height:64,borderRadius:"50%",background:C.bgTertiary,display:"flex",alignItems:"center",justifyContent:"center"}}><IStar color={C.textMuted} size={28}/></div><div style={{textAlign:"center",display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary,margin:0}}>No highlights yet</p><p style={{fontFamily:sans,fontSize:15,color:C.textSecondary,margin:0}}>Select shots and click "New highlight".</p></div><button onClick={onNewHighlight} style={{background:"none",border:"1px solid "+C.action,borderRadius:999,padding:"10px 24px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.action,cursor:"pointer"}}>Create your first highlight</button></div>
-      :<><div style={{display:"flex",flexDirection:"column",gap:2}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingBottom:8}}>{cols.map(function(col){return <div key={col.key} style={{width:col.w,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,lineHeight:"20px",color:C.textSecondary,whiteSpace:"nowrap"}}>{col.label}</span></div>;})}</div>{highlights.map(function(row){return(<div key={row.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8}}><div style={{width:79,flexShrink:0,padding:4}}><div style={{width:37,height:71,borderRadius:4,overflow:"hidden",background:C.bgTertiary}}><img src={row.img} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/></div></div><div style={{width:200,flexShrink:0,padding:4}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary,whiteSpace:"nowrap"}}>{row.name}</span></div><div style={{width:84,flexShrink:0,padding:10}}><StatusTag status={row.status}/></div><div style={{width:116,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.shots}</span></div><div style={{width:136,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.published||"–"}</span></div><div style={{width:116,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.duration}</span></div><div style={{width:112,flexShrink:0,display:"flex",alignItems:"center",gap:8}}><IconBtn onClick={function(){onEdit(row);}}><IEdit color={C.textPrimary} size={16}/></IconBtn><IconBtn onClick={function(){setDeleteTarget(row);}}><ITrash color={C.textPrimary} size={16}/></IconBtn></div></div>);})}</div><div style={{display:"flex",alignItems:"center",gap:12,padding:"0 11px"}}><IChevLeft/><div style={{width:32,height:32,borderRadius:256,background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>1</span></div><IChevRight/></div></>}
-  </div>);
-}
+      :<><div style={{display:"flex",flexDirection:"column",gap:2}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingBottom:8}}>{cols.map(function(col){return <div key={col.key} style={{width:col.w,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,lineHeight:"20px",color:C.textSecondary,whiteSpace:"nowrap"}}>{col.label}</span></div>;})}</div>{highlights.map(function(row){return(<div key={row.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8}}><div style={{width:79,flexShrink:0,padding:4}}><div style={{width:37,height:71,borderRadius:4,overflow:"hidden",background:C.bgTertiary}}><img src={row.img} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/></div></div><div style={{width:200,flexShrink:0,padding:4}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary,whiteSpace:"nowrap"}}>{row.name}</span></div><div style={{width:84,flexShrink:0,padding:10}}><HubStatusTag status={row.status}/></div><div style={{width:116,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.shots}</span></div><div style={{width:136,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.published||"–"}</span></div><div style={{width:116,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.duration}</span></div><div style={{width:112,flexShrink:0,display:"flex",alignItems:"center",gap:8}}><IconBtn onClick={function(){onEdit(row);}}><IEdit color={C.textPrimary} size={16}/></IconBtn><IconBtn onClick={function(){setDeleteTarget(row);}}><ITrash color={C.textPrimary} size={16}/></IconBtn></div></div>);})}</div><div style={{display:"flex",alignItems:"center",gap:12,padding:"0 11px"}}><IChevLeft/><div style={{width:32,height:32,borderRadius:256,background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>1</span></div><IChevRight/></div></>}
+  </div>);}
 
-// ── Send Message Modal ─────────────────────────────────────────────
+// ── Hub: Send Message Modal ────────────────────────────────────────
 function SendMessageModal({onClose}){
   var [visible,setVisible]=useState(false);
   var [title,setTitle]=useState("");
@@ -431,10 +598,9 @@ function SendMessageModal({onClose}){
         </div>
       }
     </div>
-  </div>);
-}
+  </div>);}
 
-// ── Remove Attendee Modal ──────────────────────────────────────────
+// ── Hub: Remove Attendee Modal ─────────────────────────────────────
 function RemoveAttendeeModal({attendee,onClose,onConfirm}){
   var [visible,setVisible]=useState(false);
   var [blockUser,setBlockUser]=useState(false);
@@ -443,23 +609,13 @@ function RemoveAttendeeModal({attendee,onClose,onConfirm}){
   function handleConfirm(){onConfirm(attendee.id,blockUser);handleClose();}
   return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:700,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}>
     <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(480px,100%)",display:"flex",flexDirection:"column",gap:32,padding:32,boxShadow:"0 24px 64px rgba(0,0,0,0.55)",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}>
-      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16,textAlign:"center"}}>
-        <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><ITrash color={C.bgPage} size={26}/></div>
-        <div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"32px",color:C.textPrimary,margin:0}}>Remove attendee from event?</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}><strong style={{color:C.textPrimary}}>{attendee.name}</strong> won't be able to upload videos or see event info or highlights.</p></div>
-      </div>
-      <div style={{background:C.bgTertiary,borderRadius:16,padding:"16px 20px",display:"flex",flexDirection:"column",gap:6}}>
-        <div onClick={function(){setBlockUser(function(v){return !v;});}} style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}}><Checkbox checked={blockUser} onClick={function(){setBlockUser(function(v){return !v;});}}/><span style={{fontFamily:sans,fontSize:16,color:C.textPrimary}}>Block user</span></div>
-        <span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textMuted,paddingLeft:28}}>This user won't be able to re-enter this event.</span>
-      </div>
-      <div style={{display:"flex",gap:12}}>
-        <button onClick={handleClose} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Go back</button>
-        <button onClick={handleConfirm} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Remove attendee</button>
-      </div>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16,textAlign:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><ITrash color={C.bgPage} size={26}/></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"32px",color:C.textPrimary,margin:0}}>Remove attendee from event?</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}><strong style={{color:C.textPrimary}}>{attendee.name}</strong> won't be able to upload videos or see event info or highlights.</p></div></div>
+      <div style={{background:C.bgTertiary,borderRadius:16,padding:"16px 20px",display:"flex",flexDirection:"column",gap:6}}><div onClick={function(){setBlockUser(function(v){return !v;});}} style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}}><Checkbox checked={blockUser} onClick={function(){setBlockUser(function(v){return !v;});}}/><span style={{fontFamily:sans,fontSize:16,color:C.textPrimary}}>Block user</span></div><span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textMuted,paddingLeft:28}}>This user won't be able to re-enter this event.</span></div>
+      <div style={{display:"flex",gap:12}}><button onClick={handleClose} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Go back</button><button onClick={handleConfirm} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Remove attendee</button></div>
     </div>
-  </div>);
-}
+  </div>);}
 
-// ── Attendees Panel ────────────────────────────────────────────────
+// ── Hub: Attendees Panel ───────────────────────────────────────────
 function AttendeesPanel(){
   var [query,setQuery]=useState("");
   var [queryFocused,setQueryFocused]=useState(false);
@@ -473,67 +629,32 @@ function AttendeesPanel(){
   var totalPages=Math.max(1,Math.ceil(filtered.length/ATTENDEES_PAGE_SIZE));
   var currentPage=Math.min(page,totalPages-1);
   var visible=filtered.slice(currentPage*ATTENDEES_PAGE_SIZE,(currentPage+1)*ATTENDEES_PAGE_SIZE);
-  return(
-    <div style={{display:"flex",flexDirection:"column",gap:24}}>
-      {showMessage&&<SendMessageModal onClose={function(){setShowMessage(false);}}/>}
-      {removeTarget&&<RemoveAttendeeModal attendee={removeTarget} onClose={function(){setRemoveTarget(null);}} onConfirm={function(id){handleRemoveConfirm(id);setRemoveTarget(null);}}/>}
-      <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",gap:16,flexWrap:"wrap"}}>
-        <div style={{display:"flex",flexDirection:"column",gap:4,width:320}}>
-          <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Find attendees</span>
-          <div style={{border:"2px solid "+(queryFocused?C.textPrimary:C.border),borderRadius:16,display:"flex",alignItems:"center",gap:12,padding:"10px 20px",transition:"border-color 0.15s"}}>
-            <ISearch/>
-            <input value={query} onChange={function(e){setQuery(e.target.value);setPage(0);}} onFocus={function(){setQueryFocused(true);}} onBlur={function(){setQueryFocused(false);}} placeholder="username" style={{background:"none",border:"none",outline:"none",fontFamily:sans,fontSize:16,color:C.textPrimary,flex:1,minWidth:0}}/>
-          </div>
-        </div>
-        <div style={{display:"flex",alignItems:"center",gap:16,flexShrink:0}}>
-          <button onClick={function(){setShowMessage(true);}} style={{border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}><IBubble/><span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.action,whiteSpace:"nowrap"}}>Send message</span></button>
-          <button onClick={function(){if(navigator.share){navigator.share({title:"Neon Nights Festival",text:"Join us at Neon Nights Festival on SureShot!",url:"https://sureshot.app/e/neon-nights-2026"}).catch(function(){});}else{navigator.clipboard&&navigator.clipboard.writeText("https://sureshot.app/e/neon-nights-2026");}}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}><IUserPlus/><span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,whiteSpace:"nowrap"}}>Invite users</span></button>
-        </div>
-      </div>
-      <div style={{display:"flex",flexDirection:"column"}}>
-        <div style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingBottom:8}}>
-          <div style={{flex:1}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>ATTENDEE</span></div>
-          <div style={{width:180,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>JOINED</span></div>
-          <div style={{width:100,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>SHOTS</span></div>
-          <div style={{width:60,flexShrink:0,textAlign:"right"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>ACTIONS</span></div>
-        </div>
-        {visible.length===0
-          ?<div style={{textAlign:"center",padding:"48px 0",fontFamily:sans,fontSize:16,color:C.textSecondary}}>No attendees found.</div>
-          :visible.map(function(a){
-            var removed=removedIds.has(a.id);
-            return(<div key={a.id} style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingTop:10,paddingBottom:10,opacity:removed?0.4:1,transition:"opacity 0.2s"}}>
-              <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:12}}>
-                <img src={a.avatar} alt={a.name} style={{width:48,height:48,borderRadius:"50%",objectFit:"cover",flexShrink:0,background:C.bgTertiary,filter:removed?"grayscale(1)":"none",transition:"filter 0.2s"}}/>
-                <div style={{display:"flex",flexDirection:"column",gap:2}}>
-                  <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:removed?C.textMuted:C.textPrimary,textDecoration:removed?"line-through":"none"}}>{a.name}</span>
-                  <span style={{fontFamily:mono,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{a.handle}</span>
-                </div>
-              </div>
-              <div style={{width:180,flexShrink:0}}><span style={{fontFamily:sans,fontSize:14,color:removed?C.textMuted:C.textPrimary,whiteSpace:"nowrap"}}>{a.joined}</span></div>
-              <div style={{width:100,flexShrink:0}}><span style={{fontFamily:sans,fontSize:14,color:removed?C.textMuted:C.textPrimary}}>{a.shots}</span></div>
-              <div style={{width:60,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"flex-end"}}>
-                {removed
-                  ?<IconBtn onClick={function(){handleRecover(a.id);}}><IRecover size={16} color={C.action}/></IconBtn>
-                  :<IconBtn onClick={function(){setRemoveTarget(a);}}><IX color={C.action} size={16}/></IconBtn>
-                }
-              </div>
-            </div>);
-          })
-        }
-      </div>
-      <div style={{display:"flex",alignItems:"center",gap:12,paddingLeft:11}}>
-        <div onClick={function(){setPage(function(p){return Math.max(0,p-1);});}} style={{cursor:currentPage>0?"pointer":"default",opacity:currentPage>0?1:0.35,display:"flex"}}><IChevLeft color={C.textSecondary}/></div>
-        {Array.from({length:totalPages},function(_,i){return(<div key={i} onClick={function(){setPage(i);}} style={{width:32,height:32,borderRadius:256,background:i===currentPage?C.bgPage:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,transition:"background 0.15s"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{i+1}</span></div>);})}
-        <div onClick={function(){setPage(function(p){return Math.min(totalPages-1,p+1);});}} style={{cursor:currentPage<totalPages-1?"pointer":"default",opacity:currentPage<totalPages-1?1:0.35,display:"flex"}}><IChevRight color={C.textSecondary}/></div>
+  return(<div style={{display:"flex",flexDirection:"column",gap:24}}>
+    {showMessage&&<SendMessageModal onClose={function(){setShowMessage(false);}}/>}
+    {removeTarget&&<RemoveAttendeeModal attendee={removeTarget} onClose={function(){setRemoveTarget(null);}} onConfirm={function(id){handleRemoveConfirm(id);setRemoveTarget(null);}}/>}
+    <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",gap:16,flexWrap:"wrap"}}>
+      <div style={{display:"flex",flexDirection:"column",gap:4,width:320}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Find attendees</span><div style={{border:"2px solid "+(queryFocused?C.textPrimary:C.border),borderRadius:16,display:"flex",alignItems:"center",gap:12,padding:"10px 20px",transition:"border-color 0.15s"}}><ISearch/><input value={query} onChange={function(e){setQuery(e.target.value);setPage(0);}} onFocus={function(){setQueryFocused(true);}} onBlur={function(){setQueryFocused(false);}} placeholder="username" style={{background:"none",border:"none",outline:"none",fontFamily:sans,fontSize:16,color:C.textPrimary,flex:1,minWidth:0}}/></div></div>
+      <div style={{display:"flex",alignItems:"center",gap:16,flexShrink:0}}>
+        <button onClick={function(){setShowMessage(true);}} style={{border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}><IBubble/><span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.action,whiteSpace:"nowrap"}}>Send message</span></button>
+        <button onClick={function(){if(navigator.share){navigator.share({title:"Neon Nights Festival",text:"Join us!",url:"https://sureshot.app/e/neon-nights-2026"}).catch(function(){});}else{navigator.clipboard&&navigator.clipboard.writeText("https://sureshot.app/e/neon-nights-2026");}}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}><IUserPlus/><span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,whiteSpace:"nowrap"}}>Invite users</span></button>
       </div>
     </div>
-  );
-}
+    <div style={{display:"flex",flexDirection:"column"}}>
+      <div style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingBottom:8}}><div style={{flex:1}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>ATTENDEE</span></div><div style={{width:180,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>JOINED</span></div><div style={{width:100,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>SHOTS</span></div><div style={{width:60,flexShrink:0,textAlign:"right"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>ACTIONS</span></div></div>
+      {visible.length===0?<div style={{textAlign:"center",padding:"48px 0",fontFamily:sans,fontSize:16,color:C.textSecondary}}>No attendees found.</div>:visible.map(function(a){var removed=removedIds.has(a.id);return(<div key={a.id} style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingTop:10,paddingBottom:10,opacity:removed?0.4:1,transition:"opacity 0.2s"}}><div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:12}}><img src={a.avatar} alt={a.name} style={{width:48,height:48,borderRadius:"50%",objectFit:"cover",flexShrink:0,background:C.bgTertiary,filter:removed?"grayscale(1)":"none",transition:"filter 0.2s"}}/><div style={{display:"flex",flexDirection:"column",gap:2}}><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:removed?C.textMuted:C.textPrimary,textDecoration:removed?"line-through":"none"}}>{a.name}</span><span style={{fontFamily:mono,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{a.handle}</span></div></div><div style={{width:180,flexShrink:0}}><span style={{fontFamily:sans,fontSize:14,color:removed?C.textMuted:C.textPrimary,whiteSpace:"nowrap"}}>{a.joined}</span></div><div style={{width:100,flexShrink:0}}><span style={{fontFamily:sans,fontSize:14,color:removed?C.textMuted:C.textPrimary}}>{a.shots}</span></div><div style={{width:60,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"flex-end"}}>{removed?<IconBtn onClick={function(){handleRecover(a.id);}}><IRecover size={16} color={C.action}/></IconBtn>:<IconBtn onClick={function(){setRemoveTarget(a);}}><IX color={C.action} size={16}/></IconBtn>}</div></div>);})}
+    </div>
+    <div style={{display:"flex",alignItems:"center",gap:12,paddingLeft:11}}>
+      <div onClick={function(){setPage(function(p){return Math.max(0,p-1);});}} style={{cursor:currentPage>0?"pointer":"default",opacity:currentPage>0?1:0.35,display:"flex"}}><IChevLeft color={C.textSecondary}/></div>
+      {Array.from({length:totalPages},function(_,i){return(<div key={i} onClick={function(){setPage(i);}} style={{width:32,height:32,borderRadius:256,background:i===currentPage?C.bgPage:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,transition:"background 0.15s"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{i+1}</span></div>);})}
+      <div onClick={function(){setPage(function(p){return Math.min(totalPages-1,p+1);});}} style={{cursor:currentPage<totalPages-1?"pointer":"default",opacity:currentPage<totalPages-1?1:0.35,display:"flex"}}><IChevRight color={C.textSecondary}/></div>
+    </div>
+  </div>);}
 
-// ── New Highlight Page ─────────────────────────────────────────────
+// ── Hub: New Highlight Page ────────────────────────────────────────
 function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight}){
   var isEdit=!!editHighlight;
-  var [selectedIds,setSelectedIds]=useState(isEdit?new Set(editHighlight.selectedIds||[]):new Set());
+  var originalIds=isEdit?new Set(editHighlight.shotIds||[]):new Set();
+  var [selectedIds,setSelectedIds]=useState(new Set(originalIds));
   var [showMeta,setShowMeta]=useState(true);
   var [showFavsOnly,setShowFavsOnly]=useState(false);
   var [rangeLo,setRangeLo]=useState(0);
@@ -546,13 +667,15 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
   var allSel=visible.length>0&&visible.every(function(s){return selectedIds.has(s.id);});
   var someSel=!allSel&&visible.some(function(s){return selectedIds.has(s.id);});
   var checkState=allSel?true:someSel?"indeterminate":false;
+  var hasChanges=isEdit?(selectedIds.size!==originalIds.size||[...selectedIds].some(function(id){return !originalIds.has(id);})||[...originalIds].some(function(id){return !selectedIds.has(id);})):selectedIds.size>0;
   function toggleShot(id){setSelectedIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
   function handleSelectAll(){if(allSel){setSelectedIds(function(p){var n=new Set(p);visible.forEach(function(s){n.delete(s.id);});return n;});}else{setSelectedIds(function(p){var n=new Set(p);visible.forEach(function(s){n.add(s.id);});return n;});}}
   var handleRange=useCallback(function(lo,hi){setRangeLo(lo);setRangeHi(hi);},[]);
   var canProceed=selectedIds.size>0;
-  function handleBack(){if(selectedIds.size>0){setConfirmDiscard(true);}else{onCancel();}}
-  return(<div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage}}><Sidebar/>
-    <div style={{flex:1,display:"flex",flexDirection:"column",gap:10,padding:"24px 16px",overflowY:"auto",boxSizing:"border-box"}}>
+  function handleBack(){if(hasChanges){setConfirmDiscard(true);}else{onCancel();}}
+  return(<div style={{display:"flex",alignItems:"stretch",height:"100vh",background:C.bgPage}}>
+    <Sidebar activeScreen="events" onNav={function(k){if(k==="events")handleBack();else onNav&&onNav(k);}}/>
+    <div style={{flex:1,display:"flex",flexDirection:"column",gap:10,padding:"24px 16px",overflowY:"auto",boxSizing:"border-box",minHeight:"100%"}}>
       {confirmDiscard&&(<div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(22,20,49,0.8)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:400,textAlign:"center"}}><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Discard progress?</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>You will lose your shot selection.</p></div></div><div style={{display:"flex",gap:16}}><button onClick={function(){setConfirmDiscard(false);}} style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Keep editing</button><button onClick={function(){setConfirmDiscard(false);onCancel();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Discard</button></div></div></div>)}
       <div style={{background:C.bgSecondary,borderRadius:12,padding:"16px 24px",display:"flex",alignItems:"center",gap:16}}>
         <button onClick={handleBack} style={{background:C.bgTertiary,border:"none",borderRadius:"50%",width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}><IArrowLeft color={C.textPrimary} size={20}/></button>
@@ -564,16 +687,23 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
           <div style={{display:"flex",flexDirection:"column",gap:6}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Filter by date</span><RangeSlider lo={rangeLo} hi={rangeHi} onChange={handleRange} containerW="380px"/></div>
           <div style={{display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}><Toggle active={showMeta} onToggle={function(){setShowMeta(function(v){return !v;});}} label="Show metadata"/><Toggle active={showFavsOnly} onToggle={function(){setShowFavsOnly(function(v){return !v;});}} label="Favorites only"/><CheckboxField checked={checkState} onClick={handleSelectAll} label={"Select all ("+visible.length+")"}/></div>
         </div>
-        {selectedIds.size>0&&(<div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:C.bgTertiary,borderRadius:10}}><div style={{background:C.action,borderRadius:999,minWidth:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 8px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.bgPage}}>{selectedIds.size}</span></div><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{selectedIds.size===1?"shot selected":"shots selected"}</span></div>)}
-        {visible.length>0?<div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>{visible.map(function(shot){return(<ShotCard key={shot.id} shot={shot} selected={selectedIds.has(shot.id)} onToggle={function(){toggleShot(shot.id);}} onPreview={function(){setPreviewShot(shot);}} fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}} showMeta={showMeta} discarded={false} highlightMode={true}/>);})}</div>:<div style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>No shots in this time range.</div>}
+        {isEdit?<div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:C.bgTertiary,borderRadius:10,flexWrap:"wrap"}}><div style={{display:"flex",alignItems:"center",gap:8}}><div style={{background:C.action,borderRadius:999,minWidth:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 8px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.bgPage}}>{selectedIds.size}</span></div><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>shots in this highlight</span></div>{[...originalIds].some(function(id){return !selectedIds.has(id);})&&<span style={{fontFamily:sans,fontSize:13,color:C.action,marginLeft:8}}>{"−"+[...originalIds].filter(function(id){return !selectedIds.has(id);}).length+" removed"}</span>}{[...selectedIds].some(function(id){return !originalIds.has(id);})&&<span style={{fontFamily:sans,fontSize:13,color:"#5bc98a",marginLeft:8}}>{"+"+[...selectedIds].filter(function(id){return !originalIds.has(id);}).length+" added"}</span>}</div>:selectedIds.size>0&&<div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:C.bgTertiary,borderRadius:10}}><div style={{background:C.action,borderRadius:999,minWidth:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 8px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.bgPage}}>{selectedIds.size}</span></div><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{selectedIds.size===1?"shot selected":"shots selected"}</span></div>}
+        {visible.length>0?<div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>{visible.map(function(shot){var isOriginal=originalIds.has(shot.id);var isSelected=selectedIds.has(shot.id);return(<div key={shot.id} style={{position:"relative"}}><ShotCard shot={shot} selected={isSelected} onToggle={function(){toggleShot(shot.id);}} onPreview={function(){setPreviewShot(shot);}} fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}} showMeta={showMeta} discarded={false} highlightMode={true}/>{isEdit&&isOriginal&&!isSelected&&<div style={{position:"absolute",bottom:showMeta?48:8,left:8,background:"rgba(22,20,49,0.75)",borderRadius:4,padding:"2px 6px",pointerEvents:"none"}}><span style={{fontFamily:mono,fontSize:10,color:C.textMuted}}>removed</span></div>}{isEdit&&isOriginal&&isSelected&&<div style={{position:"absolute",bottom:showMeta?48:8,left:8,background:"rgba(22,20,49,0.75)",borderRadius:4,padding:"2px 6px",pointerEvents:"none"}}><span style={{fontFamily:mono,fontSize:10,color:C.textSecondary}}>in highlight</span></div>}{isEdit&&!isOriginal&&isSelected&&<div style={{position:"absolute",bottom:showMeta?48:8,left:8,background:"rgba(91,201,138,0.15)",borderRadius:4,padding:"2px 6px",pointerEvents:"none"}}><span style={{fontFamily:mono,fontSize:10,color:"#5bc98a"}}>new</span></div>}</div>);})}</div>:<div style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>No shots in this time range.</div>}
       </div>
     </div>
     {previewShot&&<PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}}/>}
-    {showArrange&&<ArrangeModal selectedIds={selectedIds} isEdit={isEdit} editName={isEdit?editHighlight.name:""} editFeatured={isEdit?editHighlight.status==="featured":false} source="highlights" onBack={function(){setShowArrange(false);}} onPublish={function(order,n,f){setShowArrange(false);onPublish();}}/>}
-  </div>);
-}
+    {showArrange&&<ArrangeModal selectedIds={selectedIds} isEdit={isEdit} editName={isEdit?editHighlight.name:""} editFeatured={isEdit?editHighlight.status==="featured":false} source="highlights" onBack={function(){setShowArrange(false);}} onPublish={function(){setShowArrange(false);onPublish();}}/>}
+  </div>);}
 
-// ── Settings helpers ───────────────────────────────────────────────
+// ── Hub: Public Pages ──────────────────────────────────────────────
+var PUBLIC_PAGES_SEED=[{id:0,title:"Neon Nights Festival",published:true,created:"10.03.26 08:00h",cover:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=200&h=120&fit=crop&q=80",description:"",showUpload:false}];
+function PublishedSwitch({published,onChange}){return(<div onClick={function(){onChange(!published);}} style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}}><div style={{width:26.7,height:16,borderRadius:999,background:published?C.action:C.bgTertiary,padding:2.7,boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:published?"flex-end":"flex-start",transition:"background 0.2s",flexShrink:0}}><div style={{width:10.7,height:10.7,borderRadius:"50%",background:C.textPrimary}}/></div><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>Published</span></div>);}
+function CoverField({cover,onChange}){var fileRef=useRef(null);var [hov,setHov]=useState(false);function handleFile(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){onChange(ev.target.result);};r.readAsDataURL(f);}return(<div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Cover image</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>jpg or png only. Max 15MB.</span><div onClick={function(){fileRef.current&&fileRef.current.click();}} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{position:"relative",width:"100%",height:256,borderRadius:16,overflow:"hidden",background:C.bgTertiary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:8,border:"2px dashed "+(cover?"transparent":hov?C.textPrimary:C.border),transition:"border-color 0.15s"}}>{cover?<><img src={cover} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}/><div style={{position:"absolute",top:12,right:12,width:40,height:40,borderRadius:"50%",border:"1px solid "+C.textPrimary,background:"rgba(22,20,49,0.5)",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(4px)"}}><IEdit color={C.textPrimary} size={18}/></div></>:<><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={hov?C.textPrimary:C.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{transition:"stroke 0.15s"}}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style={{fontFamily:sans,fontSize:14,color:hov?C.textPrimary:C.textMuted,transition:"color 0.15s"}}>Click to upload a cover image</span></>}</div><input ref={fileRef} type="file" accept="image/jpeg,image/png" onChange={handleFile} style={{display:"none"}}/></div>);}
+function EditPageModal({page,onClose,onSave}){var [visible,setVisible]=useState(false);var [title,setTitle]=useState(page.title);var [titleFocused,setTitleFocused]=useState(false);var [desc,setDesc]=useState(page.description||"");var [descFocused,setDescFocused]=useState(false);var [cover,setCover]=useState(page.cover||null);var [published,setPublished]=useState(page.published);var [showUpload,setShowUpload]=useState(page.showUpload||false);var [saved,setSaved]=useState(false);useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);function handleClose(){setVisible(false);setTimeout(onClose,220);}function handleSave(){onSave(Object.assign({},page,{title:title.trim()||page.title,description:desc,cover:cover,published:published,showUpload:showUpload}));setSaved(true);}if(saved){return(<div style={{position:"fixed",inset:0,zIndex:600,background:"rgba(22,20,49,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}><div style={{background:C.bgSecondary,borderRadius:24,padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,width:420,textAlign:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Changes saved!</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>Your public event page has been updated.</p></div><button onClick={handleClose} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Done</button></div></div>);}return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:600,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}><div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(560px,100%)",maxHeight:"92vh",display:"flex",flexDirection:"column",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}><div style={{flex:1,overflowY:"auto",padding:32,display:"flex",flexDirection:"column",gap:16,position:"relative"}}><button onClick={handleClose} style={{position:"absolute",top:20,right:20,background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,display:"flex",zIndex:2}}><IX size={20}/></button><div style={{display:"flex",flexDirection:"column",gap:4,paddingRight:32}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Public page settings</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>These changes will affect only this public event page.</p></div><div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Public event page title</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>150 characters maximum</span><input value={title} onChange={function(e){setTitle(e.target.value);}} onFocus={function(){setTitleFocused(true);}} onBlur={function(){setTitleFocused(false);}} maxLength={150} style={{border:"2px solid "+(titleFocused?C.textPrimary:C.border),borderRadius:16,padding:"10px 24px",fontFamily:sans,fontSize:16,background:"transparent",outline:"none",width:"100%",color:C.textSecondary,transition:"border-color 0.15s"}}/></div><div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Description</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>300 characters maximum</span><textarea value={desc} onChange={function(e){setDesc(e.target.value);}} onFocus={function(){setDescFocused(true);}} onBlur={function(){setDescFocused(false);}} placeholder="Describe your event" maxLength={300} style={{border:"2px solid "+(descFocused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:"transparent",outline:"none",width:"100%",color:C.textSecondary,resize:"none",height:192,minHeight:128,transition:"border-color 0.15s"}}/></div><CoverField cover={cover} onChange={setCover}/><PublishedSwitch published={published} onChange={setPublished}/><div style={{display:"flex",flexDirection:"column",gap:4}}><div style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}} onClick={function(){setShowUpload(function(v){return !v;});}}><div style={{width:26.7,height:16,borderRadius:999,background:C.textPrimary,padding:2.7,boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:showUpload?"flex-end":"flex-start",flexShrink:0}}><div style={{width:10.7,height:10.7,borderRadius:"50%",background:C.bgPage}}/></div><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>Show upload module</span></div><div style={{display:"flex",gap:12}}><div style={{width:26.7,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>This will allow page visitors to upload videos to the event from the public event page.</span></div></div><button onClick={handleSave} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",marginTop:8}}>Save changes</button></div></div></div>);}
+function DeletePageModal({page,onClose,onConfirm}){var [visible,setVisible]=useState(false);useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);function handleClose(){setVisible(false);setTimeout(onClose,220);}return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:700,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}><div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(440px,100%)",display:"flex",flexDirection:"column",gap:32,padding:32,textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><ITrash color={C.bgPage} size={26}/></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Remove public page?</p><p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>The page <strong style={{color:C.textPrimary}}>"{page.title}"</strong> will be permanently deleted.</p></div></div><div style={{display:"flex",gap:12}}><button onClick={handleClose} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Go back</button><button onClick={function(){onConfirm(page.id);handleClose();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Delete</button></div></div></div>);}
+function PublicPagesPanel({highlights}){var [pages,setPages]=useState(PUBLIC_PAGES_SEED);var [editTarget,setEditTarget]=useState(null);var [deleteTarget,setDeleteTarget]=useState(null);function handleSave(updated){setPages(function(prev){return prev.map(function(p){return p.id===updated.id?updated:p;});});}function handleDelete(id){setPages(function(p){return p.filter(function(pp){return pp.id!==id;});});}function handleShare(page){var url="https://sureshot.app/p/neon-nights-2026";if(navigator.share){navigator.share({title:page.title,url:url}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(url);}}return(<div style={{display:"flex",flexDirection:"column",gap:2}}>{editTarget&&<EditPageModal page={editTarget} onClose={function(){setEditTarget(null);}} onSave={function(p){handleSave(p);setEditTarget(null);}}/>}{deleteTarget&&<DeletePageModal page={deleteTarget} onClose={function(){setDeleteTarget(null);}} onConfirm={function(id){handleDelete(id);setDeleteTarget(null);}}/>}<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingBottom:8,marginBottom:2}}><div style={{display:"flex",alignItems:"center",gap:40}}><div style={{width:79,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>COVER</span></div><div style={{width:320,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>PUBLIC PAGE TITLE</span></div><div style={{width:160,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>STATUS</span></div><div style={{width:128,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>CREATED</span></div></div><div style={{width:112,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>ACTIONS</span></div></div>{pages.length===0?<div style={{textAlign:"center",padding:"48px 0",fontFamily:sans,fontSize:16,color:C.textSecondary}}>No public page.</div>:pages.map(function(page){return(<div key={page.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8}}><div style={{display:"flex",alignItems:"center",gap:40}}><div style={{width:79,padding:"0 4px",flexShrink:0}}><div style={{width:71,height:37,borderRadius:4,overflow:"hidden",background:C.bgTertiary}}>{page.cover?<img src={page.cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>}</div></div><div style={{width:320,padding:"0 10px",flexShrink:0}}><span style={{fontFamily:sans,fontWeight:600,fontSize:14,color:C.textPrimary,display:"block",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{page.title}</span></div><div style={{width:160,padding:"0 10px",flexShrink:0}}><PublishedSwitch published={page.published} onChange={function(v){handleSave(Object.assign({},page,{published:v}));}}/></div><div style={{width:128,padding:"0 10px",flexShrink:0}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{page.created}</span></div></div><div style={{width:112,display:"flex",alignItems:"center",gap:4,flexShrink:0}}><IconBtn onClick={function(){setEditTarget(page);}}><IEdit color={C.textPrimary} size={16}/></IconBtn><IconBtn onClick={function(){handleShare(page);}}><IShare color={C.textSecondary} size={16}/></IconBtn><IconBtn onClick={function(){setDeleteTarget(page);}}><IX color={C.action} size={16}/></IconBtn></div></div>);})}{pages.length>10&&<div style={{display:"flex",alignItems:"center",gap:12,paddingLeft:11,paddingTop:8}}><IChevLeft color={C.textSecondary}/><div style={{width:32,height:32,borderRadius:256,background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>1</span></div><IChevRight color={C.textSecondary}/></div>}</div>);}
+
+// ── Hub: Settings Panel ────────────────────────────────────────────
 function TimeCol({items,selected,onSelect,fmt}){return(<div style={{display:"flex",flexDirection:"column",overflowY:"auto",maxHeight:160,scrollbarWidth:"none",width:52}}>{items.map(function(item){var sel=item===selected;return(<div key={item} onClick={function(e){e.stopPropagation();onSelect(item);}} onMouseEnter={function(e){if(!sel)e.currentTarget.style.background=C.bgTertiary;}} onMouseLeave={function(e){if(!sel)e.currentTarget.style.background="transparent";}} style={{height:32,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8,cursor:"pointer",flexShrink:0,fontFamily:sans,fontSize:16,color:sel?C.bgPage:C.textPrimary,background:sel?C.action:"transparent",transition:"background .15s"}}>{fmt?fmt(item):pad2(item)}</div>);})}</div>);}
 function TimePicker({value,onChange}){var [open,setOpen]=useState(false);var ref=useRef(null);useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);var parts=(value||"09:00").split(":");var h24=parseInt(parts[0])||0,min=parseInt(parts[1])||0;var ampm=h24>=12?"PM":"AM",h12=h24%12||12;function setHour(h){onChange(pad2(ampm==="PM"?h%12+12:h%12)+":"+pad2(min));}function setMin(m){onChange(pad2(h24)+":"+pad2(m));}function setAmpm(a){onChange(pad2(a==="PM"?h12%12+12:h12%12)+":"+pad2(min));}var label=pad2(h12)+":"+pad2(min)+" "+ampm;return(<div ref={ref} style={{position:"relative"}}><div onClick={function(e){e.stopPropagation();setOpen(function(v){return !v;});}} style={{background:C.bgSecondary,borderRadius:100,padding:"6px 12px",cursor:"pointer",userSelect:"none",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,whiteSpace:"nowrap"}}>{label}</span></div>{open&&(<div onClick={function(e){e.stopPropagation();}} style={{position:"absolute",bottom:"calc(100% + 6px)",right:0,background:C.bgSecondary,borderRadius:12,padding:"8px",boxShadow:"0 8px 32px rgba(0,0,0,0.5)",display:"flex",alignItems:"stretch",gap:4,zIndex:400}}><TimeCol items={[1,2,3,4,5,6,7,8,9,10,11,12]} selected={h12} onSelect={setHour} fmt={function(v){return pad2(v);}}/><div style={{width:1,background:C.border,margin:"2px 0"}}/><TimeCol items={[0,5,10,15,20,25,30,35,40,45,50,55]} selected={min} onSelect={setMin} fmt={function(v){return pad2(v);}}/><div style={{width:1,background:C.border,margin:"2px 0"}}/><TimeCol items={["AM","PM"]} selected={ampm} onSelect={setAmpm} fmt={function(v){return v;}}/></div>)}</div>);}
 function DateTimePicker({label,hint}){var today=new Date();var [viewYear,setViewYear]=useState(today.getFullYear());var [viewMonth,setViewMonth]=useState(today.getMonth());var [startDate,setStartDate]=useState(null);var [endDate,setEndDate]=useState(null);var [openFor,setOpenFor]=useState(null);var [timeStr,setTimeStr]=useState("09:00");var ref=useRef(null);useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpenFor(null);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];var DAYS=["MON","TUE","WED","THU","FRI","SAT","SUN"];function prevMonth(){if(viewMonth===0){setViewMonth(11);setViewYear(function(y){return y-1;});}else setViewMonth(function(m){return m-1;});}function nextMonth(){if(viewMonth===11){setViewMonth(0);setViewYear(function(y){return y+1;});}else setViewMonth(function(m){return m+1;});}function getDays(){var first=new Date(viewYear,viewMonth,1),last=new Date(viewYear,viewMonth+1,0),offset=(first.getDay()+6)%7,cells=[];for(var i=0;i<offset;i++)cells.push(null);for(var d=1;d<=last.getDate();d++)cells.push(d);while(cells.length%7!==0)cells.push(null);return cells;}function selectDay(d){var dt=new Date(viewYear,viewMonth,d);if(openFor==="start"){setStartDate(dt);setOpenFor(null);}else if(openFor==="end"){setEndDate(dt);setOpenFor(null);}}function isToday(d){var t=new Date();return d===t.getDate()&&viewMonth===t.getMonth()&&viewYear===t.getFullYear();}function isSel(d,dt){return dt&&d===dt.getDate()&&viewMonth===dt.getMonth()&&viewYear===dt.getFullYear();}function fmtDate(dt){if(!dt)return null;return pad2(dt.getDate())+"."+pad2(dt.getMonth()+1)+"."+String(dt.getFullYear()).slice(2);}return(<div style={{display:"flex",flexDirection:"column",gap:4,flex:1,minWidth:0,position:"relative"}} ref={ref}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{label}</span>{hint&&<span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{hint}</span>}<div style={{border:"2px solid "+(openFor?C.textPrimary:C.border),borderRadius:16,background:C.bgTertiary,overflow:"hidden",position:"relative"}}><div onClick={function(){setOpenFor(openFor==="start"?null:"start");}} style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",borderBottom:"1px solid "+C.border,cursor:"pointer",background:openFor==="start"?C.bgSecondary:"transparent"}}><div style={{width:14,height:14,borderRadius:"50%",background:C.textSecondary,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,flex:1}}>{fmtDate(startDate)||"Start"}</span>{startDate&&<span style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{timeStr}</span>}</div><div style={{position:"absolute",left:22,top:40,height:24,borderLeft:"2px dashed "+C.border,zIndex:1}}/><div onClick={function(){setOpenFor(openFor==="end"?null:"end");}} style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",cursor:"pointer",background:openFor==="end"?C.bgSecondary:"transparent"}}><div style={{width:14,height:14,borderRadius:"50%",border:"2px solid "+C.textSecondary,background:"transparent",flexShrink:0}}/><span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,flex:1}}>{fmtDate(endDate)||"End"}</span>{endDate&&<span style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{timeStr}</span>}</div></div>{openFor&&(<div style={{position:"absolute",top:"100%",left:0,zIndex:200,marginTop:4,background:C.bgTertiary,borderRadius:12,width:370,boxShadow:"0 10px 60px rgba(0,0,0,0.4)",overflow:"hidden"}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 16px"}}><span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>{MONTHS[viewMonth]+" "+viewYear}</span><div style={{display:"flex",alignItems:"center",gap:28}}><div onClick={function(e){e.stopPropagation();prevMonth();}} style={{cursor:"pointer",display:"flex",width:24,height:24,alignItems:"center"}}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div><div onClick={function(e){e.stopPropagation();nextMonth();}} style={{cursor:"pointer",display:"flex",width:24,height:24,alignItems:"center"}}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div></div><div style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:20,alignItems:"center"}}>{DAYS.map(function(d){return <div key={d} style={{width:44,textAlign:"center",fontFamily:sans,fontSize:12,color:C.textPrimary}}>{d}</div>;})}</div><div style={{display:"flex",flexDirection:"column"}}>{(function(){var cells=getDays(),rows=[];for(var i=0;i<cells.length;i+=7)rows.push(cells.slice(i,i+7));return rows.map(function(week,ri){return(<div key={ri} style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:44,alignItems:"center"}}>{week.map(function(d,di){var sel=(isSel(d,startDate)||isSel(d,endDate)),tod=d&&isToday(d);return(<div key={di} onClick={function(){if(d)selectDay(d);}} style={{width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",background:sel?"rgba(241,102,92,0.25)":"transparent",cursor:d?"pointer":"default",flexShrink:0}}>{d&&<span style={{fontFamily:sans,fontSize:20,lineHeight:"28px",fontWeight:sel?600:400,color:sel||tod?C.action:C.textPrimary}}>{d}</span>}</div>);})}</div>);});})()}</div><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",height:52,borderTop:"1px solid "+C.border}}><span style={{fontFamily:sans,fontSize:16,color:C.textPrimary}}>Time</span><TimePicker value={timeStr} onChange={function(v){setTimeStr(v);}}/></div></div>)}</div>);}
@@ -582,13 +712,13 @@ function TimezonePicker(){var [tz,setTz]=useState("UTC+1"),ref=useRef(null);var 
 function SettingsInputField({label,hint,placeholder,multiline,maxLength}){var [val,setVal]=useState("");var [focused,setFocused]=useState(false);var base={border:"2px solid "+(focused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,resize:"none"};return(<div style={{display:"flex",flexDirection:"column",gap:4,width:"100%"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{label}</span>{hint&&<span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{hint}</span>}{multiline?<textarea value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLength} onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}} style={Object.assign({},base,{height:192,minHeight:128})}/>:<input value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLength} onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}} style={base}/>}</div>);}
 function SettingsPanel(){var [privateEvent,setPrivateEvent]=useState(false);var [instantSharing,setInstantSharing]=useState(false);var [saved,setSaved]=useState(false);return(<div style={{display:"flex",flexDirection:"column",gap:24,padding:"8px 24px 24px"}}>{saved&&(<div style={{position:"fixed",top:24,left:"50%",transform:"translateX(-50%)",zIndex:900,background:C.bgSecondary,borderRadius:12,padding:"12px 24px",display:"flex",alignItems:"center",gap:10,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",animation:"fadeUp .3s ease both"}}><div style={{width:20,height:20,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span style={{fontFamily:sans,fontSize:15,color:C.textPrimary,whiteSpace:"nowrap"}}>Settings saved successfully</span></div>)}<p style={{fontFamily:sans,fontWeight:800,fontSize:24,lineHeight:"30px",color:C.textPrimary,margin:0}}>Event settings</p><div style={{display:"flex",flexDirection:"column",gap:24,width:"100%"}}><SettingsInputField label="Event name" hint="60 characters maximum" placeholder="Event name" maxLength={60}/><SettingsInputField label="Location" placeholder="Event location"/><div style={{display:"flex",alignItems:"flex-start",gap:16,width:"100%"}}><div style={{flex:1,minWidth:0,position:"relative"}}><DateTimePicker label="Date & Time" hint="Period the event will be live"/></div><div style={{flex:1,minWidth:0,position:"relative"}}><DateTimePicker label="Video submitting period (optional)" hint="During this time, attendees can upload their videos"/></div><div style={{marginTop:36,flexShrink:0}}><TimezonePicker/></div></div><SettingsInputField label="Event description" hint="300 characters maximum" placeholder="Describe your event" multiline={true} maxLength={300}/>{[{key:"private",label:"Private event",desc:"Content is exclusive to the event, and only you can invite attendees",active:privateEvent,onToggle:function(){setPrivateEvent(function(v){return !v;});}},{key:"instant",label:"Instant content sharing",desc:"When enabled, all uploaded videos are instantly shared with attendees",active:instantSharing,onToggle:function(){setInstantSharing(function(v){return !v;});}}].map(function(sw){return(<div key={sw.key} style={{display:"flex",flexDirection:"column",gap:4}}><Toggle active={sw.active} onToggle={sw.onToggle} label={sw.label}/><div style={{display:"flex",gap:12}}><div style={{width:26.7,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{sw.desc}</span></div></div>);})}</div><button onClick={function(){setSaved(true);setTimeout(function(){setSaved(false);},3000);}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,cursor:"pointer",alignSelf:"flex-start"}}>Save changes</button></div>);}
 
-// ── Shots Panel ────────────────────────────────────────────────────
+// ── Hub: Shots Panel ───────────────────────────────────────────────
 function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onToggleFav,showMeta,onToggleMeta,showFavsOnly,onToggleFavsOnly,rangeLo,rangeHi,onRange,onDownload,onCollection,onPreview,discardedIds,onDiscard,onRecover,onBatchDiscard,activeTab,onTabChange,onNewHighlight,highlights,onEditHighlight,onDeleteHighlight}){
   var [innerTab,setInnerTab]=useState("shots");
   var count=selectedIds.size;
   var loMs=TL_START+rangeLo*TL_SPAN,hiMs=TL_START+rangeHi*TL_SPAN;
   var gridRef=useRef(null);
-  var tabs=["Shots","Attendees","Highlights","Pages","Settings"];
+  var tabs=["Shots","Attendees","Highlights","Public pages","Settings"];
   var activeShots=SHOTS.filter(function(s){return !discardedIds.has(s.id);}).filter(function(s){return s.ts>=loMs&&s.ts<=hiMs;}).filter(function(s){return !showFavsOnly||favIds.has(s.id);});
   var discardedShots=SHOTS.filter(function(s){return discardedIds.has(s.id);});
   var visible=innerTab==="shots"?activeShots:discardedShots;
@@ -596,12 +726,12 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
   var someSel=!allSel&&visible.some(function(s){return selectedIds.has(s.id);});
   var checkState=allSel?true:someSel?"indeterminate":false;
   function handleCheckbox(){if(allSel)onDeselectAll(visible);else onSelectAll(visible);}
-  return(<div style={{background:C.bgSecondary,borderRadius:12,padding:"8px 24px 16px",display:"flex",flexDirection:"column",gap:12}}>
+  return(<div style={{background:C.bgSecondary,borderRadius:12,padding:"8px 24px 16px",display:"flex",flexDirection:"column",gap:12,flex:1}}>
     <div style={{display:"flex",alignItems:"center",gap:12,padding:"8px 12px"}}>{tabs.map(function(t){var active=t===activeTab;return(<div key={t} onClick={function(){onTabChange(t);}} style={{minWidth:128,padding:8,textAlign:"center",cursor:"pointer",borderBottom:active?"2px solid "+C.textPrimary:"2px solid transparent"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:16,lineHeight:"24px",color:active?C.textPrimary:C.textSecondary}}>{t}</span></div>);})}</div>
     {activeTab==="Highlights"?<HighlightsPanel onNewHighlight={onNewHighlight} highlights={highlights} onEdit={onEditHighlight} onDelete={onDeleteHighlight}/>
     :activeTab==="Settings"?<SettingsPanel/>
     :activeTab==="Attendees"?<AttendeesPanel/>
-    :activeTab!=="Shots"?<div style={{display:"flex",alignItems:"center",justifyContent:"center",padding:"64px 0"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textMuted,letterSpacing:1}}>— in progress —</span></div>
+    :activeTab==="Public pages"?<PublicPagesPanel highlights={highlights}/>
     :<>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,padding:"12px 0"}}>
         <div style={{display:"flex",flexDirection:"column",gap:6}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Filter by date</span><RangeSlider lo={rangeLo} hi={rangeHi} onChange={onRange} gridRef={gridRef}/></div>
@@ -616,11 +746,10 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
       {innerTab==="discarded"&&(<div style={{display:"flex",flexDirection:"column",gap:4,padding:"12px 16px",background:C.bgTertiary,borderRadius:12}}><span style={{fontFamily:sans,fontWeight:600,fontSize:15,color:C.textPrimary}}>Discarded shots</span><span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>These shots have been removed from the event view. They'll be kept here for 30 days, then permanently deleted.</span></div>)}
       {visible.length>0?<div ref={gridRef} style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>{visible.map(function(shot){return(<ShotCard key={shot.id} shot={shot} selected={selectedIds.has(shot.id)} onToggle={function(){onToggle(shot.id);}} onPreview={function(){onPreview(shot);}} fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}} showMeta={showMeta} discarded={discardedIds.has(shot.id)} onDiscard={function(){onDiscard(shot.id);}} onRecover={function(){onRecover(shot.id);}}/>);})}</div>:<div ref={gridRef} style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>{innerTab==="discarded"?"No discarded shots.":"No shots in this time range."}</div>}
     </>}
-  </div>);
-}
+  </div>);}
 
-// ── App ────────────────────────────────────────────────────────────
-function App(){
+// ── Hub Page ───────────────────────────────────────────────────────
+function HubPage({event,onGoToEvents,onNav,defaultTab}){
   var [page,setPage]=useState("main");
   var [editTarget,setEditTarget]=useState(null);
   var [selectedIds,setSelectedIds]=useState(new Set());
@@ -634,7 +763,7 @@ function App(){
   var [showArrangeModal,setShowArrangeModal]=useState(false);
   var [arrangeIds,setArrangeIds]=useState(new Set());
   var [previewShot,setPreviewShot]=useState(null);
-  var [activeTab,setActiveTab]=useState("Shots");
+  var [activeTab,setActiveTab]=useState(defaultTab||"Shots");
   var [highlights,setHighlights]=useState(HIGHLIGHTS_SEED);
   function toggleCard(id){setSelectedIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
   function toggleFav(id){setFavIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
@@ -646,16 +775,171 @@ function App(){
   var deselectAll=useCallback(function(shots){setSelectedIds(function(p){var n=new Set(p);shots.forEach(function(s){n.delete(s.id);});return n;});},[]);
   var handleRange=useCallback(function(lo,hi){setRangeLo(lo);setRangeHi(hi);},[]);
   if(page==="new-highlight"||page==="edit-highlight"){return <NewHighlightPage onCancel={function(){setPage("main");setEditTarget(null);}} onPublish={function(){setActiveTab("Highlights");setPage("main");setEditTarget(null);}} favIds={favIds} onToggleFav={toggleFav} editHighlight={editTarget}/>;}
-  return(<div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
-    <Sidebar/>
-    <div style={{flex:1,display:"flex",flexDirection:"column",gap:10,padding:"24px 16px",overflowY:"auto",boxSizing:"border-box"}}>
-      <EventSummary/>
+  return(<div style={{display:"flex",alignItems:"stretch",height:"100vh",background:C.bgPage,fontFamily:sans}}>
+    <Sidebar activeScreen="events" onNav={onNav}/>
+    <div style={{flex:1,display:"flex",flexDirection:"column",gap:10,padding:"24px 16px",overflowY:"auto",boxSizing:"border-box",minHeight:"100%"}}>
+      <EventSummary event={event}/>
       <ShotsPanel selectedIds={selectedIds} onToggle={toggleCard} onSelectAll={selectAll} onDeselectAll={deselectAll} favIds={favIds} onToggleFav={toggleFav} discardedIds={discardedIds} onDiscard={discardShot} onRecover={recoverShot} onBatchDiscard={batchDiscard} showMeta={showMeta} onToggleMeta={function(){setShowMeta(function(v){return !v;});}} showFavsOnly={showFavsOnly} onToggleFavsOnly={function(){setShowFavsOnly(function(v){return !v;});}} rangeLo={rangeLo} rangeHi={rangeHi} onRange={handleRange} onDownload={function(){setShowDlModal(true);}} onCollection={function(){setArrangeIds(new Set(selectedIds));setShowArrangeModal(true);}} onPreview={function(shot){setPreviewShot(shot);}} activeTab={activeTab} onTabChange={setActiveTab} onNewHighlight={function(){setPage("new-highlight");}} onEditHighlight={function(h){setEditTarget(h);setPage("edit-highlight");}} onDeleteHighlight={deleteHighlight} highlights={highlights}/>
     </div>
     {previewShot&&<PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}} onDiscard={discardShot}/>}
     {showDlModal&&<DownloadModal selectedIds={selectedIds} onConfirm={function(){setShowDlModal(false);}} onCancel={function(){setShowDlModal(false);}}/>}
-    {showArrangeModal&&<ArrangeModal selectedIds={arrangeIds} isEdit={false} editName="" editFeatured={false} source="shots" onBack={function(){setShowArrangeModal(false);}} onPublish={function(order,n,f){setShowArrangeModal(false);setActiveTab("Highlights");}}/>}
-  </div>);
+    {showArrangeModal&&<ArrangeModal selectedIds={arrangeIds} isEdit={false} editName="" editFeatured={false} source="shots" onBack={function(){setShowArrangeModal(false);}} onPublish={function(){setShowArrangeModal(false);setActiveTab("Highlights");}}/>}
+  </div>);}
+
+// ── Create Event Page ──────────────────────────────────────────────
+function CreateEventPage({onNav,onCreated}){
+  var fileRef=useRef(null);
+  var [cover,setCover]=useState(null);
+  var [coverHov,setCoverHov]=useState(false);
+  var [name,setName]=useState("");
+  var [nameFocused,setNameFocused]=useState(false);
+  var [location,setLocation]=useState("");
+  var [locationFocused,setLocationFocused]=useState(false);
+  var [desc,setDesc]=useState("");
+  var [descFocused,setDescFocused]=useState(false);
+  var [privateEvt,setPrivateEvt]=useState(false);
+  var [instantShare,setInstantShare]=useState(false);
+  var [saved,setSaved]=useState(null); // null | "draft" | "published"
+
+  function handleFile(e){
+    var f=e.target.files&&e.target.files[0];
+    if(!f)return;
+    var r=new FileReader();
+    r.onload=function(ev){setCover(ev.target.result);};
+    r.readAsDataURL(f);
+  }
+
+  function handleSave(asDraft){
+    setSaved(asDraft?"draft":"published");
+  }
+
+  if(saved){
+    return(
+      <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
+        <Sidebar activeScreen="events" onNav={onNav}/>
+        <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh"}}>
+          <div style={{background:C.bgSecondary,borderRadius:24,padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,width:420,textAlign:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}>
+            <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <p style={{fontFamily:sans,fontWeight:800,fontSize:24,lineHeight:"30px",color:C.textPrimary,margin:0}}>{saved==="draft"?"Draft saved!":"Event created!"}</p>
+              <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>{saved==="draft"?"Your event has been saved as a draft.":"Your event is now live for attendees."}</p>
+            </div>
+            <button onClick={function(){onNav("events");}} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Go to Events</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // reuse existing DateTimePicker & TimezonePicker from SettingsPanel
+  var inp=function(val,setVal,focused,setFocused,placeholder,multiline,maxLen){
+    var base={border:"2px solid "+(focused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,resize:"none",transition:"border-color 0.15s"};
+    return multiline
+      ?<textarea value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLen} onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}} style={Object.assign({},base,{height:192,minHeight:128})}/>
+      :<input value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLen} onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}} style={base}/>;
+  };
+
+  return(
+    <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
+      <Sidebar activeScreen="events" onNav={onNav}/>
+      <div style={{flex:1,padding:"24px 16px",boxSizing:"border-box"}}>
+        <div style={{background:C.bgSecondary,borderRadius:16,padding:"16px 24px 24px",display:"flex",flexDirection:"column",gap:24}}>
+
+          <span style={{fontFamily:sans,fontWeight:800,fontSize:24,lineHeight:"30px",color:C.textPrimary}}>Create event</span>
+
+          {/* cover image */}
+          <div style={{position:"relative",width:361,height:192,borderRadius:24,overflow:"hidden",background:C.bgPage,flexShrink:0,cursor:"pointer"}} onClick={function(){fileRef.current&&fileRef.current.click();}} onMouseEnter={function(){setCoverHov(true);}} onMouseLeave={function(){setCoverHov(false);}}>
+            {/* decorative sureshot vectors in bg */}
+            <svg style={{position:"absolute",top:"50%",transform:"translateY(-50%)",left:8,opacity:0.18}} width="26" height="135" viewBox="0 0 178 135" fill="none"><path d="M147.553 68.4289C147.553 94.1164 136.943 117.486 119.592 135V1.8578C136.943 19.3713 147.553 42.7414 147.553 68.4289Z" fill="#F1665C"/><path d="M178 66.5711C178 92.2586 168.333 115.629 152.524 133.142V0C168.333 17.5135 178 40.8836 178 66.5711Z" fill="#F1665C"/></svg>
+            <svg style={{position:"absolute",top:"50%",transform:"translateY(-50%)",right:8,opacity:0.18}} width="26" height="135" viewBox="0 0 178 135" fill="none"><path d="M30.447 68.4289C30.447 94.1164 41.057 117.486 58.408 135V1.8578C41.057 19.3713 30.447 42.7414 30.447 68.4289Z" fill="#F1665C"/><path d="M0 66.5711C0 92.2586 9.667 115.629 25.476 133.142V0C9.667 17.5135 0 40.8836 0 66.5711Z" fill="#F1665C"/></svg>
+            {cover
+              ?<img src={cover} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+              :null
+            }
+            <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,display:"flex",alignItems:"center",gap:12,padding:"8px 16px",background:cover?"rgba(22,20,49,0.6)":"transparent",backdropFilter:cover?"blur(4px)":"none",transition:"background 0.15s"}}>
+                <IPlus color={C.textPrimary} size={24}/>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.textPrimary,whiteSpace:"nowrap"}}>{cover?"Change cover":"Add cover"}</span>
+              </div>
+            </div>
+            <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{display:"none"}}/>
+          </div>
+
+          {/* event name */}
+          <div style={{display:"flex",flexDirection:"column",gap:4}}>
+            <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Event name</span>
+            <span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>60 characters maximum</span>
+            {inp(name,setName,nameFocused,setNameFocused,"Event name",false,60)}
+          </div>
+
+          {/* location */}
+          <div style={{display:"flex",flexDirection:"column",gap:4}}>
+            <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Location</span>
+            {inp(location,setLocation,locationFocused,setLocationFocused,"Event location",false,200)}
+          </div>
+
+          {/* date/time row */}
+          <div style={{display:"flex",alignItems:"flex-end",gap:16,flexWrap:"wrap"}}>
+            <div style={{flex:1,minWidth:240,position:"relative"}}>
+              <DateTimePicker label="Date & Time" hint="Period the event will be live"/>
+            </div>
+            <div style={{flex:1,minWidth:240,position:"relative"}}>
+              <DateTimePicker label="Video submitting period (optional)" hint="During this time, attendees can upload their videos"/>
+            </div>
+            <div style={{marginBottom:4,flexShrink:0}}><TimezonePicker/></div>
+          </div>
+
+          {/* description */}
+          <div style={{display:"flex",flexDirection:"column",gap:4}}>
+            <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Event description</span>
+            <span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>300 characters maximum</span>
+            {inp(desc,setDesc,descFocused,setDescFocused,"Describe your event",true,300)}
+          </div>
+
+          {/* toggles */}
+          <div style={{display:"flex",flexDirection:"column",gap:16}}>
+            {[
+              {active:privateEvt,  set:setPrivateEvt,  label:"Private event",           desc:"Content is exclusive to the event, and only you can invite attendees"},
+              {active:instantShare,set:setInstantShare,label:"Instant content sharing",  desc:"When enabled, all uploaded videos are instantly shared with attendees"},
+            ].map(function(sw){return(
+              <div key={sw.label} style={{display:"flex",flexDirection:"column",gap:4}}>
+                <Toggle active={sw.active} onToggle={function(){sw.set(function(v){return !v;});}} label={sw.label}/>
+                <div style={{display:"flex",gap:12}}><div style={{width:26.7,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{sw.desc}</span></div>
+              </div>
+            );})}
+          </div>
+
+          {/* action buttons */}
+          <div style={{display:"flex",gap:16,alignItems:"center"}}>
+            <button onClick={function(){handleSave(true);}} style={{border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"8px 16px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.action,cursor:"pointer",whiteSpace:"nowrap"}}>Save as draft</button>
+            <button onClick={function(){handleSave(false);}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,cursor:"pointer",whiteSpace:"nowrap"}}>Create event</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+function App(){
+  var [screen,setScreen]=useState("dashboard");
+  var [activeEvent,setActiveEvent]=useState(null);
+  var [defaultTab,setDefaultTab]=useState("Shots");
+  function handleNav(key){
+    if(key==="events"){setScreen("events");setActiveEvent(null);}
+    else if(key==="dashboard"){setScreen("dashboard");setActiveEvent(null);}
+    else if(key==="create"){setScreen("create");}
+    else if(key==="accounts"){setScreen("events");}
+  }
+  function openEvent(ev,tab){setActiveEvent(ev);setScreen("hub");setDefaultTab(tab||"Shots");}
+  function goToEvents(){setScreen("events");setActiveEvent(null);}
+  if(screen==="hub")return <HubPage event={activeEvent} onGoToEvents={goToEvents} onNav={handleNav} defaultTab={defaultTab}/>;
+  if(screen==="events")return <EventsListPage onOpenEvent={openEvent} onNav={handleNav}/>;
+  if(screen==="create")return <CreateEventPage onNav={handleNav} onCreated={function(){setScreen("events");}}/>;
+  return <DashboardPage onNav={handleNav}/>;
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
