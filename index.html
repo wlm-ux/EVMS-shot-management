@@ -220,44 +220,293 @@ function Sidebar({activeScreen,onNav}){
 }
 
 // ── Dashboard Page ─────────────────────────────────────────────────
-function DashboardPage({onNav}){
-  var stats=[
-    {v:"3",   l:"Events created"},
-    {v:"14",  l:"Shots received"},
-    {v:"8",   l:"Attendees"},
-    {v:"3",   l:"Highlights"},
-    {v:"1.5", l:"Total size (GB)"},
-    {v:"8",   l:"Duration (min)"},
-  ];
+// ── Dashboard seed data ────────────────────────────────────────────
+var DASH_ACTIVE_EVENT={
+  id:2,
+  name:"Neon Nights Festival",
+  cover:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=900&h=400&fit=crop&q=80",
+  location:"Refshaleøen, Copenhagen",
+  status:"live",
+  videosLastHour:34,
+  activeUsers:127,
+  uploadGraph:[4,7,11,18,22,34,28,19,14,9,6,3],
+  graphHours:["13h","14h","15h","16h","17h","18h","19h","20h","21h","22h","23h","00h"],
+};
+var DASH_USERS={
+  totalAttendees:4498,
+  activeUsers:1243,
+  uploadRate:31,
+  topContributors:[
+    {name:"Daniel Ferreira", handle:"@dani_f",   videos:35,avatar:"https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=96&h=96&fit=crop&q=80"},
+    {name:"Priya Nair",      handle:"@priyanair", videos:21,avatar:"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=96&h=96&fit=crop&q=80"},
+    {name:"Lucas Bergström", handle:"@lucasb",   videos:14,avatar:"https://images.unsplash.com/photo-1488161628813-04466f872be2?w=96&h=96&fit=crop&q=80"},
+    {name:"Camille Rousseau",handle:"@camilleR", videos:12,avatar:"https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=96&h=96&fit=crop&q=80"},
+    {name:"Marcus Webb",     handle:"@marcusw",  videos:10,avatar:"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=96&h=96&fit=crop&q=80"},
+  ],
+};
+var DASH_VIDEOS={total:562,avgPerEvent:47,avgDuration:"0:18",verticalPct:68,horizontalPct:32};
+var DASH_HIGHLIGHTS=[
+  {id:2,name:"Best of the audience",views:1840,img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=120&h=180&fit=crop&q=80"},
+  {id:1,name:"Sponsors",            views:924, img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=120&h=180&fit=crop&q=80"},
+  {id:3,name:"Stage B",             views:511, img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=120&h=180&fit=crop&q=80"},
+  {id:4,name:"Crowd highlights",    views:388, img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=120&h=180&fit=crop&q=80"},
+  {id:5,name:"After party",         views:210, img:"https://images.unsplash.com/photo-1468359601543-843bfaef291a?w=120&h=180&fit=crop&q=80"},
+];
+var DASH_HIGHLIGHTS_META={total:12,avgPerEvent:3};
+var DASH_AVG_VIEWS=Math.round(DASH_HIGHLIGHTS.reduce(function(a,h){return a+h.views;},0)/DASH_HIGHLIGHTS.length);
+
+// ── Bar chart ──────────────────────────────────────────────────────
+function BarChart({data,labels,height}){
+  var W=600,H=height||64,gap=4,n=data.length;
+  var mx=Math.max.apply(null,data)||1;
+  var bw=Math.floor((W-(n-1)*gap)/n);
+  return(
+    <div style={{width:"100%"}}>
+      <svg viewBox={"0 0 "+W+" "+H} style={{width:"100%",height:H,display:"block"}} preserveAspectRatio="none">
+        {data.map(function(v,i){
+          var bh=Math.max(3,Math.round((v/mx)*(H-6)));
+          return <rect key={i} x={i*(bw+gap)} y={H-bh} width={bw} height={bh} rx={3}
+            fill={i===n-1?C.action:C.bgTertiary}/>;
+        })}
+      </svg>
+      {labels&&<div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
+        {labels.filter(function(_,i){return i%3===0;}).map(function(l,i){return(
+          <span key={i} style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{l}</span>
+        );})}
+      </div>}
+    </div>
+  );
+}
+
+// ── Stat card — bgTertiary bg, white value, secondary label ────────
+function StatCard({value,label,orange}){
+  return(
+    <div style={{flex:1,minWidth:0,background:C.bgTertiary,borderRadius:12,padding:"12px 16px",display:"flex",flexDirection:"column",gap:8}}>
+      <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:orange?C.action:C.textPrimary}}>{value}</span>
+      <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary,whiteSpace:"nowrap"}}>{label}</span>
+    </div>
+  );
+}
+
+// ── Section title ──────────────────────────────────────────────────
+function SectionTitle({children}){
+  return <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{children}</span>;
+}
+
+function DashboardPage({onNav,onOpenEvent}){
+  var otherEvents=EVENTS.slice(0,3);
   return(
     <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
       <Sidebar activeScreen="dashboard" onNav={onNav}/>
       <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,padding:"24px 16px",boxSizing:"border-box"}}>
-        {/* welcome banner */}
-        <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",alignItems:"center",justifyContent:"space-between",gap:24}}>
+
+        {/* ── 1. WELCOME HEADER ── */}
+        <div style={{background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:24}}>
           <div style={{display:"flex",flexDirection:"column",gap:8,flex:1}}>
             <span style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"30px",color:C.textPrimary}}>Hey there, Nicolai</span>
-            <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,margin:0,maxWidth:740}}>
-              Welcome to <strong style={{fontFamily:sans,fontWeight:800}}>SureShot</strong>'s online platform, your go-to for managing events and shots. You can easily create and oversee your events, plus share highlight reels and updates with your attendees.
+            <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,margin:0}}>
+              Welcome to <strong style={{fontFamily:sans,fontWeight:700}}>SureShot</strong>'s online platform, your go-to for managing events and shots. You can easily create and oversee your events, plus share highlight reels and updates with your attendees.
             </p>
           </div>
           <div style={{flexShrink:0}}>
-            <svg width="178" height="135" viewBox="0 0 178 135" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M76.097 95.367C61.684 95.367 49.9999 83.5836 49.9999 69.0482C49.9999 54.5127 61.684 42.7294 76.097 42.7294C90.51 42.7294 102.194 54.5127 102.194 69.0482C102.194 83.5836 90.51 95.367 76.097 95.367Z" fill="#F1665C"/><path d="M147.553 68.4289C147.553 94.1164 136.943 117.486 119.592 135V1.8578C136.943 19.3713 147.553 42.7414 147.553 68.4289Z" fill="#F1665C"/><path d="M178 66.5711C178 92.2586 168.333 115.629 152.524 133.142V0C168.333 17.5135 178 40.8836 178 66.5711Z" fill="#F1665C"/></svg>
+            <svg width="96" height="72" viewBox="0 0 178 135" fill="none">
+              <path d="M76.097 95.367C61.684 95.367 49.9999 83.5836 49.9999 69.0482C49.9999 54.5127 61.684 42.7294 76.097 42.7294C90.51 42.7294 102.194 54.5127 102.194 69.0482C102.194 83.5836 90.51 95.367 76.097 95.367Z" fill="#F1665C"/>
+              <path d="M147.553 68.4289C147.553 94.1164 136.943 117.486 119.592 135V1.8578C136.943 19.3713 147.553 42.7414 147.553 68.4289Z" fill="#F1665C"/>
+              <path d="M178 66.5711C178 92.2586 168.333 115.629 152.524 133.142V0C168.333 17.5135 178 40.8836 178 66.5711Z" fill="#F1665C"/>
+            </svg>
           </div>
         </div>
-        {/* stat cards */}
-        <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
-          {stats.map(function(s){return(
-            <div key={s.l} style={{flex:"1 0 128px",background:C.bgSecondary,borderRadius:16,padding:"12px 16px",display:"flex",flexDirection:"column",alignItems:"center",gap:8,textAlign:"center"}}>
-              <span style={{fontFamily:sans,fontWeight:800,fontSize:28,lineHeight:"34px",color:C.action}}>{s.v}</span>
-              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,whiteSpace:"nowrap"}}>{s.l}</span>
+
+        {/* ── 2. ACTIVE EVENT ── */}
+        <div style={{background:C.bgTertiary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:16,border:"1px solid rgba(241,102,92,0.35)"}}>
+          {/* section title */}
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <div style={{position:"relative",width:10,height:10,flexShrink:0}}>
+                <div style={{position:"absolute",inset:0,borderRadius:"50%",background:C.action,animation:"none"}}/>
+                <div style={{position:"absolute",inset:-3,borderRadius:"50%",background:"rgba(241,102,92,0.25)"}}/>
+              </div>
+              <span style={{fontFamily:sans,fontWeight:700,fontSize:12,color:C.action,letterSpacing:"0.08em",textTransform:"uppercase"}}>Live now</span>
             </div>
-          );})}
+            <div style={{flex:1,height:1,background:"rgba(241,102,92,0.2)"}}/>
+          </div>
+          {/* content row */}
+          <div style={{display:"flex",gap:24,alignItems:"center",flexWrap:"wrap"}}>
+          {/* left: event card */}
+          <div style={{display:"flex",gap:0,alignItems:"stretch",flex:"0 0 auto",background:C.bgPage,borderRadius:16,overflow:"hidden",height:156}}>
+            <div style={{width:128,flexShrink:0,position:"relative"}}>
+              <img src={DASH_ACTIVE_EVENT.cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+            </div>
+            <div style={{padding:"16px",display:"flex",flexDirection:"column",gap:4,justifyContent:"center",minWidth:200,maxWidth:280}}>
+              <div style={{background:C.action,borderRadius:999,padding:"1px 8px",display:"inline-flex",alignSelf:"flex-start"}}>
+                <span style={{fontFamily:mono,fontSize:12,color:C.bgPage}}>LIVE!</span>
+              </div>
+              <span style={{fontFamily:sans,fontWeight:800,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{DASH_ACTIVE_EVENT.name}</span>
+              <div style={{display:"flex",alignItems:"center",gap:4}}>
+                <IUsers color={C.textSecondary} size={16}/>
+                <span style={{fontFamily:sans,fontSize:16,color:C.textSecondary}}>{DASH_USERS.totalAttendees.toLocaleString()}</span>
+              </div>
+              <span onClick={function(){onOpenEvent&&onOpenEvent(EVENTS[2]);}} style={{fontFamily:sans,fontSize:14,color:C.action,cursor:"pointer",textDecoration:"underline",textDecorationColor:"rgba(241,102,92,0.4)"}}>See event</span>
+            </div>
+          </div>
+          {/* middle: last 24h stats */}
+          <div style={{display:"flex",flexDirection:"column",gap:12,flexShrink:0}}>
+            <span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>Last 24h</span>
+            <div style={{display:"flex",gap:16}}>
+              <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px",minWidth:128,display:"flex",flexDirection:"column",gap:8}}>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.action}}>{DASH_ACTIVE_EVENT.videosLastHour}</span>
+                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Videos</span>
+              </div>
+              <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px",minWidth:128,display:"flex",flexDirection:"column",gap:8}}>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.action}}>{DASH_ACTIVE_EVENT.activeUsers}</span>
+                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Active users</span>
+              </div>
+            </div>
+          </div>
+          {/* right: upload graph */}
+          <div style={{display:"flex",flexDirection:"column",gap:12,flex:1,minWidth:200}}>
+            <span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>Videos uploaded</span>
+            <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px"}}>
+              <BarChart data={DASH_ACTIVE_EVENT.uploadGraph} labels={DASH_ACTIVE_EVENT.graphHours} height={72}/>
+            </div>
+          </div>
+          </div>
+        </div>
+
+        {/* ── 3. VIDEOS + USERS ── */}
+        <div style={{display:"flex",gap:12,alignItems:"stretch"}}>
+
+          {/* Videos */}
+          <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:24}}>
+            <SectionTitle>Videos</SectionTitle>
+            <div style={{display:"flex",gap:16}}>
+              <StatCard value={DASH_VIDEOS.total.toLocaleString()} label="Total videos"/>
+              <StatCard value={DASH_VIDEOS.avgPerEvent} label="Avg. per event"/>
+              <StatCard value={DASH_VIDEOS.avgDuration} label="Avg duration"/>
+            </div>
+            {/* orientation split */}
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <span style={{fontFamily:sans,fontSize:16,color:C.textSecondary}}>Orientation split</span>
+              <div style={{height:6,borderRadius:3,overflow:"hidden",background:C.bgPage,display:"flex"}}>
+                <div style={{width:DASH_VIDEOS.verticalPct+"%",background:C.action}}/>
+                <div style={{flex:1,background:C.bgTertiary}}/>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between"}}>
+                <div style={{display:"flex",alignItems:"center",gap:5}}>
+                  <svg width="9" height="12" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.action} strokeWidth="1.5"/></svg>
+                  <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{DASH_VIDEOS.verticalPct}% vertical</span>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:5}}>
+                  <svg width="12" height="9" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textMuted} strokeWidth="1.5"/></svg>
+                  <span style={{fontFamily:sans,fontSize:14,color:C.textMuted}}>{DASH_VIDEOS.horizontalPct}% horizontal</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Users */}
+          <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:24}}>
+            <SectionTitle>Users</SectionTitle>
+            <div style={{display:"flex",gap:16}}>
+              <StatCard value={DASH_USERS.totalAttendees.toLocaleString()} label="Attendees"/>
+              <StatCard value={DASH_USERS.activeUsers.toLocaleString()} label="Active users"/>
+              <StatCard value={DASH_USERS.uploadRate+"%"} label="Upload rate"/>
+            </div>
+            {/* top contributors — 3 only */}
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>Top contributors</span>
+              <div style={{display:"flex",gap:24}}>
+                {DASH_USERS.topContributors.slice(0,3).map(function(u){
+                  return(
+                    <div key={u.handle} style={{display:"flex",flexDirection:"column",gap:4,alignItems:"flex-start"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8,height:34}}>
+                        <img src={u.avatar} alt={u.name} style={{width:24,height:24,borderRadius:"50%",objectFit:"cover",flexShrink:0}}/>
+                        <div style={{display:"flex",flexDirection:"column",gap:0}}>
+                          <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary,whiteSpace:"nowrap"}}>{u.name}</span>
+                          <span style={{fontFamily:mono,fontSize:12,color:C.textSecondary}}>{u.handle}</span>
+                        </div>
+                      </div>
+                      <span style={{fontFamily:sans,fontWeight:700,fontSize:14,color:C.textPrimary}}>{u.videos} videos</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── 4. HIGHLIGHTS + OTHER EVENTS ── */}
+        <div style={{display:"flex",gap:12,alignItems:"stretch"}}>
+
+          {/* Highlights */}
+          <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:24}}>
+            <SectionTitle>Highlights</SectionTitle>
+            <div style={{display:"flex",gap:16}}>
+              <StatCard value={DASH_HIGHLIGHTS_META.total} label="Highlights"/>
+              <StatCard value={DASH_HIGHLIGHTS_META.avgPerEvent} label="Avg. per event"/>
+              <StatCard value={DASH_AVG_VIEWS.toLocaleString()} label="Avg. views"/>
+            </div>
+            {/* top performers — all 5, portrait covers with name */}
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              <span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>Top performers</span>
+              <div style={{display:"flex",gap:8}}>
+                {DASH_HIGHLIGHTS.map(function(h){
+                  return(
+                    <div key={h.id} style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:6}}>
+                      <div style={{position:"relative",borderRadius:8,overflow:"hidden",paddingBottom:"146%"}}>
+                        <img src={h.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+                        <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"20px 6px 6px",background:"linear-gradient(transparent,rgba(22,20,49,0.88))"}}>
+                          <div style={{display:"flex",alignItems:"center",gap:3}}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span style={{fontFamily:mono,fontSize:12,color:C.textSecondary}}>{h.views.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <span style={{fontFamily:sans,fontSize:14,lineHeight:"18px",color:C.textPrimary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{h.name}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Other events */}
+          <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:20}}>
+            <SectionTitle>Other events</SectionTitle>
+            {/* table header */}
+            <div style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingBottom:8}}>
+              <div style={{width:76,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>COVER</span></div>
+              <div style={{flex:1,paddingLeft:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>EVENT NAME</span></div>
+              <div style={{width:130,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>STATUS</span></div>
+            </div>
+            <div style={{display:"flex",flexDirection:"column"}}>
+              {otherEvents.map(function(ev){
+                return(
+                  <div key={ev.id} onClick={function(){onOpenEvent&&onOpenEvent(ev);}} style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8,cursor:"pointer",borderRadius:4,transition:"background 0.12s"}} onMouseEnter={function(e){e.currentTarget.style.background="rgba(62,61,100,0.3)";}} onMouseLeave={function(e){e.currentTarget.style.background="transparent";}}>
+                    <div style={{width:76,flexShrink:0}}>
+                      <div style={{width:64,height:38,borderRadius:4,overflow:"hidden",background:C.bgTertiary}}>
+                        <img src={ev.cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+                      </div>
+                    </div>
+                    <div style={{flex:1,minWidth:0,paddingLeft:4,paddingRight:8}}>
+                      <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,display:"block",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{ev.name}</span>
+                    </div>
+                    <div style={{width:130,flexShrink:0}}>
+                      <ListStatusTag status={ev.status}/>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   );
 }
+
 
 // ── Events List Page ───────────────────────────────────────────────
 function EventsListPage({onOpenEvent,onNav}){
@@ -786,7 +1035,279 @@ function HubPage({event,onGoToEvents,onNav,defaultTab}){
     {showArrangeModal&&<ArrangeModal selectedIds={arrangeIds} isEdit={false} editName="" editFeatured={false} source="shots" onBack={function(){setShowArrangeModal(false);}} onPublish={function(){setShowArrangeModal(false);setActiveTab("Highlights");}}/>}
   </div>);}
 
-// ── Create Event Page ──────────────────────────────────────────────
+// ── Account Page ───────────────────────────────────────────────────
+var COMPANY={
+  name:"Luminary Events Group",
+  logo:"https://images.unsplash.com/photo-1532256253150-2f0e4e883a74?w=900&auto=format&fit=crop&q=60",
+  plan:"Business",
+  since:"March 2024",
+};
+var TEAM_MEMBERS=[
+  {id:0, name:"Jane Doe",       handle:"@janedoe",     email:"jane.doe@luminaryevents.com",     role:"Admin",  avatar:"https://images.unsplash.com/photo-1525186402429-b4ff38bedec6?w=200&h=200&fit=crop&q=80"},
+  {id:1, name:"Marcus Webb",    handle:"@marcusw",     email:"marcus.webb@luminaryevents.com",   role:"Member", avatar:"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&q=80"},
+  {id:2, name:"Lena Hoffmann",  handle:"@lenahoff",    email:"lena.hoffmann@luminaryevents.com", role:"Member", avatar:"https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop&q=80"},
+  {id:3, name:"Daniel Ferreira",handle:"@dani_f",      email:"daniel.f@luminaryevents.com",      role:"Member", avatar:"https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=200&h=200&fit=crop&q=80"},
+  {id:4, name:"Camille Rousseau",handle:"@camilleR",   email:"camille.r@luminaryevents.com",     role:"Member", avatar:"https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop&q=80"},
+  {id:5, name:"Yuki Tanaka",    handle:"@yukitan",     email:"yuki.tanaka@luminaryevents.com",   role:"Member", avatar:"https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&q=80"},
+];
+
+function EditCompanyModal({company,logo,onClose,onSave}){
+  var [visible,setVisible]=useState(false);
+  var [logoSrc,setLogoSrc]=useState(logo);
+  var [logoHov,setLogoHov]=useState(false);
+  var [email,setEmail]=useState(company.email||"");
+  var [emailFocused,setEmailFocused]=useState(false);
+  var [saved,setSaved]=useState(false);
+  var fileRef=useRef(null);
+  useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);
+  function handleLogoFile(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){setLogoSrc(ev.target.result);};r.readAsDataURL(f);}
+  function handleClose(){setVisible(false);setTimeout(onClose,220);}
+  function handleSave(){onSave({logo:logoSrc,email:email});setSaved(true);}
+  return(
+    <div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:700,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}>
+      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(520px,100%)",display:"flex",flexDirection:"column",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}>
+        {saved
+          ?<div style={{padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,textAlign:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}>
+            <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              <p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Changes saved!</p>
+              <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>Your company profile has been updated.</p>
+            </div>
+            <button onClick={handleClose} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"14px 24px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Done</button>
+          </div>
+          :<div style={{padding:32,display:"flex",flexDirection:"column",gap:24}}>
+            {/* header */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <p style={{fontFamily:sans,fontWeight:600,fontSize:28,lineHeight:"34px",color:C.textPrimary,margin:0}}>Edit company</p>
+              <button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,display:"flex"}}><IX size={20}/></button>
+            </div>
+            {/* logo */}
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Company logo</span>
+              <div style={{display:"flex",alignItems:"center",gap:16}}>
+                <div onMouseEnter={function(){setLogoHov(true);}} onMouseLeave={function(){setLogoHov(false);}} onClick={function(){fileRef.current&&fileRef.current.click();}} style={{position:"relative",width:80,height:80,borderRadius:12,overflow:"hidden",background:C.bgTertiary,flexShrink:0,cursor:"pointer",border:"2px solid "+C.border}}>
+                  <img src={logoSrc} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+                  {logoHov&&<div style={{position:"absolute",inset:0,background:"rgba(22,20,49,0.65)",display:"flex",alignItems:"center",justifyContent:"center"}}><IEdit color={C.textPrimary} size={18}/></div>}
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  <button onClick={function(){fileRef.current&&fileRef.current.click();}} style={{border:"1px solid "+C.textPrimary,background:"none",borderRadius:999,padding:"6px 16px",fontFamily:sans,fontWeight:600,fontSize:14,color:C.textPrimary,cursor:"pointer",display:"flex",alignItems:"center",gap:8}}>
+                    <IUpload size={14}/>
+                    Upload new logo
+                  </button>
+                  <span style={{fontFamily:sans,fontSize:12,color:C.textMuted}}>JPG or PNG, max 5MB</span>
+                </div>
+                <input ref={fileRef} type="file" accept="image/jpeg,image/png" onChange={handleLogoFile} style={{display:"none"}}/>
+              </div>
+            </div>
+            {/* email */}
+            <div style={{display:"flex",flexDirection:"column",gap:4}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Contact email</span>
+              <input value={email} onChange={function(e){setEmail(e.target.value);}} onFocus={function(){setEmailFocused(true);}} onBlur={function(){setEmailFocused(false);}} placeholder="hello@company.com" style={{border:"2px solid "+(emailFocused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,transition:"border-color 0.15s"}}/>
+            </div>
+            {/* plan — read only */}
+            <div style={{display:"flex",flexDirection:"column",gap:4}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Plan</span>
+              <div style={{border:"2px solid "+C.border,borderRadius:16,padding:"12px 24px",background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.action} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                  <span style={{fontFamily:sans,fontSize:16,color:C.textPrimary}}>{company.plan}</span>
+                </div>
+                <span style={{fontFamily:sans,fontSize:13,color:C.textMuted}}>Not editable</span>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:8,padding:"10px 16px",background:"rgba(241,102,92,0.08)",borderRadius:12,marginTop:4}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.action} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>To change your plan, please </span>
+                <span onClick={function(){window.open("mailto:support@sureshot.app","_blank");}} style={{fontFamily:sans,fontWeight:600,fontSize:13,color:C.action,cursor:"pointer",textDecoration:"underline"}}>contact support</span>
+              </div>
+            </div>
+            {/* actions */}
+            <div style={{display:"flex",gap:12}}>
+              <button onClick={handleClose} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.textSecondary,cursor:"pointer"}}>Cancel</button>
+              <button onClick={handleSave} style={{flex:2,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,cursor:"pointer"}}>Save changes</button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  );
+}
+
+function InviteUserModal({onClose}){
+  var [visible,setVisible]=useState(false);
+  var [email,setEmail]=useState("");
+  var [emailFocused,setEmailFocused]=useState(false);
+  var [sent,setSent]=useState(false);
+  useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);
+  function handleClose(){setVisible(false);setTimeout(onClose,220);}
+  var canSend=email.trim().includes("@");
+  return(
+    <div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:700,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}>
+      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(480px,100%)",padding:32,display:"flex",flexDirection:"column",gap:24,boxShadow:"0 24px 64px rgba(0,0,0,0.55)",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}>
+        {sent
+          ?<div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:24,textAlign:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}>
+            <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              <p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Invitation sent!</p>
+              <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>An invite was sent to <strong style={{color:C.textPrimary}}>{email}</strong>.</p>
+            </div>
+            <button onClick={handleClose} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"14px 24px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Done</button>
+          </div>
+          :<>
+            <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+              <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                <p style={{fontFamily:sans,fontWeight:600,fontSize:28,lineHeight:"34px",color:C.textPrimary,margin:0}}>Invite user</p>
+                <p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>They'll get an email to join <strong style={{color:C.textPrimary}}>{COMPANY.name}</strong>.</p>
+              </div>
+              <button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,flexShrink:0,marginTop:2}}><IX size={20}/></button>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:4}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Email address</span>
+              <input value={email} onChange={function(e){setEmail(e.target.value);}} onFocus={function(){setEmailFocused(true);}} onBlur={function(){setEmailFocused(false);}} placeholder="colleague@company.com" style={{border:"2px solid "+(emailFocused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,transition:"border-color 0.15s"}}/>
+            </div>
+            <div style={{display:"flex",gap:12}}>
+              <button onClick={handleClose} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.textSecondary,cursor:"pointer"}}>Cancel</button>
+              <button onClick={function(){if(canSend)setSent(true);}} style={{flex:2,background:canSend?C.action:C.bgTertiary,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:16,color:canSend?C.bgPage:C.textMuted,cursor:canSend?"pointer":"not-allowed",transition:"background .2s,color .2s"}}>Send invite</button>
+            </div>
+          </>
+        }
+      </div>
+    </div>
+  );
+}
+
+function RemoveMemberModal({member,onClose,onConfirm}){
+  var [visible,setVisible]=useState(false);
+  useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);
+  function handleClose(){setVisible(false);setTimeout(onClose,220);}
+  return(
+    <div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:700,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}>
+      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(440px,100%)",padding:32,display:"flex",flexDirection:"column",gap:32,textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
+          <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><ITrash color={C.bgPage} size={26}/></div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            <p style={{fontFamily:sans,fontWeight:600,fontSize:22,color:C.textPrimary,margin:0}}>Remove member?</p>
+            <p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}><strong style={{color:C.textPrimary}}>{member.name}</strong> will lose access to the account and all events.</p>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:12}}>
+          <button onClick={handleClose} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.textSecondary,cursor:"pointer"}}>Go back</button>
+          <button onClick={function(){onConfirm(member.id);handleClose();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,cursor:"pointer"}}>Remove</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AccountPage({onNav}){
+  var [members,setMembers]=useState(TEAM_MEMBERS);
+  var [showInvite,setShowInvite]=useState(false);
+  var [showEdit,setShowEdit]=useState(false);
+  var [removeTarget,setRemoveTarget]=useState(null);
+  var [logo,setLogo]=useState(COMPANY.logo);
+  var [companyEmail,setCompanyEmail]=useState("hello@luminaryevents.com");
+  function removeMember(id){setMembers(function(p){return p.filter(function(m){return m.id!==id;});});}
+  function handleEditSave(data){setLogo(data.logo);setCompanyEmail(data.email);}
+
+  var cols=[
+    {key:"user",  label:"USER",  flex:1},
+    {key:"email", label:"EMAIL", w:280},
+    {key:"role",  label:"ROLE",  w:100},
+    {key:"action",label:"",      w:48},
+  ];
+
+  return(
+    <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
+      <Sidebar activeScreen="accounts" onNav={onNav}/>
+      {showInvite&&<InviteUserModal onClose={function(){setShowInvite(false);}}/>}
+      {showEdit&&<EditCompanyModal company={Object.assign({},COMPANY,{email:companyEmail})} logo={logo} onClose={function(){setShowEdit(false);}} onSave={handleEditSave}/>}
+      {removeTarget&&<RemoveMemberModal member={removeTarget} onClose={function(){setRemoveTarget(null);}} onConfirm={removeMember}/>}
+
+      <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,padding:"24px 16px",boxSizing:"border-box"}}>
+
+        {/* company header */}
+        <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",alignItems:"center",gap:24}}>
+          <div style={{position:"relative",width:96,height:96,borderRadius:16,overflow:"hidden",background:C.bgTertiary,flexShrink:0}}>
+            <img src={logo} alt="Company logo" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:6,flex:1}}>
+            <span style={{fontFamily:sans,fontWeight:800,fontSize:28,lineHeight:"34px",color:C.textPrimary}}>{COMPANY.name}</span>
+            <div style={{display:"flex",alignItems:"center",gap:16,flexWrap:"wrap"}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgTertiary,borderRadius:8,padding:"4px 12px"}}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.action} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.action}}>{COMPANY.plan}</span>
+              </div>
+              <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Member since {COMPANY.since}</span>
+              {companyEmail&&<span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>{companyEmail}</span>}
+            </div>
+          </div>
+          <button onClick={function(){setShowEdit(true);}} style={{border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"8px 16px",fontFamily:sans,fontWeight:600,fontSize:15,color:C.textSecondary,cursor:"pointer",display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+            <IEdit color={C.textSecondary} size={15}/>
+            Edit company
+          </button>
+        </div>
+
+        {/* team members panel */}
+        <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",flexDirection:"column",gap:20}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div style={{display:"flex",flexDirection:"column",gap:4}}>
+              <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"28px",color:C.textPrimary}}>Team members</span>
+              <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>{members.length} {members.length===1?"member":"members"}</span>
+            </div>
+            <button onClick={function(){setShowInvite(true);}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+              <IUserPlus size={20}/>
+              <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,whiteSpace:"nowrap"}}>Invite user</span>
+            </button>
+          </div>
+
+          <div style={{display:"flex",flexDirection:"column"}}>
+            {/* header */}
+            <div style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingBottom:8}}>
+              {cols.map(function(col){return(
+                <div key={col.key} style={{width:col.w||undefined,flex:col.flex||undefined,flexShrink:col.flex?undefined:0,padding:"0 4px"}}>
+                  {col.label&&<span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>{col.label}</span>}
+                </div>
+              );})}
+            </div>
+            {/* rows */}
+            {members.map(function(m){return(
+              <div key={m.id} style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingTop:12,paddingBottom:12}}>
+                {/* avatar + name + handle stacked — same as Attendees panel */}
+                <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:12,padding:"0 4px"}}>
+                  <img src={m.avatar} alt={m.name} style={{width:48,height:48,borderRadius:"50%",objectFit:"cover",flexShrink:0,background:C.bgTertiary}}/>
+                  <div style={{display:"flex",flexDirection:"column",gap:2,minWidth:0}}>
+                    <span style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textPrimary,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.name}</span>
+                    <span style={{fontFamily:mono,fontWeight:700,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>{m.handle}</span>
+                  </div>
+                </div>
+                {/* email */}
+                <div style={{width:280,flexShrink:0,padding:"0 4px"}}>
+                  <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary,display:"block",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.email}</span>
+                </div>
+                {/* role */}
+                <div style={{width:100,flexShrink:0,padding:"0 4px"}}>
+                  <div style={{display:"inline-flex",alignItems:"center",borderRadius:4,padding:"2px 8px",background:m.role==="Admin"?"rgba(241,102,92,0.15)":"transparent",border:"1px solid "+(m.role==="Admin"?C.action:C.border)}}>
+                    <span style={{fontFamily:sans,fontSize:13,color:m.role==="Admin"?C.action:C.textSecondary}}>{m.role}</span>
+                  </div>
+                </div>
+                {/* remove */}
+                <div style={{width:48,flexShrink:0,display:"flex",justifyContent:"flex-end"}}>
+                  {m.role!=="Admin"&&<IconBtn onClick={function(){setRemoveTarget(m);}}><IX color={C.action} size={16}/></IconBtn>}
+                </div>
+              </div>
+            );})}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+
 function CreateEventPage({onNav,onCreated}){
   var fileRef=useRef(null);
   var [cover,setCover]=useState(null);
@@ -932,14 +1453,15 @@ function App(){
     if(key==="events"){setScreen("events");setActiveEvent(null);}
     else if(key==="dashboard"){setScreen("dashboard");setActiveEvent(null);}
     else if(key==="create"){setScreen("create");}
-    else if(key==="accounts"){setScreen("events");}
+    else if(key==="accounts"){setScreen("accounts");}
   }
   function openEvent(ev,tab){setActiveEvent(ev);setScreen("hub");setDefaultTab(tab||"Shots");}
   function goToEvents(){setScreen("events");setActiveEvent(null);}
   if(screen==="hub")return <HubPage event={activeEvent} onGoToEvents={goToEvents} onNav={handleNav} defaultTab={defaultTab}/>;
   if(screen==="events")return <EventsListPage onOpenEvent={openEvent} onNav={handleNav}/>;
   if(screen==="create")return <CreateEventPage onNav={handleNav} onCreated={function(){setScreen("events");}}/>;
-  return <DashboardPage onNav={handleNav}/>;
+  if(screen==="accounts")return <AccountPage onNav={handleNav}/>;
+  return <DashboardPage onNav={handleNav} onOpenEvent={openEvent}/>;
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
