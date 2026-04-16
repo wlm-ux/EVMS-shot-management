@@ -303,9 +303,9 @@ function DashboardPage({onNav,onOpenEvent}){
         {/* ── 1. WELCOME HEADER ── */}
         <div style={{background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:24}}>
           <div style={{display:"flex",flexDirection:"column",gap:8,flex:1}}>
-            <span style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"30px",color:C.textPrimary}}>Hey there, Nicolai</span>
+            <span style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"30px",color:C.textPrimary}}>Hi, Nicolai</span>
             <p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,margin:0}}>
-              Welcome to <strong style={{fontFamily:sans,fontWeight:700}}>SureShot</strong>'s online platform, your go-to for managing events and shots. You can easily create and oversee your events, plus share highlight reels and updates with your attendees.
+              Manage your events, collect video from attendees and share highlights, all in one place.
             </p>
           </div>
           <div style={{flexShrink:0}}>
@@ -355,17 +355,17 @@ function DashboardPage({onNav,onOpenEvent}){
             <div style={{display:"flex",gap:16}}>
               <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px",minWidth:128,display:"flex",flexDirection:"column",gap:8}}>
                 <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.action}}>{DASH_ACTIVE_EVENT.videosLastHour}</span>
-                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Videos</span>
+                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Shots</span>
               </div>
               <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px",minWidth:128,display:"flex",flexDirection:"column",gap:8}}>
                 <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.action}}>{DASH_ACTIVE_EVENT.activeUsers}</span>
-                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Active users</span>
+                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Active attendees</span>
               </div>
             </div>
           </div>
           {/* right: upload graph */}
           <div style={{display:"flex",flexDirection:"column",gap:12,flex:1,minWidth:200}}>
-            <span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>Videos uploaded</span>
+            <span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>Shots uploaded</span>
             <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px"}}>
               <BarChart data={DASH_ACTIVE_EVENT.uploadGraph} labels={DASH_ACTIVE_EVENT.graphHours} height={72}/>
             </div>
@@ -378,11 +378,11 @@ function DashboardPage({onNav,onOpenEvent}){
 
           {/* Videos */}
           <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:24}}>
-            <SectionTitle>Videos</SectionTitle>
+            <SectionTitle>Shots</SectionTitle>
             <div style={{display:"flex",gap:16}}>
-              <StatCard value={DASH_VIDEOS.total.toLocaleString()} label="Total videos"/>
+              <StatCard value={DASH_VIDEOS.total.toLocaleString()} label="Total shots"/>
               <StatCard value={DASH_VIDEOS.avgPerEvent} label="Avg. per event"/>
-              <StatCard value={DASH_VIDEOS.avgDuration} label="Avg duration"/>
+              <StatCard value={DASH_VIDEOS.avgDuration} label="Avg. duration"/>
             </div>
             {/* orientation split */}
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
@@ -406,10 +406,10 @@ function DashboardPage({onNav,onOpenEvent}){
 
           {/* Users */}
           <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:24}}>
-            <SectionTitle>Users</SectionTitle>
+            <SectionTitle>Attendees</SectionTitle>
             <div style={{display:"flex",gap:16}}>
               <StatCard value={DASH_USERS.totalAttendees.toLocaleString()} label="Attendees"/>
-              <StatCard value={DASH_USERS.activeUsers.toLocaleString()} label="Active users"/>
+              <StatCard value={DASH_USERS.activeUsers.toLocaleString()} label="Active attendees"/>
               <StatCard value={DASH_USERS.uploadRate+"%"} label="Upload rate"/>
             </div>
             {/* top contributors — 3 only */}
@@ -822,28 +822,25 @@ function HighlightsPanel({onNewHighlight,highlights,onEdit,onDelete}){
 // ── Hub: Send Message Modal ────────────────────────────────────────
 function SendMessageModal({onClose}){
   var [visible,setVisible]=useState(false);
-  var [title,setTitle]=useState("");
-  var [titleFocused,setTitleFocused]=useState(false);
   var [message,setMessage]=useState("");
   var [messageFocused,setMessageFocused]=useState(false);
   var [confirmDiscard,setConfirmDiscard]=useState(false);
   var [sent,setSent]=useState(false);
   useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);
-  var isDirty=title.trim().length>0||message.trim().length>0;
+  var isDirty=message.trim().length>0;
   var canSend=message.trim().length>0;
   function tryClose(){if(isDirty&&!sent){setConfirmDiscard(true);}else{handleClose();}}
   function handleClose(){setVisible(false);setTimeout(onClose,220);}
   function handleSend(){if(!canSend)return;setSent(true);setTimeout(function(){handleClose();},2500);}
   return(<div onClick={function(){tryClose();}} style={{position:"fixed",inset:0,zIndex:700,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}>
-    {confirmDiscard&&(<div onClick={function(e){e.stopPropagation();}} style={{position:"absolute",inset:0,zIndex:10,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}><div style={{background:C.bgSecondary,borderRadius:24,padding:32,width:"min(400px,100%)",display:"flex",flexDirection:"column",gap:32,textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,0.6)"}}><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"32px",color:C.textPrimary,margin:0}}>Discard message?</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>You will lose your draft notification.</p></div></div><div style={{display:"flex",gap:12}}><button onClick={function(){setConfirmDiscard(false);}} style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.action,cursor:"pointer"}}>Keep editing</button><button onClick={function(){setConfirmDiscard(false);handleClose();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Discard</button></div></div></div>)}
+    {confirmDiscard&&(<div onClick={function(e){e.stopPropagation();}} style={{position:"absolute",inset:0,zIndex:10,display:"flex",alignItems:"center",justifyContent:"center",padding:24}}><div style={{background:C.bgSecondary,borderRadius:24,padding:32,width:"min(400px,100%)",display:"flex",flexDirection:"column",gap:32,textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,0.6)"}}><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"32px",color:C.textPrimary,margin:0}}>Discard message?</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>Your message will be lost.</p></div></div><div style={{display:"flex",gap:12}}><button onClick={function(){setConfirmDiscard(false);}} style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.action,cursor:"pointer"}}>Keep editing</button><button onClick={function(){setConfirmDiscard(false);handleClose();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Discard</button></div></div></div>)}
     <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(560px,100%)",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}>
       {sent
-        ?<div style={{padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,textAlign:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><IBubble color={C.bgPage} size={28}/></div><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Notification sent!</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>All attendees will receive your message shortly.</p></div></div>
+        ?<div style={{padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,textAlign:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><IBubble color={C.bgPage} size={28}/></div><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Message sent</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>All attendees will receive your message shortly.</p></div></div>
         :<div style={{padding:32,display:"flex",flexDirection:"column",gap:24}}>
-          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:16}}><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Send message</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>Attendees will get a notification on their app. Keep it short and sweet.</p></div><button onClick={tryClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,flexShrink:0,display:"flex",marginTop:4}}><IX size={20}/></button></div>
-          <div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Title <span style={{fontFamily:sans,fontWeight:400,color:C.textMuted}}>(optional)</span></span><input value={title} onChange={function(e){setTitle(e.target.value);}} onFocus={function(){setTitleFocused(true);}} onBlur={function(){setTitleFocused(false);}} placeholder="i.e. Starting soon" style={{border:"2px solid "+(titleFocused?C.textPrimary:C.border),borderRadius:16,padding:"10px 24px",fontFamily:sans,fontSize:16,background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,transition:"border-color 0.15s"}}/></div>
-          <div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Message <span style={{fontFamily:sans,fontWeight:400,color:C.textMuted}}>(250 characters max)</span></span><textarea value={message} onChange={function(e){setMessage(e.target.value);}} onFocus={function(){setMessageFocused(true);}} onBlur={function(){setMessageFocused(false);}} placeholder="i.e. Doors are opening in 10 minutes, head to the main stage!" maxLength={250} style={{border:"2px solid "+(messageFocused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,resize:"none",height:160,transition:"border-color 0.15s"}}/><span style={{fontFamily:sans,fontSize:12,color:C.textMuted,alignSelf:"flex-end"}}>{message.length}/250</span></div>
-          <button onClick={handleSend} style={{width:"100%",background:canSend?C.action:C.bgTertiary,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:canSend?C.bgPage:C.textMuted,cursor:canSend?"pointer":"not-allowed",transition:"background .2s,color .2s"}}>Send notification</button>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:16}}><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Send message</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>Attendees will get a push notification. Keep it brief.</p></div><button onClick={tryClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,flexShrink:0,display:"flex",marginTop:4}}><IX size={20}/></button></div>
+          <div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Message <span style={{fontFamily:sans,fontWeight:400,color:C.textMuted}}>(250 characters max)</span></span><textarea value={message} onChange={function(e){setMessage(e.target.value);}} onFocus={function(){setMessageFocused(true);}} onBlur={function(){setMessageFocused(false);}} placeholder="Doors open in 10 minutes — head to the main stage." maxLength={250} style={{border:"2px solid "+(messageFocused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,resize:"none",height:160,transition:"border-color 0.15s"}}/><span style={{fontFamily:sans,fontSize:12,color:C.textMuted,alignSelf:"flex-end"}}>{message.length}/250</span></div>
+          <button onClick={handleSend} style={{width:"100%",background:canSend?C.action:C.bgTertiary,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:canSend?C.bgPage:C.textMuted,cursor:canSend?"pointer":"not-allowed",transition:"background .2s,color .2s"}}>Send message</button>
         </div>
       }
     </div>
@@ -1087,7 +1084,7 @@ function EditCompanyModal({company,logo,onClose,onSave}){
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Company logo</span>
               <div style={{display:"flex",alignItems:"center",gap:16}}>
-                <div onMouseEnter={function(){setLogoHov(true);}} onMouseLeave={function(){setLogoHov(false);}} onClick={function(){fileRef.current&&fileRef.current.click();}} style={{position:"relative",width:80,height:80,borderRadius:12,overflow:"hidden",background:C.bgTertiary,flexShrink:0,cursor:"pointer",border:"2px solid "+C.border}}>
+                <div onMouseEnter={function(){setLogoHov(true);}} onMouseLeave={function(){setLogoHov(false);}} onClick={function(){fileRef.current&&fileRef.current.click();}} style={{position:"relative",width:80,height:80,borderRadius:"50%",overflow:"hidden",background:C.bgTertiary,flexShrink:0,cursor:"pointer",border:"2px solid "+C.border}}>
                   <img src={logoSrc} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
                   {logoHov&&<div style={{position:"absolute",inset:0,background:"rgba(22,20,49,0.65)",display:"flex",alignItems:"center",justifyContent:"center"}}><IEdit color={C.textPrimary} size={18}/></div>}
                 </div>
@@ -1202,106 +1199,254 @@ function RemoveMemberModal({member,onClose,onConfirm}){
   );
 }
 
+function DeleteAccountModal({onClose}){
+  var [visible,setVisible]=useState(false);
+  var [confirmed,setConfirmed]=useState(false);
+  useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);
+  function handleClose(){setVisible(false);setTimeout(onClose,220);}
+  return(
+    <div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:700,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}>
+      <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(440px,100%)",padding:32,display:"flex",flexDirection:"column",gap:32,textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}>
+        {confirmed
+          ?<div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:24,animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}>
+            <div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              <p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Account deleted</p>
+              <p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>Your account has been removed. You'll be signed out shortly.</p>
+            </div>
+            <button onClick={handleClose} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"14px 24px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Done</button>
+          </div>
+          :<>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
+              <div style={{background:"rgba(241,102,92,0.15)",borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><ITrash color={C.action} size={26}/></div>
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                <p style={{fontFamily:sans,fontWeight:600,fontSize:22,color:C.textPrimary,margin:0}}>Delete your account?</p>
+                <p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>This is permanent. All your data will be removed and you'll lose access immediately.</p>
+              </div>
+            </div>
+            <div style={{display:"flex",gap:12}}>
+              <button onClick={handleClose} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.textSecondary,cursor:"pointer"}}>Go back</button>
+              <button onClick={function(){setConfirmed(true);}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,cursor:"pointer"}}>Delete account</button>
+            </div>
+          </>
+        }
+      </div>
+    </div>
+  );
+}
+
+function MyAccountPanel(){
+  var ME=TEAM_MEMBERS[0];
+  var fileRef=useRef(null);
+  var [avatar,setAvatar]=useState(ME.avatar);
+  var [avatarHov,setAvatarHov]=useState(false);
+  var [name,setName]=useState(ME.name);
+  var [nameFocused,setNameFocused]=useState(false);
+  var [username,setUsername]=useState(ME.handle);
+  var [usernameFocused,setUsernameFocused]=useState(false);
+  var [email,setEmail]=useState(ME.email);
+  var [emailFocused,setEmailFocused]=useState(false);
+  var [phone,setPhone]=useState("");
+  var [phoneFocused,setPhoneFocused]=useState(false);
+  var [emailNotifs,setEmailNotifs]=useState(true);
+  var [showDelete,setShowDelete]=useState(false);
+  var [saved,setSaved]=useState(false);
+
+  function handleAvatarFile(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){setAvatar(ev.target.result);};r.readAsDataURL(f);}
+
+  var inp=function(val,setVal,focused,setFocused,placeholder,prefix){
+    return(
+      <div style={{position:"relative",display:"flex",alignItems:"center"}}>
+        {prefix&&<span style={{position:"absolute",left:16,fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary,pointerEvents:"none"}}>{prefix}</span>}
+        <input value={val} onChange={function(e){setVal(e.target.value);setSaved(false);}} onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}} placeholder={placeholder} style={{border:"2px solid "+(focused?C.textPrimary:C.border),borderRadius:12,padding:prefix?"10px 16px 10px 28px":"10px 16px",fontFamily:prefix?mono:sans,fontWeight:prefix?700:400,fontSize:14,background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,transition:"border-color 0.15s"}}/>
+      </div>
+    );
+  };
+
+  return(
+    <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",flexDirection:"column",gap:24,height:"100%",boxSizing:"border-box"}}>
+      {showDelete&&<DeleteAccountModal onClose={function(){setShowDelete(false);}}/>}
+
+      {/* avatar */}
+      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
+        <div onMouseEnter={function(){setAvatarHov(true);}} onMouseLeave={function(){setAvatarHov(false);}} onClick={function(){fileRef.current&&fileRef.current.click();}} style={{position:"relative",width:96,height:96,borderRadius:"50%",overflow:"hidden",background:C.bgTertiary,cursor:"pointer",flexShrink:0,border:"2px solid "+C.border}}>
+          <img src={avatar} alt={name} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+          {avatarHov&&<div style={{position:"absolute",inset:0,background:"rgba(22,20,49,0.65)",display:"flex",alignItems:"center",justifyContent:"center"}}><IEdit color={C.textPrimary} size={18}/></div>}
+        </div>
+        <input ref={fileRef} type="file" accept="image/jpeg,image/png" onChange={handleAvatarFile} style={{display:"none"}}/>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+          <span style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary}}>{name||"Your name"}</span>
+          <div style={{display:"inline-flex",alignItems:"center",borderRadius:4,padding:"2px 8px",background:"rgba(241,102,92,0.15)",border:"1px solid "+C.action}}>
+            <span style={{fontFamily:sans,fontSize:12,color:C.action}}>{ME.role}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* divider */}
+      <div style={{borderTop:"1px solid "+C.border}}/>
+
+      {/* fields */}
+      <div style={{display:"flex",flexDirection:"column",gap:16}}>
+        <div style={{display:"flex",flexDirection:"column",gap:4}}>
+          <span style={{fontFamily:mono,fontWeight:700,fontSize:11,color:C.textSecondary}}>Name</span>
+          {inp(name,setName,nameFocused,setNameFocused,"Your name",null)}
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:4}}>
+          <span style={{fontFamily:mono,fontWeight:700,fontSize:11,color:C.textSecondary}}>Username</span>
+          {inp(username,setUsername,usernameFocused,setUsernameFocused,"@username","@")}
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:4}}>
+          <span style={{fontFamily:mono,fontWeight:700,fontSize:11,color:C.textSecondary}}>Email</span>
+          {inp(email,setEmail,emailFocused,setEmailFocused,"your@email.com",null)}
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:4}}>
+          <span style={{fontFamily:mono,fontWeight:700,fontSize:11,color:C.textSecondary}}>Phone <span style={{fontWeight:400,color:C.textMuted}}>(optional)</span></span>
+          {inp(phone,setPhone,phoneFocused,setPhoneFocused,"+44 7700 000000",null)}
+        </div>
+      </div>
+
+      {/* save button */}
+      <button onClick={function(){setSaved(true);}} style={{background:saved?C.bgTertiary:C.action,border:"none",borderRadius:999,padding:"10px 16px",fontFamily:sans,fontWeight:600,fontSize:15,color:saved?C.textSecondary:C.bgPage,cursor:"pointer",transition:"background 0.2s,color 0.2s",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+        {saved
+          ?<><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Saved</>
+          :"Save changes"
+        }
+      </button>
+
+      {/* divider */}
+      <div style={{borderTop:"1px solid "+C.border}}/>
+
+      {/* email notifications */}
+      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        <Toggle active={emailNotifs} onToggle={function(){setEmailNotifs(function(v){return !v;});}} label="Email notifications"/>
+        <span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary,paddingLeft:38}}>Receive updates about your events and team activity.</span>
+      </div>
+
+      {/* divider */}
+      <div style={{borderTop:"1px solid "+C.border}}/>
+
+      {/* sign out + delete */}
+      <div style={{display:"flex",flexDirection:"column",gap:12}}>
+        <button style={{border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"10px 16px",fontFamily:sans,fontWeight:600,fontSize:15,color:C.textSecondary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign out
+        </button>
+        <button onClick={function(){setShowDelete(true);}} style={{background:"none",border:"none",fontFamily:sans,fontSize:13,color:C.textMuted,cursor:"pointer",textDecoration:"underline",textUnderlineOffset:3,padding:"4px 0"}}>
+          Delete account
+        </button>
+      </div>
+
+      {/* spacer */}
+      <div style={{flex:1}}/>
+
+      {/* support strip */}
+      <div style={{background:C.bgTertiary,borderRadius:16,padding:"16px 20px",display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+        <span style={{fontFamily:sans,fontSize:15,lineHeight:"24px",color:C.textSecondary}}>Need help?</span>
+        <a href="mailto:support@sureshot.app" style={{fontFamily:sans,fontSize:15,lineHeight:"24px",color:C.textPrimary,textDecoration:"underline",textUnderlineOffset:3,cursor:"pointer"}}>Contact support</a>
+      </div>
+
+    </div>
+  );
+}
+
 function AccountPage({onNav}){
   var [members,setMembers]=useState(TEAM_MEMBERS);
   var [showInvite,setShowInvite]=useState(false);
-  var [showEdit,setShowEdit]=useState(false);
   var [removeTarget,setRemoveTarget]=useState(null);
-  var [logo,setLogo]=useState(COMPANY.logo);
-  var [companyEmail,setCompanyEmail]=useState("hello@luminaryevents.com");
+  var [logo]=useState(COMPANY.logo);
   function removeMember(id){setMembers(function(p){return p.filter(function(m){return m.id!==id;});});}
-  function handleEditSave(data){setLogo(data.logo);setCompanyEmail(data.email);}
 
   var cols=[
     {key:"user",  label:"USER",  flex:1},
-    {key:"email", label:"EMAIL", w:280},
-    {key:"role",  label:"ROLE",  w:100},
-    {key:"action",label:"",      w:48},
+    {key:"role",  label:"ROLE",  w:90},
+    {key:"action",label:"",      w:40},
   ];
 
   return(
     <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
       <Sidebar activeScreen="accounts" onNav={onNav}/>
       {showInvite&&<InviteUserModal onClose={function(){setShowInvite(false);}}/>}
-      {showEdit&&<EditCompanyModal company={Object.assign({},COMPANY,{email:companyEmail})} logo={logo} onClose={function(){setShowEdit(false);}} onSave={handleEditSave}/>}
       {removeTarget&&<RemoveMemberModal member={removeTarget} onClose={function(){setRemoveTarget(null);}} onConfirm={removeMember}/>}
 
-      <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,padding:"24px 16px",boxSizing:"border-box"}}>
+      <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,padding:"24px 16px",boxSizing:"border-box",minHeight:"100vh"}}>
 
-        {/* company header */}
-        <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",alignItems:"center",gap:24}}>
-          <div style={{position:"relative",width:96,height:96,borderRadius:16,overflow:"hidden",background:C.bgTertiary,flexShrink:0}}>
-            <img src={logo} alt="Company logo" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
-          </div>
-          <div style={{display:"flex",flexDirection:"column",gap:6,flex:1}}>
-            <span style={{fontFamily:sans,fontWeight:800,fontSize:28,lineHeight:"34px",color:C.textPrimary}}>{COMPANY.name}</span>
-            <div style={{display:"flex",alignItems:"center",gap:16,flexWrap:"wrap"}}>
-              <div style={{display:"flex",alignItems:"center",gap:6,background:C.bgTertiary,borderRadius:8,padding:"4px 12px"}}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.action} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.action}}>{COMPANY.plan}</span>
-              </div>
-              <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Member since {COMPANY.since}</span>
-              {companyEmail&&<span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>{companyEmail}</span>}
-            </div>
-          </div>
-          <button onClick={function(){setShowEdit(true);}} style={{border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"8px 16px",fontFamily:sans,fontWeight:600,fontSize:15,color:C.textSecondary,cursor:"pointer",display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-            <IEdit color={C.textSecondary} size={15}/>
-            Edit company
-          </button>
+        {/* ── Page header ── */}
+        <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <span style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary}}>Account</span>
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="18" r="7" fill="none" stroke={C.action} strokeWidth="2.5"/>
+            <path d="M8 40c0-8.837 7.163-16 16-16s16 7.163 16 16" fill="none" stroke={C.action} strokeWidth="2.5" strokeLinecap="round"/>
+            <circle cx="24" cy="18" r="3" fill={C.action}/>
+          </svg>
         </div>
 
-        {/* team members panel */}
-        <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",flexDirection:"column",gap:20}}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-            <div style={{display:"flex",flexDirection:"column",gap:4}}>
-              <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"28px",color:C.textPrimary}}>Team members</span>
-              <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>{members.length} {members.length===1?"member":"members"}</span>
-            </div>
-            <button onClick={function(){setShowInvite(true);}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
-              <IUserPlus size={20}/>
-              <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,whiteSpace:"nowrap"}}>Invite user</span>
-            </button>
+        {/* ── Two columns ── */}
+        <div style={{display:"flex",gap:12,flex:1,alignItems:"stretch"}}>
+
+          {/* Left: your account */}
+          <div style={{flex:"0 0 50%",maxWidth:"50%"}}>
+            <MyAccountPanel/>
           </div>
 
-          <div style={{display:"flex",flexDirection:"column"}}>
-            {/* header */}
-            <div style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingBottom:8}}>
-              {cols.map(function(col){return(
-                <div key={col.key} style={{width:col.w||undefined,flex:col.flex||undefined,flexShrink:col.flex?undefined:0,padding:"0 4px"}}>
-                  {col.label&&<span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>{col.label}</span>}
-                </div>
-              );})}
-            </div>
-            {/* rows */}
-            {members.map(function(m){return(
-              <div key={m.id} style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingTop:12,paddingBottom:12}}>
-                {/* avatar + name + handle stacked — same as Attendees panel */}
-                <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:12,padding:"0 4px"}}>
-                  <img src={m.avatar} alt={m.name} style={{width:48,height:48,borderRadius:"50%",objectFit:"cover",flexShrink:0,background:C.bgTertiary}}/>
-                  <div style={{display:"flex",flexDirection:"column",gap:2,minWidth:0}}>
-                    <span style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textPrimary,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.name}</span>
-                    <span style={{fontFamily:mono,fontWeight:700,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>{m.handle}</span>
-                  </div>
-                </div>
-                {/* email */}
-                <div style={{width:280,flexShrink:0,padding:"0 4px"}}>
-                  <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary,display:"block",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.email}</span>
-                </div>
-                {/* role */}
-                <div style={{width:100,flexShrink:0,padding:"0 4px"}}>
-                  <div style={{display:"inline-flex",alignItems:"center",borderRadius:4,padding:"2px 8px",background:m.role==="Admin"?"rgba(241,102,92,0.15)":"transparent",border:"1px solid "+(m.role==="Admin"?C.action:C.border)}}>
-                    <span style={{fontFamily:sans,fontSize:13,color:m.role==="Admin"?C.action:C.textSecondary}}>{m.role}</span>
-                  </div>
-                </div>
-                {/* remove */}
-                <div style={{width:48,flexShrink:0,display:"flex",justifyContent:"flex-end"}}>
-                  {m.role!=="Admin"&&<IconBtn onClick={function(){setRemoveTarget(m);}}><IX color={C.action} size={16}/></IconBtn>}
-                </div>
+          {/* Right: company + team */}
+          <div style={{flex:"0 0 50%",maxWidth:"50%",display:"flex",flexDirection:"column",gap:12}}>
+
+            {/* company strip */}
+            <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",alignItems:"center",gap:20}}>
+              <div style={{width:64,height:64,borderRadius:"50%",overflow:"hidden",background:C.bgTertiary,flexShrink:0}}>
+                <img src={logo} alt="Company logo" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
               </div>
-            );})}
+              <div style={{display:"flex",flexDirection:"column",gap:4,flex:1,minWidth:0}}>
+                <span style={{fontFamily:sans,fontWeight:800,fontSize:22,lineHeight:"28px",color:C.textPrimary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{COMPANY.name}</span>
+                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>hello@luminaryevents.com</span>
+              </div>
+            </div>
+
+            {/* team members panel */}
+            <div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",flexDirection:"column",gap:20,flex:1}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                  <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"28px",color:C.textPrimary}}>Team members</span>
+                  <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>{members.length} {members.length===1?"member":"members"}</span>
+                </div>
+                <button onClick={function(){setShowInvite(true);}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+                  <IUserPlus size={20}/>
+                  <span style={{fontFamily:sans,fontWeight:600,fontSize:15,color:C.bgPage,whiteSpace:"nowrap"}}>Invite user</span>
+                </button>
+              </div>
+
+              <div style={{display:"flex",flexDirection:"column"}}>
+                <div style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingBottom:8}}>
+                  {cols.map(function(col){return(
+                    <div key={col.key} style={{width:col.w||undefined,flex:col.flex||undefined,flexShrink:col.flex?undefined:0,padding:"0 4px"}}>
+                      {col.label&&<span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>{col.label}</span>}
+                    </div>
+                  );})}
+                </div>
+                {members.map(function(m){return(
+                  <div key={m.id} style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingTop:12,paddingBottom:12}}>
+                    <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:12,padding:"0 4px"}}>
+                      <img src={m.avatar} alt={m.name} style={{width:44,height:44,borderRadius:"50%",objectFit:"cover",flexShrink:0,background:C.bgTertiary}}/>
+                      <div style={{display:"flex",flexDirection:"column",gap:2,minWidth:0}}>
+                        <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.name}</span>
+                        <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"18px",color:C.textSecondary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.email}</span>
+                      </div>
+                    </div>
+                    <div style={{width:90,flexShrink:0,padding:"0 4px"}}>
+                      <div style={{display:"inline-flex",alignItems:"center",borderRadius:4,padding:"2px 8px",background:m.role==="Admin"?"rgba(241,102,92,0.15)":"transparent",border:"1px solid "+(m.role==="Admin"?C.action:C.border)}}>
+                        <span style={{fontFamily:sans,fontSize:12,color:m.role==="Admin"?C.action:C.textSecondary}}>{m.role}</span>
+                      </div>
+                    </div>
+                    <div style={{width:40,flexShrink:0,display:"flex",justifyContent:"flex-end"}}>
+                      {m.role!=="Admin"&&<IconBtn onClick={function(){setRemoveTarget(m);}}><IX color={C.action} size={16}/></IconBtn>}
+                    </div>
+                  </div>
+                );})}
+              </div>
+            </div>
+
           </div>
         </div>
-
       </div>
     </div>
   );
@@ -1422,8 +1567,8 @@ function CreateEventPage({onNav,onCreated}){
           {/* toggles */}
           <div style={{display:"flex",flexDirection:"column",gap:16}}>
             {[
-              {active:privateEvt,  set:setPrivateEvt,  label:"Private event",           desc:"Content is exclusive to the event, and only you can invite attendees"},
-              {active:instantShare,set:setInstantShare,label:"Instant content sharing",  desc:"When enabled, all uploaded videos are instantly shared with attendees"},
+              {active:privateEvt,  set:setPrivateEvt,  label:"Private event",           desc:"Only people you invite can join. Shots are not visible outside the event."},
+              {active:instantShare,set:setInstantShare,label:"Instant content sharing",  desc:"Shots are shared with attendees as soon as they're uploaded."},
             ].map(function(sw){return(
               <div key={sw.label} style={{display:"flex",flexDirection:"column",gap:4}}>
                 <Toggle active={sw.active} onToggle={function(){sw.set(function(v){return !v;});}} label={sw.label}/>
