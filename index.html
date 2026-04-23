@@ -62,18 +62,18 @@ var EVENTS=[
 // ── Hub constants ──────────────────────────────────────────────────
 var RAW=[
   {id:0, orient:"portrait", ts:new Date("2026-03-10T09:20:00").getTime(),img:"https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=260&h=380&fit=crop&q=80",user:"Alice M.", size:"14.2 MB",dur:"0:12"},
-  {id:1, orient:"portrait", ts:new Date("2026-03-10T10:35:00").getTime(),img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=260&h=380&fit=crop&q=80",user:"Bob K.",   size:"22.7 MB",dur:"0:24"},
+  {id:1, orient:"portrait", ts:new Date("2026-03-10T10:35:00").getTime(),img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=260&h=380&fit=crop&q=80",user:"Bob K.",   size:"22.7 MB",dur:"0:24", public:true},
   {id:2, orient:"landscape",ts:new Date("2026-03-10T12:00:00").getTime(),img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=780&h=440&fit=crop&q=80",user:"Carol T.", size:"18.1 MB",dur:"0:18"},
   {id:3, orient:"portrait", ts:new Date("2026-03-10T13:30:00").getTime(),img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=260&h=380&fit=crop&q=80",user:"Dan R.",   size:"31.0 MB",dur:"0:30"},
-  {id:4, orient:"portrait", ts:new Date("2026-03-10T15:30:00").getTime(),img:"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=260&h=380&fit=crop&q=80",user:"Eve S.",   size:"12.5 MB",dur:"0:08"},
+  {id:4, orient:"portrait", ts:new Date("2026-03-10T15:30:00").getTime(),img:"https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=260&h=380&fit=crop&q=80",user:"Eve S.",   size:"12.5 MB",dur:"0:08", public:true},
   {id:5, orient:"landscape",ts:new Date("2026-03-10T17:00:00").getTime(),img:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=780&h=440&fit=crop&q=80",user:"Frank L.", size:"41.3 MB",dur:"0:36"},
-  {id:6, orient:"portrait", ts:new Date("2026-03-10T19:00:00").getTime(),img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=260&h=380&fit=crop&q=80",user:"Grace W.", size:"19.8 MB",dur:"0:18"},
+  {id:6, orient:"portrait", ts:new Date("2026-03-10T19:00:00").getTime(),img:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=260&h=380&fit=crop&q=80",user:"Grace W.", size:"19.8 MB",dur:"0:18", public:true},
   {id:7, orient:"landscape",ts:new Date("2026-03-10T21:00:00").getTime(),img:"https://images.unsplash.com/photo-1468359601543-843bfaef291a?w=780&h=440&fit=crop&q=80",user:"Hank P.",  size:"27.6 MB",dur:"0:22"},
   {id:8, orient:"portrait", ts:new Date("2026-03-10T23:00:00").getTime(),img:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=260&h=380&fit=crop&q=80",user:"Iris N.",  size:"15.9 MB",dur:"0:10"},
-  {id:9, orient:"portrait", ts:new Date("2026-03-11T01:00:00").getTime(),img:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=260&h=380&fit=crop&q=80",user:"Jack O.",  size:"48.2 MB",dur:"0:42"},
+  {id:9, orient:"portrait", ts:new Date("2026-03-11T01:00:00").getTime(),img:"https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=260&h=380&fit=crop&q=80",user:"Jack O.",  size:"48.2 MB",dur:"0:42", public:true},
   {id:10,orient:"landscape",ts:new Date("2026-03-11T05:00:00").getTime(),img:"https://images.unsplash.com/photo-1506157786151-b8491531f063?w=780&h=440&fit=crop&q=80",user:"Kim Y.",   size:"20.4 MB",dur:"0:18"},
   {id:11,orient:"portrait", ts:new Date("2026-03-11T09:00:00").getTime(),img:"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=260&h=380&fit=crop&q=80",user:"Leo A.",   size:"33.7 MB",dur:"0:28"},
-  {id:12,orient:"portrait", ts:new Date("2026-03-11T13:00:00").getTime(),img:"https://images.unsplash.com/photo-1598387846148-47e82ee120cc?w=260&h=380&fit=crop&q=80",user:"Mia B.",   size:"11.3 MB",dur:"0:09"},
+  {id:12,orient:"portrait", ts:new Date("2026-03-11T13:00:00").getTime(),img:"https://images.unsplash.com/photo-1598387846148-47e82ee120cc?w=260&h=380&fit=crop&q=80",user:"Mia B.",   size:"11.3 MB",dur:"0:09", public:true},
   {id:13,orient:"landscape",ts:new Date("2026-03-11T16:00:00").getTime(),img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=780&h=440&fit=crop&q=80",user:"Nate C.",  size:"28.9 MB",dur:"0:24"},
 ];
 var TL_START=RAW[0].ts,TL_END=RAW[RAW.length-1].ts,TL_SPAN=TL_END-TL_START;
@@ -233,8 +233,8 @@ var DASH_ACTIVE_EVENT={
   graphHours:["13h","14h","15h","16h","17h","18h","19h","20h","21h","22h","23h","00h"],
 };
 var DASH_USERS={
-  totalAttendees:4498,
-  activeUsers:1243,
+  totalAttendees:34200,
+  activeUsers:8900,
   uploadRate:31,
   topContributors:[
     {name:"Daniel Ferreira", handle:"@dani_f",   videos:35,avatar:"https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=96&h=96&fit=crop&q=80"},
@@ -244,7 +244,7 @@ var DASH_USERS={
     {name:"Marcus Webb",     handle:"@marcusw",  videos:10,avatar:"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=96&h=96&fit=crop&q=80"},
   ],
 };
-var DASH_VIDEOS={total:562,avgPerEvent:47,avgDuration:"0:18",verticalPct:68,horizontalPct:32};
+var DASH_VIDEOS={total:18420,avgPerEvent:340,avgDuration:"0:18",verticalPct:68,horizontalPct:32};
 var DASH_HIGHLIGHTS=[
   {id:2,name:"Best of the audience",views:1840,img:"https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=120&h=180&fit=crop&q=80"},
   {id:1,name:"Sponsors",            views:924, img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=120&h=180&fit=crop&q=80"},
@@ -294,7 +294,7 @@ function SectionTitle({children}){
 }
 
 function DashboardPage({onNav,onOpenEvent}){
-  var otherEvents=EVENTS.slice(0,3);
+  var otherEvents=EVENTS.filter(function(e){return e.id!==2;}).slice(0,3);
   return(
     <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
       <Sidebar activeScreen="dashboard" onNav={onNav}/>
@@ -318,7 +318,7 @@ function DashboardPage({onNav,onOpenEvent}){
         </div>
 
         {/* ── 2. ACTIVE EVENT ── */}
-        <div style={{background:C.bgTertiary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:16,border:"1px solid rgba(241,102,92,0.35)"}}>
+        <div onClick={function(){onOpenEvent&&onOpenEvent(EVENTS[2]);}} style={{background:C.bgTertiary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:16,border:"1px solid rgba(241,102,92,0.35)",cursor:"pointer",transition:"border-color 0.15s, background 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.borderColor="rgba(241,102,92,0.7)";e.currentTarget.style.background="#47465f";}} onMouseLeave={function(e){e.currentTarget.style.borderColor="rgba(241,102,92,0.35)";e.currentTarget.style.background=C.bgTertiary;}}>
           {/* section title */}
           <div style={{display:"flex",alignItems:"center",gap:10}}>
             <div style={{display:"flex",alignItems:"center",gap:6}}>
@@ -329,6 +329,7 @@ function DashboardPage({onNav,onOpenEvent}){
               <span style={{fontFamily:sans,fontWeight:700,fontSize:12,color:C.action,letterSpacing:"0.08em",textTransform:"uppercase"}}>Live now</span>
             </div>
             <div style={{flex:1,height:1,background:"rgba(241,102,92,0.2)"}}/>
+            <button onClick={function(e){e.stopPropagation();onNav&&onNav("events");}} style={{background:"none",border:"1px solid rgba(241,102,92,0.45)",borderRadius:999,padding:"4px 14px",fontFamily:sans,fontWeight:600,fontSize:14,color:C.action,cursor:"pointer",flexShrink:0,transition:"border-color 0.15s, color 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.borderColor=C.action;e.currentTarget.style.color=C.textPrimary;}} onMouseLeave={function(e){e.currentTarget.style.borderColor="rgba(241,102,92,0.45)";e.currentTarget.style.color=C.action;}}>See all events</button>
           </div>
           {/* content row */}
           <div style={{display:"flex",gap:24,alignItems:"center",flexWrap:"wrap"}}>
@@ -346,7 +347,10 @@ function DashboardPage({onNav,onOpenEvent}){
                 <IUsers color={C.textSecondary} size={16}/>
                 <span style={{fontFamily:sans,fontSize:16,color:C.textSecondary}}>{DASH_USERS.totalAttendees.toLocaleString()}</span>
               </div>
-              <span onClick={function(){onOpenEvent&&onOpenEvent(EVENTS[2]);}} style={{fontFamily:sans,fontSize:14,color:C.action,cursor:"pointer",textDecoration:"underline",textDecorationColor:"rgba(241,102,92,0.4)"}}>See event</span>
+              <div style={{display:"flex",alignItems:"center",gap:4,marginTop:2}}>
+                <span style={{fontFamily:sans,fontSize:14,color:C.action}}>Open event</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.action} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
             </div>
           </div>
           {/* middle: last 24h stats */}
@@ -359,7 +363,7 @@ function DashboardPage({onNav,onOpenEvent}){
               </div>
               <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px",minWidth:128,display:"flex",flexDirection:"column",gap:8}}>
                 <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.action}}>{DASH_ACTIVE_EVENT.activeUsers}</span>
-                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Active attendees</span>
+                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Active in last 24h</span>
               </div>
             </div>
           </div>
@@ -426,7 +430,7 @@ function DashboardPage({onNav,onOpenEvent}){
                           <span style={{fontFamily:mono,fontSize:12,color:C.textSecondary}}>{u.handle}</span>
                         </div>
                       </div>
-                      <span style={{fontFamily:sans,fontWeight:700,fontSize:14,color:C.textPrimary}}>{u.videos} videos</span>
+                      <span style={{fontFamily:sans,fontWeight:700,fontSize:14,color:C.textPrimary}}>{u.videos} shots</span>
                     </div>
                   );
                 })}
@@ -473,7 +477,10 @@ function DashboardPage({onNav,onOpenEvent}){
 
           {/* Other events */}
           <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:20}}>
-            <SectionTitle>Other events</SectionTitle>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <SectionTitle>Other events</SectionTitle>
+              <button onClick={function(){onNav&&onNav("events");}} style={{background:"none",border:"1px solid "+C.border,borderRadius:999,padding:"4px 14px",fontFamily:sans,fontWeight:600,fontSize:14,color:C.textSecondary,cursor:"pointer",transition:"border-color 0.15s, color 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.borderColor=C.textPrimary;e.currentTarget.style.color=C.textPrimary;}} onMouseLeave={function(e){e.currentTarget.style.borderColor=C.border;e.currentTarget.style.color=C.textSecondary;}}>See all</button>
+            </div>
             {/* table header */}
             <div style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingBottom:8}}>
               <div style={{width:76,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>COVER</span></div>
@@ -588,7 +595,7 @@ function EventsListPage({onOpenEvent,onNav}){
 }
 
 // ── Hub: Event Status Dropdown ─────────────────────────────────────
-var STATUS_OPTIONS=[{value:"published",label:"Published",bg:C.action,textColor:C.bgPage},{value:"draft",label:"Draft",bg:"#a3a19f",textColor:C.bgPage},{value:"ended",label:"Ended",bg:C.bgTertiary,textColor:C.textPrimary},{value:"cancelled",label:"Cancelled",bg:"#750000",textColor:C.textPrimary}];
+var STATUS_OPTIONS=[{value:"published",label:"Published",bg:C.action,textColor:C.bgPage},{value:"draft",label:"Draft",bg:"#a3a19f",textColor:C.bgPage},{value:"cancelled",label:"Cancelled",bg:"#750000",textColor:C.textPrimary}];
 function EventStatusDropdown(){
   var [status,setStatus]=useState("published");
   var [open,setOpen]=useState(false);
@@ -607,14 +614,17 @@ function EventStatusDropdown(){
 
 // ── Hub: Event Summary ─────────────────────────────────────────────
 function EventSummary({event}){
-  var stats=[{v:"55",l:"Joined users",muted:true},{v:"33",l:"Shots uploaded"},{v:"20.04",l:"Duration (min)"},{v:"890",l:"Size (MB)"}];
+  var stats=[{v:"4,498",l:"Attendees",muted:true},{v:"2,838",l:"Shots uploaded"},{v:"0:18",l:"Avg. duration"},{v:"68%",l:"Vertical shots"}];
   var cover=event?event.cover:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?q=80&w=2340&auto=format&fit=crop";
   var name=event?event.name:"Neon Nights Festival";
   var location=event?event.location:"Location name";
   return(<div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px"}}>
     <div style={{display:"flex",alignItems:"center",gap:24,padding:"12px 0"}}>
       <div style={{display:"flex",flexDirection:"column",gap:12,flexShrink:0}}>
-        <div style={{width:241,height:128,borderRadius:16,overflow:"hidden"}}><img src={cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/></div>
+        <div style={{width:241,height:128,borderRadius:16,overflow:"hidden",position:"relative"}}>
+          <img src={cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+          <div title="Edit cover" style={{position:"absolute",top:8,right:8,width:28,height:28,borderRadius:"50%",background:"rgba(22,20,49,0.6)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"background 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.background="rgba(22,20,49,0.88)";}} onMouseLeave={function(e){e.currentTarget.style.background="rgba(22,20,49,0.6)";}}><IEdit color={C.textPrimary} size={14}/></div>
+        </div>
         <EventStatusDropdown/>
       </div>
       <div style={{flex:1,display:"flex",flexDirection:"column",gap:12}}>
@@ -623,7 +633,7 @@ function EventSummary({event}){
           <div title="Share event" style={{cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,opacity:0.7,transition:"opacity 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.opacity=1;}} onMouseLeave={function(e){e.currentTarget.style.opacity=0.7;}}><IShare/></div>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
-          <div style={{display:"flex",alignItems:"center",gap:4}}><IUsers size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>4498</span></div>
+          <div style={{display:"flex",alignItems:"center",gap:4}}><IUsers size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>4,498</span></div>
           <div style={{display:"flex",alignItems:"center",gap:4}}><IPin size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>{location}</span></div>
           <div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Start</span><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>10.03.26 09:00h</span></div>
           <div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Finish</span><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>11.03.26 17:00h</span></div>
@@ -686,6 +696,18 @@ function RangeSlider({lo,hi,onChange,gridRef,containerW}){
   </div>);}
 
 // ── Hub: Shot Card ─────────────────────────────────────────────────
+// ── Public page source tag ─────────────────────────────────────────
+function PublicPageTag(){
+  var [pos,setPos]=useState(null);
+  var ref=useRef(null);
+  return(
+    <div ref={ref} onMouseEnter={function(){var r=ref.current.getBoundingClientRect();setPos({x:r.left+r.width/2,y:r.bottom+6});}} onMouseLeave={function(){setPos(null);}} style={{position:"relative",display:"flex",alignItems:"center",padding:"2px 8px",borderRadius:4,flexShrink:0}}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      {pos&&ReactDOM.createPortal(<div style={{position:"fixed",top:pos.y,left:pos.x,transform:"translateX(-50%)",background:C.bgPage,border:"1px solid "+C.border,borderRadius:6,padding:"4px 8px",whiteSpace:"nowrap",zIndex:9999,pointerEvents:"none",boxShadow:"0 4px 12px rgba(0,0,0,0.3)"}}><span style={{fontFamily:sans,fontSize:12,color:C.textSecondary}}>Submitted via public page</span></div>,document.body)}
+    </div>
+  );
+}
+
 function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onToggleFav,onDiscard,onRecover,highlightMode}){
   var videoSrc=shot.orient==="landscape"?VIDEO_LANDSCAPE:VIDEO_PORTRAIT;
   var vidRef=useRef(null),scrubRef=useRef(null);
@@ -708,7 +730,7 @@ function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onTog
         {hovering&&!highlightMode&&onDiscard&&(discarded?<CardChip onClick={function(e){e.stopPropagation();onRecover();}}><IRecover color={C.action} size={15}/></CardChip>:<CardChip onClick={function(e){e.stopPropagation();onDiscard();}}><ITrash color={C.action} size={15}/></CardChip>)}
       </div>
     </div>
-    {showMeta&&<div style={{padding:12}}><div style={{display:"flex",flexWrap:"wrap",gap:2}}><div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{shot.orient==="landscape"?<svg width="14" height="10" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>:<svg width="10" height="14" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>}</div><Tag icon={<ICalendar/>} label={shot.date}/><Tag icon={<IClock/>} label={shot.time}/><Tag icon={<ITimer/>} label={shot.dur}/><Tag icon={<IUser/>} label={shot.user}/><Tag icon={<IFile/>} label={shot.size}/></div></div>}
+    {showMeta&&<div style={{padding:12}}><div style={{display:"flex",flexWrap:"wrap",gap:2}}>{shot.public&&<PublicPageTag/>}<div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{shot.orient==="landscape"?<svg width="14" height="10" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>:<svg width="10" height="14" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>}</div><Tag icon={<ICalendar/>} label={shot.date}/><Tag icon={<IClock/>} label={shot.time}/><Tag icon={<ITimer/>} label={shot.dur}/><Tag icon={<IUser/>} label={shot.user}/><Tag icon={<IFile/>} label={shot.size}/></div></div>}
   </div>);}
 
 // ── Hub: Arrange Shot Card ─────────────────────────────────────────
@@ -945,18 +967,141 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
 var PUBLIC_PAGES_SEED=[{id:0,title:"Neon Nights Festival",published:true,created:"10.03.26 08:00h",cover:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=200&h=120&fit=crop&q=80",description:"",showUpload:false}];
 function PublishedSwitch({published,onChange}){return(<div onClick={function(){onChange(!published);}} style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}}><div style={{width:26.7,height:16,borderRadius:999,background:published?C.action:C.bgTertiary,padding:2.7,boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:published?"flex-end":"flex-start",transition:"background 0.2s",flexShrink:0}}><div style={{width:10.7,height:10.7,borderRadius:"50%",background:C.textPrimary}}/></div><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>Published</span></div>);}
 function CoverField({cover,onChange}){var fileRef=useRef(null);var [hov,setHov]=useState(false);function handleFile(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){onChange(ev.target.result);};r.readAsDataURL(f);}return(<div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Cover image</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>jpg or png only. Max 15MB.</span><div onClick={function(){fileRef.current&&fileRef.current.click();}} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{position:"relative",width:"100%",height:256,borderRadius:16,overflow:"hidden",background:C.bgTertiary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:8,border:"2px dashed "+(cover?"transparent":hov?C.textPrimary:C.border),transition:"border-color 0.15s"}}>{cover?<><img src={cover} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}/><div style={{position:"absolute",top:12,right:12,width:40,height:40,borderRadius:"50%",border:"1px solid "+C.textPrimary,background:"rgba(22,20,49,0.5)",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(4px)"}}><IEdit color={C.textPrimary} size={18}/></div></>:<><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={hov?C.textPrimary:C.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{transition:"stroke 0.15s"}}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style={{fontFamily:sans,fontSize:14,color:hov?C.textPrimary:C.textMuted,transition:"color 0.15s"}}>Click to upload a cover image</span></>}</div><input ref={fileRef} type="file" accept="image/jpeg,image/png" onChange={handleFile} style={{display:"none"}}/></div>);}
-function EditPageModal({page,onClose,onSave}){var [visible,setVisible]=useState(false);var [title,setTitle]=useState(page.title);var [titleFocused,setTitleFocused]=useState(false);var [desc,setDesc]=useState(page.description||"");var [descFocused,setDescFocused]=useState(false);var [cover,setCover]=useState(page.cover||null);var [published,setPublished]=useState(page.published);var [showUpload,setShowUpload]=useState(page.showUpload||false);var [saved,setSaved]=useState(false);useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);function handleClose(){setVisible(false);setTimeout(onClose,220);}function handleSave(){onSave(Object.assign({},page,{title:title.trim()||page.title,description:desc,cover:cover,published:published,showUpload:showUpload}));setSaved(true);}if(saved){return(<div style={{position:"fixed",inset:0,zIndex:600,background:"rgba(22,20,49,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}><div style={{background:C.bgSecondary,borderRadius:24,padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,width:420,textAlign:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Changes saved!</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>Your public event page has been updated.</p></div><button onClick={handleClose} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Done</button></div></div>);}return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:600,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}><div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(560px,100%)",maxHeight:"92vh",display:"flex",flexDirection:"column",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}><div style={{flex:1,overflowY:"auto",padding:32,display:"flex",flexDirection:"column",gap:16,position:"relative"}}><button onClick={handleClose} style={{position:"absolute",top:20,right:20,background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,display:"flex",zIndex:2}}><IX size={20}/></button><div style={{display:"flex",flexDirection:"column",gap:4,paddingRight:32}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Public page settings</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>These changes will affect only this public event page.</p></div><div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Public event page title</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>150 characters maximum</span><input value={title} onChange={function(e){setTitle(e.target.value);}} onFocus={function(){setTitleFocused(true);}} onBlur={function(){setTitleFocused(false);}} maxLength={150} style={{border:"2px solid "+(titleFocused?C.textPrimary:C.border),borderRadius:16,padding:"10px 24px",fontFamily:sans,fontSize:16,background:"transparent",outline:"none",width:"100%",color:C.textSecondary,transition:"border-color 0.15s"}}/></div><div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Description</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>300 characters maximum</span><textarea value={desc} onChange={function(e){setDesc(e.target.value);}} onFocus={function(){setDescFocused(true);}} onBlur={function(){setDescFocused(false);}} placeholder="Describe your event" maxLength={300} style={{border:"2px solid "+(descFocused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:"transparent",outline:"none",width:"100%",color:C.textSecondary,resize:"none",height:192,minHeight:128,transition:"border-color 0.15s"}}/></div><CoverField cover={cover} onChange={setCover}/><PublishedSwitch published={published} onChange={setPublished}/><div style={{display:"flex",flexDirection:"column",gap:4}}><div style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}} onClick={function(){setShowUpload(function(v){return !v;});}}><div style={{width:26.7,height:16,borderRadius:999,background:C.textPrimary,padding:2.7,boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:showUpload?"flex-end":"flex-start",flexShrink:0}}><div style={{width:10.7,height:10.7,borderRadius:"50%",background:C.bgPage}}/></div><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>Show upload module</span></div><div style={{display:"flex",gap:12}}><div style={{width:26.7,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>This will allow page visitors to upload videos to the event from the public event page.</span></div></div><button onClick={handleSave} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",marginTop:8}}>Save changes</button></div></div></div>);}
+function EditPageModal({page,onClose,onSave,modalTitle}){var [visible,setVisible]=useState(false);var [title,setTitle]=useState(page.title);var [titleFocused,setTitleFocused]=useState(false);var [desc,setDesc]=useState(page.description||"");var [descFocused,setDescFocused]=useState(false);var [cover,setCover]=useState(page.cover||null);var [published,setPublished]=useState(page.published);var [showUpload,setShowUpload]=useState(page.showUpload||false);var [saved,setSaved]=useState(false);useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);function handleClose(){setVisible(false);setTimeout(onClose,220);}function handleSave(){onSave(Object.assign({},page,{title:title.trim()||page.title,description:desc,cover:cover,published:published,showUpload:showUpload}));setSaved(true);}if(saved){return(<div style={{position:"fixed",inset:0,zIndex:600,background:"rgba(22,20,49,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}><div style={{background:C.bgSecondary,borderRadius:24,padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,width:420,textAlign:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Changes saved!</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>Your public event page has been updated.</p></div><button onClick={handleClose} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Done</button></div></div>);}return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:600,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}><div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(560px,100%)",maxHeight:"92vh",display:"flex",flexDirection:"column",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}><div style={{flex:1,overflowY:"auto",padding:32,display:"flex",flexDirection:"column",gap:16,position:"relative"}}><button onClick={handleClose} style={{position:"absolute",top:20,right:20,background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,display:"flex",zIndex:2}}><IX size={20}/></button><div style={{display:"flex",flexDirection:"column",gap:4,paddingRight:32}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>{modalTitle||"Public page settings"}</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>These changes will affect only this public event page.</p></div><div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Public event page title</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>150 characters maximum</span><input value={title} onChange={function(e){setTitle(e.target.value);}} onFocus={function(){setTitleFocused(true);}} onBlur={function(){setTitleFocused(false);}} maxLength={150} style={{border:"2px solid "+(titleFocused?C.textPrimary:C.border),borderRadius:16,padding:"10px 24px",fontFamily:sans,fontSize:16,background:"transparent",outline:"none",width:"100%",color:C.textSecondary,transition:"border-color 0.15s"}}/></div><div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Description</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>300 characters maximum</span><textarea value={desc} onChange={function(e){setDesc(e.target.value);}} onFocus={function(){setDescFocused(true);}} onBlur={function(){setDescFocused(false);}} placeholder="Describe your event" maxLength={300} style={{border:"2px solid "+(descFocused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:"transparent",outline:"none",width:"100%",color:C.textSecondary,resize:"none",height:192,minHeight:128,transition:"border-color 0.15s"}}/></div><CoverField cover={cover} onChange={setCover}/><PublishedSwitch published={published} onChange={setPublished}/><div style={{width:"25%",flexShrink:0,position:"relative"}}><DateTimePicker label="Video upload window" hint="When the page accepts video submissions"/></div><button onClick={handleSave} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",marginTop:8}}>Save changes</button></div></div></div>);}
 function DeletePageModal({page,onClose,onConfirm}){var [visible,setVisible]=useState(false);useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);function handleClose(){setVisible(false);setTimeout(onClose,220);}return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:700,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}><div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(440px,100%)",display:"flex",flexDirection:"column",gap:32,padding:32,textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><ITrash color={C.bgPage} size={26}/></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Remove public page?</p><p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>The page <strong style={{color:C.textPrimary}}>"{page.title}"</strong> will be permanently deleted.</p></div></div><div style={{display:"flex",gap:12}}><button onClick={handleClose} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Go back</button><button onClick={function(){onConfirm(page.id);handleClose();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Delete</button></div></div></div>);}
-function PublicPagesPanel({highlights}){var [pages,setPages]=useState(PUBLIC_PAGES_SEED);var [editTarget,setEditTarget]=useState(null);var [deleteTarget,setDeleteTarget]=useState(null);function handleSave(updated){setPages(function(prev){return prev.map(function(p){return p.id===updated.id?updated:p;});});}function handleDelete(id){setPages(function(p){return p.filter(function(pp){return pp.id!==id;});});}function handleShare(page){var url="https://sureshot.app/p/neon-nights-2026";if(navigator.share){navigator.share({title:page.title,url:url}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(url);}}return(<div style={{display:"flex",flexDirection:"column",gap:2}}>{editTarget&&<EditPageModal page={editTarget} onClose={function(){setEditTarget(null);}} onSave={function(p){handleSave(p);setEditTarget(null);}}/>}{deleteTarget&&<DeletePageModal page={deleteTarget} onClose={function(){setDeleteTarget(null);}} onConfirm={function(id){handleDelete(id);setDeleteTarget(null);}}/>}<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingBottom:8,marginBottom:2}}><div style={{display:"flex",alignItems:"center",gap:40}}><div style={{width:79,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>COVER</span></div><div style={{width:320,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>PUBLIC PAGE TITLE</span></div><div style={{width:160,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>STATUS</span></div><div style={{width:128,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>CREATED</span></div></div><div style={{width:112,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>ACTIONS</span></div></div>{pages.length===0?<div style={{textAlign:"center",padding:"48px 0",fontFamily:sans,fontSize:16,color:C.textSecondary}}>No public page.</div>:pages.map(function(page){return(<div key={page.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8}}><div style={{display:"flex",alignItems:"center",gap:40}}><div style={{width:79,padding:"0 4px",flexShrink:0}}><div style={{width:71,height:37,borderRadius:4,overflow:"hidden",background:C.bgTertiary}}>{page.cover?<img src={page.cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>}</div></div><div style={{width:320,padding:"0 10px",flexShrink:0}}><span style={{fontFamily:sans,fontWeight:600,fontSize:14,color:C.textPrimary,display:"block",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{page.title}</span></div><div style={{width:160,padding:"0 10px",flexShrink:0}}><PublishedSwitch published={page.published} onChange={function(v){handleSave(Object.assign({},page,{published:v}));}}/></div><div style={{width:128,padding:"0 10px",flexShrink:0}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{page.created}</span></div></div><div style={{width:112,display:"flex",alignItems:"center",gap:4,flexShrink:0}}><IconBtn onClick={function(){setEditTarget(page);}}><IEdit color={C.textPrimary} size={16}/></IconBtn><IconBtn onClick={function(){handleShare(page);}}><IShare color={C.textSecondary} size={16}/></IconBtn><IconBtn onClick={function(){setDeleteTarget(page);}}><IX color={C.action} size={16}/></IconBtn></div></div>);})}{pages.length>10&&<div style={{display:"flex",alignItems:"center",gap:12,paddingLeft:11,paddingTop:8}}><IChevLeft color={C.textSecondary}/><div style={{width:32,height:32,borderRadius:256,background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>1</span></div><IChevRight color={C.textSecondary}/></div>}</div>);}
+function PublicPagesPanel({highlights}){var [pages,setPages]=useState(PUBLIC_PAGES_SEED);var [editTarget,setEditTarget]=useState(null);var [deleteTarget,setDeleteTarget]=useState(null);var [showCreate,setShowCreate]=useState(false);var NEW_PAGE_TEMPLATE={id:null,title:"",description:"",cover:null,published:false,showUpload:false,created:""};function handleSave(updated){setPages(function(prev){return prev.map(function(p){return p.id===updated.id?updated:p;});});}function handleDelete(id){setPages(function(p){return p.filter(function(pp){return pp.id!==id;});});}function handleShare(page){var url="https://sureshot.app/p/neon-nights-2026";if(navigator.share){navigator.share({title:page.title,url:url}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(url);}}return(<div style={{display:"flex",flexDirection:"column",gap:2}}>{showCreate&&<EditPageModal page={NEW_PAGE_TEMPLATE} modalTitle="New public page" onClose={function(){setShowCreate(false);}} onSave={function(p){setPages(function(prev){return prev.concat(Object.assign({},p,{id:Date.now(),created:new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"2-digit"}).replace(/\//g,".")}));});setShowCreate(false);}}/>}{editTarget&&<EditPageModal page={editTarget} onClose={function(){setEditTarget(null);}} onSave={function(p){handleSave(p);setEditTarget(null);}}/>}{deleteTarget&&<DeletePageModal page={deleteTarget} onClose={function(){setDeleteTarget(null);}} onConfirm={function(id){handleDelete(id);setDeleteTarget(null);}}/>}<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingBottom:8,marginBottom:2}}><div style={{display:"flex",alignItems:"center",gap:40}}><div style={{width:79,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>COVER</span></div><div style={{width:320,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>PUBLIC PAGE TITLE</span></div><div style={{width:160,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>STATUS</span></div><div style={{width:128,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>CREATED</span></div></div><div style={{display:"flex",alignItems:"center",gap:12}}><div style={{width:112,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>ACTIONS</span></div><button onClick={function(){setShowCreate(true);}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer",flexShrink:0}}><IPlus color={C.bgPage} size={20}/><span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,whiteSpace:"nowrap"}}>Create new page</span></button></div></div>{pages.length===0?<div style={{textAlign:"center",padding:"48px 0",fontFamily:sans,fontSize:16,color:C.textSecondary}}>No public page.</div>:pages.map(function(page){return(<div key={page.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8}}><div style={{display:"flex",alignItems:"center",gap:40}}><div style={{width:79,padding:"0 4px",flexShrink:0}}><div style={{width:71,height:37,borderRadius:4,overflow:"hidden",background:C.bgTertiary}}>{page.cover?<img src={page.cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>}</div></div><div style={{width:320,padding:"0 10px",flexShrink:0}}><span style={{fontFamily:sans,fontWeight:600,fontSize:14,color:C.textPrimary,display:"block",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{page.title}</span></div><div style={{width:160,padding:"0 10px",flexShrink:0}}><PublishedSwitch published={page.published} onChange={function(v){handleSave(Object.assign({},page,{published:v}));}}/></div><div style={{width:128,padding:"0 10px",flexShrink:0}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{page.created}</span></div></div><div style={{width:112,display:"flex",alignItems:"center",gap:4,flexShrink:0}}><IconBtn onClick={function(){setEditTarget(page);}}><IEdit color={C.textPrimary} size={16}/></IconBtn><IconBtn onClick={function(){handleShare(page);}}><IShare color={C.textSecondary} size={16}/></IconBtn><IconBtn onClick={function(){setDeleteTarget(page);}}><IX color={C.action} size={16}/></IconBtn></div></div>);})}{pages.length>10&&<div style={{display:"flex",alignItems:"center",gap:12,paddingLeft:11,paddingTop:8}}><IChevLeft color={C.textSecondary}/><div style={{width:32,height:32,borderRadius:256,background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>1</span></div><IChevRight color={C.textSecondary}/></div>}</div>);}
 
 // ── Hub: Settings Panel ────────────────────────────────────────────
 function TimeCol({items,selected,onSelect,fmt}){return(<div style={{display:"flex",flexDirection:"column",overflowY:"auto",maxHeight:160,scrollbarWidth:"none",width:52}}>{items.map(function(item){var sel=item===selected;return(<div key={item} onClick={function(e){e.stopPropagation();onSelect(item);}} onMouseEnter={function(e){if(!sel)e.currentTarget.style.background=C.bgTertiary;}} onMouseLeave={function(e){if(!sel)e.currentTarget.style.background="transparent";}} style={{height:32,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8,cursor:"pointer",flexShrink:0,fontFamily:sans,fontSize:16,color:sel?C.bgPage:C.textPrimary,background:sel?C.action:"transparent",transition:"background .15s"}}>{fmt?fmt(item):pad2(item)}</div>);})}</div>);}
 function TimePicker({value,onChange}){var [open,setOpen]=useState(false);var ref=useRef(null);useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);var parts=(value||"09:00").split(":");var h24=parseInt(parts[0])||0,min=parseInt(parts[1])||0;var ampm=h24>=12?"PM":"AM",h12=h24%12||12;function setHour(h){onChange(pad2(ampm==="PM"?h%12+12:h%12)+":"+pad2(min));}function setMin(m){onChange(pad2(h24)+":"+pad2(m));}function setAmpm(a){onChange(pad2(a==="PM"?h12%12+12:h12%12)+":"+pad2(min));}var label=pad2(h12)+":"+pad2(min)+" "+ampm;return(<div ref={ref} style={{position:"relative"}}><div onClick={function(e){e.stopPropagation();setOpen(function(v){return !v;});}} style={{background:C.bgSecondary,borderRadius:100,padding:"6px 12px",cursor:"pointer",userSelect:"none",display:"inline-flex",alignItems:"center"}}><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary,whiteSpace:"nowrap"}}>{label}</span></div>{open&&(<div onClick={function(e){e.stopPropagation();}} style={{position:"absolute",bottom:"calc(100% + 6px)",right:0,background:C.bgSecondary,borderRadius:12,padding:"8px",boxShadow:"0 8px 32px rgba(0,0,0,0.5)",display:"flex",alignItems:"stretch",gap:4,zIndex:400}}><TimeCol items={[1,2,3,4,5,6,7,8,9,10,11,12]} selected={h12} onSelect={setHour} fmt={function(v){return pad2(v);}}/><div style={{width:1,background:C.border,margin:"2px 0"}}/><TimeCol items={[0,5,10,15,20,25,30,35,40,45,50,55]} selected={min} onSelect={setMin} fmt={function(v){return pad2(v);}}/><div style={{width:1,background:C.border,margin:"2px 0"}}/><TimeCol items={["AM","PM"]} selected={ampm} onSelect={setAmpm} fmt={function(v){return v;}}/></div>)}</div>);}
-function DateTimePicker({label,hint}){var today=new Date();var [viewYear,setViewYear]=useState(today.getFullYear());var [viewMonth,setViewMonth]=useState(today.getMonth());var [startDate,setStartDate]=useState(null);var [endDate,setEndDate]=useState(null);var [openFor,setOpenFor]=useState(null);var [timeStr,setTimeStr]=useState("09:00");var ref=useRef(null);useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpenFor(null);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];var DAYS=["MON","TUE","WED","THU","FRI","SAT","SUN"];function prevMonth(){if(viewMonth===0){setViewMonth(11);setViewYear(function(y){return y-1;});}else setViewMonth(function(m){return m-1;});}function nextMonth(){if(viewMonth===11){setViewMonth(0);setViewYear(function(y){return y+1;});}else setViewMonth(function(m){return m+1;});}function getDays(){var first=new Date(viewYear,viewMonth,1),last=new Date(viewYear,viewMonth+1,0),offset=(first.getDay()+6)%7,cells=[];for(var i=0;i<offset;i++)cells.push(null);for(var d=1;d<=last.getDate();d++)cells.push(d);while(cells.length%7!==0)cells.push(null);return cells;}function selectDay(d){var dt=new Date(viewYear,viewMonth,d);if(openFor==="start"){setStartDate(dt);setOpenFor(null);}else if(openFor==="end"){setEndDate(dt);setOpenFor(null);}}function isToday(d){var t=new Date();return d===t.getDate()&&viewMonth===t.getMonth()&&viewYear===t.getFullYear();}function isSel(d,dt){return dt&&d===dt.getDate()&&viewMonth===dt.getMonth()&&viewYear===dt.getFullYear();}function fmtDate(dt){if(!dt)return null;return pad2(dt.getDate())+"."+pad2(dt.getMonth()+1)+"."+String(dt.getFullYear()).slice(2);}return(<div style={{display:"flex",flexDirection:"column",gap:4,flex:1,minWidth:0,position:"relative"}} ref={ref}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{label}</span>{hint&&<span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{hint}</span>}<div style={{border:"2px solid "+(openFor?C.textPrimary:C.border),borderRadius:16,background:C.bgTertiary,overflow:"hidden",position:"relative"}}><div onClick={function(){setOpenFor(openFor==="start"?null:"start");}} style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",borderBottom:"1px solid "+C.border,cursor:"pointer",background:openFor==="start"?C.bgSecondary:"transparent"}}><div style={{width:14,height:14,borderRadius:"50%",background:C.textSecondary,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,flex:1}}>{fmtDate(startDate)||"Start"}</span>{startDate&&<span style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{timeStr}</span>}</div><div style={{position:"absolute",left:22,top:40,height:24,borderLeft:"2px dashed "+C.border,zIndex:1}}/><div onClick={function(){setOpenFor(openFor==="end"?null:"end");}} style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",cursor:"pointer",background:openFor==="end"?C.bgSecondary:"transparent"}}><div style={{width:14,height:14,borderRadius:"50%",border:"2px solid "+C.textSecondary,background:"transparent",flexShrink:0}}/><span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,flex:1}}>{fmtDate(endDate)||"End"}</span>{endDate&&<span style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{timeStr}</span>}</div></div>{openFor&&(<div style={{position:"absolute",top:"100%",left:0,zIndex:200,marginTop:4,background:C.bgTertiary,borderRadius:12,width:370,boxShadow:"0 10px 60px rgba(0,0,0,0.4)",overflow:"hidden"}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 16px"}}><span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>{MONTHS[viewMonth]+" "+viewYear}</span><div style={{display:"flex",alignItems:"center",gap:28}}><div onClick={function(e){e.stopPropagation();prevMonth();}} style={{cursor:"pointer",display:"flex",width:24,height:24,alignItems:"center"}}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div><div onClick={function(e){e.stopPropagation();nextMonth();}} style={{cursor:"pointer",display:"flex",width:24,height:24,alignItems:"center"}}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div></div><div style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:20,alignItems:"center"}}>{DAYS.map(function(d){return <div key={d} style={{width:44,textAlign:"center",fontFamily:sans,fontSize:12,color:C.textPrimary}}>{d}</div>;})}</div><div style={{display:"flex",flexDirection:"column"}}>{(function(){var cells=getDays(),rows=[];for(var i=0;i<cells.length;i+=7)rows.push(cells.slice(i,i+7));return rows.map(function(week,ri){return(<div key={ri} style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:44,alignItems:"center"}}>{week.map(function(d,di){var sel=(isSel(d,startDate)||isSel(d,endDate)),tod=d&&isToday(d);return(<div key={di} onClick={function(){if(d)selectDay(d);}} style={{width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",background:sel?"rgba(241,102,92,0.25)":"transparent",cursor:d?"pointer":"default",flexShrink:0}}>{d&&<span style={{fontFamily:sans,fontSize:20,lineHeight:"28px",fontWeight:sel?600:400,color:sel||tod?C.action:C.textPrimary}}>{d}</span>}</div>);})}</div>);});})()}</div><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",height:52,borderTop:"1px solid "+C.border}}><span style={{fontFamily:sans,fontSize:16,color:C.textPrimary}}>Time</span><TimePicker value={timeStr} onChange={function(v){setTimeStr(v);}}/></div></div>)}</div>);}
+function DateTimePicker({label,hint}){var today=new Date();var [viewYear,setViewYear]=useState(today.getFullYear());var [viewMonth,setViewMonth]=useState(today.getMonth());var [startDate,setStartDate]=useState(null);var [endDate,setEndDate]=useState(null);var [openFor,setOpenFor]=useState(null);var [timeStr,setTimeStr]=useState("09:00");var ref=useRef(null);useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpenFor(null);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];var DAYS=["MON","TUE","WED","THU","FRI","SAT","SUN"];function prevMonth(){if(viewMonth===0){setViewMonth(11);setViewYear(function(y){return y-1;});}else setViewMonth(function(m){return m-1;});}function nextMonth(){if(viewMonth===11){setViewMonth(0);setViewYear(function(y){return y+1;});}else setViewMonth(function(m){return m+1;});}function getDays(){var first=new Date(viewYear,viewMonth,1),last=new Date(viewYear,viewMonth+1,0),offset=(first.getDay()+6)%7,cells=[];for(var i=0;i<offset;i++)cells.push(null);for(var d=1;d<=last.getDate();d++)cells.push(d);while(cells.length%7!==0)cells.push(null);return cells;}function selectDay(d){var dt=new Date(viewYear,viewMonth,d);if(openFor==="start"){setStartDate(dt);setOpenFor(null);}else if(openFor==="end"){setEndDate(dt);setOpenFor(null);}}function isToday(d){var t=new Date();return d===t.getDate()&&viewMonth===t.getMonth()&&viewYear===t.getFullYear();}function isSel(d,dt){return dt&&d===dt.getDate()&&viewMonth===dt.getMonth()&&viewYear===dt.getFullYear();}function fmtDate(dt){if(!dt)return null;return pad2(dt.getDate())+"."+pad2(dt.getMonth()+1)+"."+String(dt.getFullYear()).slice(2);}return(<div style={{display:"flex",flexDirection:"column",gap:4,position:"relative"}} ref={ref}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{label}</span>{hint&&<span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{hint}</span>}<div style={{border:"2px solid "+(openFor?C.textPrimary:C.border),borderRadius:16,background:C.bgTertiary,overflow:"hidden",position:"relative"}}><div onClick={function(){setOpenFor(openFor==="start"?null:"start");}} style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",borderBottom:"1px solid "+C.border,cursor:"pointer",background:openFor==="start"?C.bgSecondary:"transparent"}}><div style={{width:14,height:14,borderRadius:"50%",background:C.textSecondary,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,flex:1}}>{fmtDate(startDate)||"Start"}</span>{startDate&&<span style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{timeStr}</span>}</div><div style={{position:"absolute",left:22,top:40,height:24,borderLeft:"2px dashed "+C.border,zIndex:1}}/><div onClick={function(){setOpenFor(openFor==="end"?null:"end");}} style={{display:"flex",alignItems:"center",gap:8,padding:"12px 16px",cursor:"pointer",background:openFor==="end"?C.bgSecondary:"transparent"}}><div style={{width:14,height:14,borderRadius:"50%",border:"2px solid "+C.textSecondary,background:"transparent",flexShrink:0}}/><span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,flex:1}}>{fmtDate(endDate)||"End"}</span>{endDate&&<span style={{fontFamily:mono,fontSize:12,color:C.textMuted}}>{timeStr}</span>}</div></div>{openFor&&(<div style={{position:"absolute",top:"100%",left:0,zIndex:200,marginTop:4,background:C.bgTertiary,borderRadius:12,width:370,boxShadow:"0 10px 60px rgba(0,0,0,0.4)",overflow:"hidden"}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 16px"}}><span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>{MONTHS[viewMonth]+" "+viewYear}</span><div style={{display:"flex",alignItems:"center",gap:28}}><div onClick={function(e){e.stopPropagation();prevMonth();}} style={{cursor:"pointer",display:"flex",width:24,height:24,alignItems:"center"}}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div><div onClick={function(e){e.stopPropagation();nextMonth();}} style={{cursor:"pointer",display:"flex",width:24,height:24,alignItems:"center"}}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div></div><div style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:20,alignItems:"center"}}>{DAYS.map(function(d){return <div key={d} style={{width:44,textAlign:"center",fontFamily:sans,fontSize:12,color:C.textPrimary}}>{d}</div>;})}</div><div style={{display:"flex",flexDirection:"column"}}>{(function(){var cells=getDays(),rows=[];for(var i=0;i<cells.length;i+=7)rows.push(cells.slice(i,i+7));return rows.map(function(week,ri){return(<div key={ri} style={{display:"flex",justifyContent:"space-between",padding:"0 16px",height:44,alignItems:"center"}}>{week.map(function(d,di){var sel=(isSel(d,startDate)||isSel(d,endDate)),tod=d&&isToday(d);return(<div key={di} onClick={function(){if(d)selectDay(d);}} style={{width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"50%",background:sel?"rgba(241,102,92,0.25)":"transparent",cursor:d?"pointer":"default",flexShrink:0}}>{d&&<span style={{fontFamily:sans,fontSize:20,lineHeight:"28px",fontWeight:sel?600:400,color:sel||tod?C.action:C.textPrimary}}>{d}</span>}</div>);})}</div>);});})()}</div><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 16px",height:52,borderTop:"1px solid "+C.border}}><span style={{fontFamily:sans,fontSize:16,color:C.textPrimary}}>Time</span><TimePicker value={timeStr} onChange={function(v){setTimeStr(v);}}/></div></div>)}</div>);}
 var TIMEZONES=["UTC-12","UTC-11","UTC-10","UTC-9","UTC-8","UTC-7","UTC-6","UTC-5","UTC-4","UTC-3","UTC-2","UTC-1","UTC+0","UTC+1","UTC+2","UTC+3","UTC+4","UTC+5","UTC+5:30","UTC+6","UTC+7","UTC+8","UTC+9","UTC+9:30","UTC+10","UTC+11","UTC+12"];
 function TimezonePicker(){var [tz,setTz]=useState("UTC+1"),ref=useRef(null);var [open,setOpen]=useState(false);useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);return(<div ref={ref} style={{position:"relative",flexShrink:0}}><div onClick={function(){setOpen(function(v){return !v;});}} style={{display:"flex",alignItems:"center",gap:4,border:"1px solid "+C.textPrimary,borderRadius:4,padding:"2px 8px",cursor:"pointer",userSelect:"none"}}><IGlobe color={C.textPrimary} size={12}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,whiteSpace:"nowrap"}}>{tz}</span></div>{open&&(<div style={{position:"absolute",top:"calc(100% + 4px)",right:0,background:C.bgSecondary,borderRadius:12,padding:4,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",zIndex:200,maxHeight:240,overflowY:"auto",scrollbarWidth:"none",minWidth:130}}>{TIMEZONES.map(function(t){var sel=t===tz;return(<div key={t} onClick={function(){setTz(t);setOpen(false);}} style={{padding:"6px 12px",borderRadius:8,cursor:"pointer",fontFamily:sans,fontSize:14,color:sel?C.bgPage:C.textPrimary,background:sel?C.action:"transparent",transition:"background .15s",whiteSpace:"nowrap"}} onMouseEnter={function(e){if(!sel)e.currentTarget.style.background=C.bgTertiary;}} onMouseLeave={function(e){if(!sel)e.currentTarget.style.background="transparent";}}>{t}</div>);})}</div>)}</div>);}
 function SettingsInputField({label,hint,placeholder,multiline,maxLength}){var [val,setVal]=useState("");var [focused,setFocused]=useState(false);var base={border:"2px solid "+(focused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:C.bgTertiary,outline:"none",width:"100%",color:C.textPrimary,resize:"none"};return(<div style={{display:"flex",flexDirection:"column",gap:4,width:"100%"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{label}</span>{hint&&<span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{hint}</span>}{multiline?<textarea value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLength} onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}} style={Object.assign({},base,{height:192,minHeight:128})}/>:<input value={val} onChange={function(e){setVal(e.target.value);}} placeholder={placeholder} maxLength={maxLength} onFocus={function(){setFocused(true);}} onBlur={function(){setFocused(false);}} style={base}/>}</div>);}
-function SettingsPanel(){var [privateEvent,setPrivateEvent]=useState(false);var [instantSharing,setInstantSharing]=useState(false);var [saved,setSaved]=useState(false);return(<div style={{display:"flex",flexDirection:"column",gap:24,padding:"8px 24px 24px"}}>{saved&&(<div style={{position:"fixed",top:24,left:"50%",transform:"translateX(-50%)",zIndex:900,background:C.bgSecondary,borderRadius:12,padding:"12px 24px",display:"flex",alignItems:"center",gap:10,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",animation:"fadeUp .3s ease both"}}><div style={{width:20,height:20,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span style={{fontFamily:sans,fontSize:15,color:C.textPrimary,whiteSpace:"nowrap"}}>Settings saved successfully</span></div>)}<p style={{fontFamily:sans,fontWeight:800,fontSize:24,lineHeight:"30px",color:C.textPrimary,margin:0}}>Event settings</p><div style={{display:"flex",flexDirection:"column",gap:24,width:"100%"}}><SettingsInputField label="Event name" hint="60 characters maximum" placeholder="Event name" maxLength={60}/><SettingsInputField label="Location" placeholder="Event location"/><div style={{display:"flex",alignItems:"flex-start",gap:16,width:"100%"}}><div style={{flex:1,minWidth:0,position:"relative"}}><DateTimePicker label="Date & Time" hint="Period the event will be live"/></div><div style={{flex:1,minWidth:0,position:"relative"}}><DateTimePicker label="Video submitting period (optional)" hint="During this time, attendees can upload their videos"/></div><div style={{marginTop:36,flexShrink:0}}><TimezonePicker/></div></div><SettingsInputField label="Event description" hint="300 characters maximum" placeholder="Describe your event" multiline={true} maxLength={300}/>{[{key:"private",label:"Private event",desc:"Content is exclusive to the event, and only you can invite attendees",active:privateEvent,onToggle:function(){setPrivateEvent(function(v){return !v;});}},{key:"instant",label:"Instant content sharing",desc:"When enabled, all uploaded videos are instantly shared with attendees",active:instantSharing,onToggle:function(){setInstantSharing(function(v){return !v;});}}].map(function(sw){return(<div key={sw.key} style={{display:"flex",flexDirection:"column",gap:4}}><Toggle active={sw.active} onToggle={sw.onToggle} label={sw.label}/><div style={{display:"flex",gap:12}}><div style={{width:26.7,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{sw.desc}</span></div></div>);})}</div><button onClick={function(){setSaved(true);setTimeout(function(){setSaved(false);},3000);}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,cursor:"pointer",alignSelf:"flex-start"}}>Save changes</button></div>);}
+function SettingsPanel(){var [privateEvent,setPrivateEvent]=useState(false);var [instantSharing,setInstantSharing]=useState(false);var [saved,setSaved]=useState(false);return(<div style={{display:"flex",flexDirection:"column",gap:24,padding:"8px 24px 24px"}}>{saved&&(<div style={{position:"fixed",top:24,left:"50%",transform:"translateX(-50%)",zIndex:900,background:C.bgSecondary,borderRadius:12,padding:"12px 24px",display:"flex",alignItems:"center",gap:10,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",animation:"fadeUp .3s ease both"}}><div style={{width:20,height:20,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span style={{fontFamily:sans,fontSize:15,color:C.textPrimary,whiteSpace:"nowrap"}}>Settings saved successfully</span></div>)}<p style={{fontFamily:sans,fontWeight:800,fontSize:24,lineHeight:"30px",color:C.textPrimary,margin:0}}>Event settings</p><div style={{display:"flex",flexDirection:"column",gap:24,width:"100%"}}><SettingsInputField label="Event name" hint="60 characters maximum" placeholder="Event name" maxLength={60}/><SettingsInputField label="Location" placeholder="Event location"/><div style={{display:"flex",alignItems:"flex-start",gap:16,width:"100%"}}><div style={{width:"25%",flexShrink:0,position:"relative"}}><DateTimePicker label="Date & Time" hint="Period the event will be live"/></div><div style={{marginTop:36,flexShrink:0}}><TimezonePicker/></div></div><SettingsInputField label="Event description" hint="300 characters maximum" placeholder="Describe your event" multiline={true} maxLength={300}/>{[{key:"private",label:"Private event",desc:"Content is exclusive to the event, and only you can invite attendees",active:privateEvent,onToggle:function(){setPrivateEvent(function(v){return !v;});}},{key:"instant",label:"Instant content sharing",desc:"When enabled, all uploaded videos are instantly shared with attendees",active:instantSharing,onToggle:function(){setInstantSharing(function(v){return !v;});}}].map(function(sw){return(<div key={sw.key} style={{display:"flex",flexDirection:"column",gap:4}}><Toggle active={sw.active} onToggle={sw.onToggle} label={sw.label}/><div style={{display:"flex",gap:12}}><div style={{width:26.7,flexShrink:0}}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{sw.desc}</span></div></div>);})}</div><button onClick={function(){setSaved(true);setTimeout(function(){setSaved(false);},3000);}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,cursor:"pointer",alignSelf:"flex-start"}}>Save changes</button></div>);}
+
+// ── Hub: Event Overview Panel ──────────────────────────────────────
+var EVENT_STATS={
+  attendees:{total:4498,uploadRate:31,avgPerAttendee:2.3},
+  shots:{total:2838,avgDuration:"0:18",verticalPct:68,horizontalPct:32},
+  highlights:{totalViews:184200,totalShots:188,published:4},
+};
+var TOP_CONTRIBUTORS_OV=ATTENDEES.slice(0,5).map(function(a,i){return Object.assign({},a,{videos:[35,21,14,12,10][i]});});
+var TOP_PERFORMERS_OV=HIGHLIGHTS_SEED.map(function(h,i){return Object.assign({},h,{views:[12400,9800,7200,5100,3800][i]||3000});});
+
+function OvStatCard({value,label,orange}){
+  return(
+    <div style={{flex:1,minWidth:0,background:C.bgPage,borderRadius:12,padding:"14px 18px",display:"flex",flexDirection:"column",gap:6}}>
+      <span style={{fontFamily:sans,fontWeight:600,fontSize:22,lineHeight:"28px",color:orange?C.action:C.textPrimary}}>{value}</span>
+      <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{label}</span>
+    </div>
+  );
+}
+
+function OvSectionTitle({children,onSeeAll}){
+  return(
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <span style={{fontFamily:sans,fontWeight:600,fontSize:18,lineHeight:"24px",color:C.textPrimary}}>{children}</span>
+      {onSeeAll&&<button onClick={onSeeAll} style={{background:"none",border:"1px solid "+C.border,borderRadius:999,padding:"4px 14px",fontFamily:sans,fontWeight:600,fontSize:14,color:C.textSecondary,cursor:"pointer",transition:"border-color 0.15s, color 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.borderColor=C.textPrimary;e.currentTarget.style.color=C.textPrimary;}} onMouseLeave={function(e){e.currentTarget.style.borderColor=C.border;e.currentTarget.style.color=C.textSecondary;}}>See all</button>}
+    </div>
+  );
+}
+
+function EventOverviewPanel({onTabChange}){
+  var s=EVENT_STATS;
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+
+      {/* ── Attendees ── */}
+      <div style={{background:C.bgTertiary,borderRadius:16,padding:"20px 24px",display:"flex",flexDirection:"column",gap:20}}>
+        <OvSectionTitle onSeeAll={function(){onTabChange("Attendees");}}>Attendees</OvSectionTitle>
+        <div style={{display:"flex",gap:12}}>
+          <OvStatCard value={s.attendees.total.toLocaleString()} label="Total attendees"/>
+          <OvStatCard value={s.attendees.uploadRate+"%"} label="Upload rate" orange/>
+          <OvStatCard value={s.attendees.avgPerAttendee} label="Avg. shots per attendee"/>
+        </div>
+        {/* top contributors */}
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textSecondary}}>Top contributors</span>
+          <div style={{display:"flex",gap:12}}>
+            {TOP_CONTRIBUTORS_OV.slice(0,3).map(function(u,i){return(
+              <div key={u.id} style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:10,background:C.bgPage,borderRadius:10,padding:"10px 14px"}}>
+                <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textMuted,flexShrink:0}}>{i+1}</span>
+                <img src={u.avatar} alt={u.name} style={{width:32,height:32,borderRadius:"50%",objectFit:"cover",flexShrink:0}}/>
+                <div style={{flex:1,minWidth:0}}>
+                  <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary,display:"block",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{u.name}</span>
+                  <span style={{fontFamily:mono,fontSize:12,color:C.textSecondary}}>{u.handle}</span>
+                </div>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:14,color:C.action,flexShrink:0}}>{u.videos}</span>
+              </div>
+            );})}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Shots + Highlights side by side ── */}
+      <div style={{display:"flex",gap:12,alignItems:"stretch"}}>
+
+        {/* Shots */}
+        <div style={{flex:1,minWidth:0,background:C.bgTertiary,borderRadius:16,padding:"20px 24px",display:"flex",flexDirection:"column",gap:20}}>
+          <OvSectionTitle onSeeAll={function(){onTabChange("Shots");}}>Shots</OvSectionTitle>
+          <div style={{display:"flex",gap:12}}>
+            <OvStatCard value={s.shots.total.toLocaleString()} label="Total shots"/>
+            <OvStatCard value={s.shots.avgDuration} label="Avg. duration"/>
+          </div>
+          {/* orientation split */}
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textSecondary}}>Orientation split</span>
+            <div style={{height:6,borderRadius:3,overflow:"hidden",background:C.bgPage,display:"flex"}}>
+              <div style={{width:s.shots.verticalPct+"%",background:C.action,transition:"width 0.4s"}}/>
+              <div style={{flex:1,background:C.bgSecondary}}/>
+            </div>
+            <div style={{display:"flex",justifyContent:"space-between"}}>
+              <div style={{display:"flex",alignItems:"center",gap:5}}>
+                <svg width="9" height="12" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.action} strokeWidth="1.5"/></svg>
+                <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{s.shots.verticalPct}% vertical</span>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:5}}>
+                <svg width="12" height="9" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textMuted} strokeWidth="1.5"/></svg>
+                <span style={{fontFamily:sans,fontSize:14,color:C.textMuted}}>{s.shots.horizontalPct}% horizontal</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Highlights */}
+        <div style={{flex:1,minWidth:0,background:C.bgTertiary,borderRadius:16,padding:"20px 24px",display:"flex",flexDirection:"column",gap:20}}>
+          <OvSectionTitle onSeeAll={function(){onTabChange("Highlights");}}>Highlights</OvSectionTitle>
+          <div style={{display:"flex",gap:12}}>
+            <OvStatCard value={s.highlights.totalViews.toLocaleString()} label="Total views" orange/>
+            <OvStatCard value={s.highlights.published} label="Published"/>
+          </div>
+          {/* top performers */}
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textSecondary}}>Top performers</span>
+            <div style={{display:"flex",gap:8}}>
+              {TOP_PERFORMERS_OV.map(function(h){return(
+                <div key={h.id} style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:5}}>
+                  <div style={{position:"relative",borderRadius:8,overflow:"hidden",paddingBottom:"150%"}}>
+                    <img src={h.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+                    <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"16px 6px 6px",background:"linear-gradient(transparent,rgba(22,20,49,0.9))"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:3}}>
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={C.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span style={{fontFamily:mono,fontSize:11,color:C.textSecondary}}>{h.views.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{fontFamily:sans,fontSize:13,lineHeight:"17px",color:C.textPrimary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{h.name}</span>
+                </div>
+              );})}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
 
 // ── Hub: Shots Panel ───────────────────────────────────────────────
 function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onToggleFav,showMeta,onToggleMeta,showFavsOnly,onToggleFavsOnly,rangeLo,rangeHi,onRange,onDownload,onCollection,onPreview,discardedIds,onDiscard,onRecover,onBatchDiscard,activeTab,onTabChange,onNewHighlight,highlights,onEditHighlight,onDeleteHighlight}){
@@ -964,7 +1109,7 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
   var count=selectedIds.size;
   var loMs=TL_START+rangeLo*TL_SPAN,hiMs=TL_START+rangeHi*TL_SPAN;
   var gridRef=useRef(null);
-  var tabs=["Shots","Attendees","Highlights","Public pages","Settings"];
+  var tabs=["Overview","Shots","Attendees","Highlights","Public pages","Settings"];
   var activeShots=SHOTS.filter(function(s){return !discardedIds.has(s.id);}).filter(function(s){return s.ts>=loMs&&s.ts<=hiMs;}).filter(function(s){return !showFavsOnly||favIds.has(s.id);});
   var discardedShots=SHOTS.filter(function(s){return discardedIds.has(s.id);});
   var visible=innerTab==="shots"?activeShots:discardedShots;
@@ -974,7 +1119,8 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
   function handleCheckbox(){if(allSel)onDeselectAll(visible);else onSelectAll(visible);}
   return(<div style={{background:C.bgSecondary,borderRadius:12,padding:"8px 24px 16px",display:"flex",flexDirection:"column",gap:12,flex:1}}>
     <div style={{display:"flex",alignItems:"center",gap:12,padding:"8px 12px"}}>{tabs.map(function(t){var active=t===activeTab;return(<div key={t} onClick={function(){onTabChange(t);}} style={{minWidth:128,padding:8,textAlign:"center",cursor:"pointer",borderBottom:active?"2px solid "+C.textPrimary:"2px solid transparent"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:16,lineHeight:"24px",color:active?C.textPrimary:C.textSecondary}}>{t}</span></div>);})}</div>
-    {activeTab==="Highlights"?<HighlightsPanel onNewHighlight={onNewHighlight} highlights={highlights} onEdit={onEditHighlight} onDelete={onDeleteHighlight}/>
+    {activeTab==="Overview"?<EventOverviewPanel onTabChange={onTabChange}/>
+    :activeTab==="Highlights"?<HighlightsPanel onNewHighlight={onNewHighlight} highlights={highlights} onEdit={onEditHighlight} onDelete={onDeleteHighlight}/>
     :activeTab==="Settings"?<SettingsPanel/>
     :activeTab==="Attendees"?<AttendeesPanel/>
     :activeTab==="Public pages"?<PublicPagesPanel highlights={highlights}/>
@@ -1009,7 +1155,7 @@ function HubPage({event,onGoToEvents,onNav,defaultTab}){
   var [showArrangeModal,setShowArrangeModal]=useState(false);
   var [arrangeIds,setArrangeIds]=useState(new Set());
   var [previewShot,setPreviewShot]=useState(null);
-  var [activeTab,setActiveTab]=useState(defaultTab||"Shots");
+  var [activeTab,setActiveTab]=useState(defaultTab||"Overview");
   var [highlights,setHighlights]=useState(HIGHLIGHTS_SEED);
   function toggleCard(id){setSelectedIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
   function toggleFav(id){setFavIds(function(p){var n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;});}
@@ -1045,7 +1191,7 @@ var TEAM_MEMBERS=[
   {id:2, name:"Lena Hoffmann",  handle:"@lenahoff",    email:"lena.hoffmann@luminaryevents.com", role:"Member", avatar:"https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop&q=80"},
   {id:3, name:"Daniel Ferreira",handle:"@dani_f",      email:"daniel.f@luminaryevents.com",      role:"Member", avatar:"https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=200&h=200&fit=crop&q=80"},
   {id:4, name:"Camille Rousseau",handle:"@camilleR",   email:"camille.r@luminaryevents.com",     role:"Member", avatar:"https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop&q=80"},
-  {id:5, name:"Yuki Tanaka",    handle:"@yukitan",     email:"yuki.tanaka@luminaryevents.com",   role:"Member", avatar:"https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&q=80"},
+  {id:5, name:"Yuki Tanaka",    handle:"@yukitan",     email:"yuki.tanaka@luminaryevents.com",   role:"Member", avatar:"https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&q=80", invited:true},
 ];
 
 function EditCompanyModal({company,logo,onClose,onSave}){
@@ -1353,7 +1499,8 @@ function AccountPage({onNav}){
   var [members,setMembers]=useState(TEAM_MEMBERS);
   var [showInvite,setShowInvite]=useState(false);
   var [removeTarget,setRemoveTarget]=useState(null);
-  var [logo]=useState(COMPANY.logo);
+  var [logo,setLogo]=useState(COMPANY.logo);
+  var [showEditCompany,setShowEditCompany]=useState(false);
   function removeMember(id){setMembers(function(p){return p.filter(function(m){return m.id!==id;});});}
 
   var cols=[
@@ -1367,6 +1514,7 @@ function AccountPage({onNav}){
       <Sidebar activeScreen="accounts" onNav={onNav}/>
       {showInvite&&<InviteUserModal onClose={function(){setShowInvite(false);}}/>}
       {removeTarget&&<RemoveMemberModal member={removeTarget} onClose={function(){setRemoveTarget(null);}} onConfirm={removeMember}/>}
+      {showEditCompany&&<EditCompanyModal company={COMPANY} logo={logo} onClose={function(){setShowEditCompany(false);}} onSave={function(updated){setLogo(updated.logo);setShowEditCompany(false);}}/>}
 
       <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,padding:"24px 16px",boxSizing:"border-box",minHeight:"100vh"}}>
 
@@ -1400,6 +1548,7 @@ function AccountPage({onNav}){
                 <span style={{fontFamily:sans,fontWeight:800,fontSize:22,lineHeight:"28px",color:C.textPrimary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{COMPANY.name}</span>
                 <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>hello@luminaryevents.com</span>
               </div>
+              <IconBtn title="Edit company" onClick={function(){setShowEditCompany(true);}}><IEdit color={C.textPrimary} size={16}/></IconBtn>
             </div>
 
             {/* team members panel */}
@@ -1426,19 +1575,27 @@ function AccountPage({onNav}){
                 {members.map(function(m){return(
                   <div key={m.id} style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingTop:12,paddingBottom:12}}>
                     <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:12,padding:"0 4px"}}>
-                      <img src={m.avatar} alt={m.name} style={{width:44,height:44,borderRadius:"50%",objectFit:"cover",flexShrink:0,background:C.bgTertiary}}/>
+                      <img src={m.avatar} alt={m.name} style={{width:44,height:44,borderRadius:"50%",objectFit:"cover",flexShrink:0,background:C.bgTertiary,opacity:m.invited?0.4:1,filter:m.invited?"grayscale(1)":"none"}}/>
                       <div style={{display:"flex",flexDirection:"column",gap:2,minWidth:0}}>
-                        <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.name}</span>
+                        <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:m.invited?C.textMuted:C.textPrimary,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.name}</span>
                         <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"18px",color:C.textSecondary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.email}</span>
                       </div>
                     </div>
                     <div style={{width:90,flexShrink:0,padding:"0 4px"}}>
-                      <div style={{display:"inline-flex",alignItems:"center",borderRadius:4,padding:"2px 8px",background:m.role==="Admin"?"rgba(241,102,92,0.15)":"transparent",border:"1px solid "+(m.role==="Admin"?C.action:C.border)}}>
-                        <span style={{fontFamily:sans,fontSize:12,color:m.role==="Admin"?C.action:C.textSecondary}}>{m.role}</span>
-                      </div>
+                      {m.invited
+                        ?<div style={{display:"inline-flex",alignItems:"center",borderRadius:4,padding:"2px 8px",background:"transparent",border:"1px solid "+C.border}}>
+                          <span style={{fontFamily:sans,fontSize:12,color:C.textMuted}}>Invited</span>
+                        </div>
+                        :<div style={{display:"inline-flex",alignItems:"center",borderRadius:4,padding:"2px 8px",background:m.role==="Admin"?"rgba(241,102,92,0.15)":"transparent",border:"1px solid "+(m.role==="Admin"?C.action:C.border)}}>
+                          <span style={{fontFamily:sans,fontSize:12,color:m.role==="Admin"?C.action:C.textSecondary}}>{m.role}</span>
+                        </div>
+                      }
                     </div>
                     <div style={{width:40,flexShrink:0,display:"flex",justifyContent:"flex-end"}}>
-                      {m.role!=="Admin"&&<IconBtn onClick={function(){setRemoveTarget(m);}}><IX color={C.action} size={16}/></IconBtn>}
+                      {m.invited
+                        ?<IconBtn title="Resend invite" onClick={function(){}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></IconBtn>
+                        :m.role!=="Admin"&&<IconBtn onClick={function(){setRemoveTarget(m);}}><IX color={C.action} size={16}/></IconBtn>
+                      }
                     </div>
                   </div>
                 );})}
@@ -1465,6 +1622,7 @@ function CreateEventPage({onNav,onCreated}){
   var [descFocused,setDescFocused]=useState(false);
   var [privateEvt,setPrivateEvt]=useState(false);
   var [instantShare,setInstantShare]=useState(false);
+  var [publicPage,setPublicPage]=useState(false);
   var [saved,setSaved]=useState(null); // null | "draft" | "published"
 
   function handleFile(e){
@@ -1548,11 +1706,8 @@ function CreateEventPage({onNav,onCreated}){
 
           {/* date/time row */}
           <div style={{display:"flex",alignItems:"flex-end",gap:16,flexWrap:"wrap"}}>
-            <div style={{flex:1,minWidth:240,position:"relative"}}>
+            <div style={{width:"25%",flexShrink:0,position:"relative"}}>
               <DateTimePicker label="Date & Time" hint="Period the event will be live"/>
-            </div>
-            <div style={{flex:1,minWidth:240,position:"relative"}}>
-              <DateTimePicker label="Video submitting period (optional)" hint="During this time, attendees can upload their videos"/>
             </div>
             <div style={{marginBottom:4,flexShrink:0}}><TimezonePicker/></div>
           </div>
@@ -1562,6 +1717,24 @@ function CreateEventPage({onNav,onCreated}){
             <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Event description</span>
             <span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>300 characters maximum</span>
             {inp(desc,setDesc,descFocused,setDescFocused,"Describe your event",true,300)}
+          </div>
+
+          {/* public page */}
+          <div style={{display:"flex",flexDirection:"column",gap:0,border:"1px solid "+(publicPage?C.action:C.border),borderRadius:16,overflow:"hidden",transition:"border-color 0.2s"}}>
+            <div onClick={function(){setPublicPage(function(v){return !v;});}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 20px",cursor:"pointer",background:publicPage?"rgba(241,102,92,0.07)":"transparent",transition:"background 0.2s",userSelect:"none"}}>
+              <div style={{display:"flex",alignItems:"center",gap:12}}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={publicPage?C.action:C.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:publicPage?C.textPrimary:C.textSecondary,transition:"color 0.2s"}}>Create a public page</span>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.textSecondary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{transition:"transform 0.2s",transform:publicPage?"rotate(180deg)":"rotate(0deg)"}}><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            {publicPage&&<div style={{padding:"0 20px 20px",display:"flex",flexDirection:"column",gap:20}}>
+              <div style={{height:1,background:C.border}}/>
+              <p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>A public page lets anyone submit footage without downloading the app. Share the link and anyone with it can upload videos during the window you set. You can edit or remove it at any time.</p>
+              <div style={{width:"25%",flexShrink:0,position:"relative"}}>
+                <DateTimePicker label="Video upload window" hint="When the public page accepts submissions"/>
+              </div>
+            </div>}
           </div>
 
           {/* toggles */}
@@ -1593,14 +1766,14 @@ function CreateEventPage({onNav,onCreated}){
 function App(){
   var [screen,setScreen]=useState("dashboard");
   var [activeEvent,setActiveEvent]=useState(null);
-  var [defaultTab,setDefaultTab]=useState("Shots");
+  var [defaultTab,setDefaultTab]=useState("Overview");
   function handleNav(key){
     if(key==="events"){setScreen("events");setActiveEvent(null);}
     else if(key==="dashboard"){setScreen("dashboard");setActiveEvent(null);}
     else if(key==="create"){setScreen("create");}
     else if(key==="accounts"){setScreen("accounts");}
   }
-  function openEvent(ev,tab){setActiveEvent(ev);setScreen("hub");setDefaultTab(tab||"Shots");}
+  function openEvent(ev,tab){setActiveEvent(ev);setScreen("hub");setDefaultTab(tab||"Overview");}
   function goToEvents(){setScreen("events");setActiveEvent(null);}
   if(screen==="hub")return <HubPage event={activeEvent} onGoToEvents={goToEvents} onNav={handleNav} defaultTab={defaultTab}/>;
   if(screen==="events")return <EventsListPage onOpenEvent={openEvent} onNav={handleNav}/>;
