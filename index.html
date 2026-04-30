@@ -173,17 +173,14 @@ function HubStatusTag({status}){
 }
 
 // ── Sidebar ────────────────────────────────────────────────────────
-// mode="events"  → events list (Events highlighted)
-// mode="accounts"→ events list (Account highlighted)
-// mode="hub"     → hub (back to Events + active event name)
 // Sidebar — unified, never changes. activeScreen = "dashboard"|"events"|"accounts"
 function Sidebar({activeScreen,onNav}){
   var Logo=<svg width="152" height="36" viewBox="0 0 152 36" fill="none"><path d={LOGO_PATH} fill="#F1665C"/></svg>;
   var navItems=[
     {key:"dashboard", label:"Dashboard", icon:function(col){return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={col} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="9" width="7" height="12" rx="1"/><rect x="14" y="3" width="7" height="18" rx="1"/><rect x="3" y="3" width="7" height="4" rx="1"/></svg>;}},
     {key:"events",    label:"Events",    icon:function(col){return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={col} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;}},
-    {key:"accounts",  label:"Account",   icon:function(col){return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={col} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;}},
   ];
+  var isAccountActive=activeScreen==="accounts";
   return(
     <div style={{background:C.bgSecondary,width:241,minWidth:241,flexShrink:0,borderRadius:"0 32px 32px 0",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"24px 16px 12px",boxSizing:"border-box",position:"sticky",top:0,height:"100vh",overflow:"hidden"}}>
       <div style={{display:"flex",flexDirection:"column",gap:32}}>
@@ -206,12 +203,10 @@ function Sidebar({activeScreen,onNav}){
         </div>
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:20}}>
-        <div style={{display:"flex",alignItems:"center"}}>
-          <div style={{flex:1,display:"flex",alignItems:"center",gap:8,height:42}}>
-            <div style={{width:32,height:32,borderRadius:"50%",background:C.action,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:13,color:C.bgPage}}>JD</span></div>
-            <div style={{display:"flex",flexDirection:"column",gap:2}}><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>John Doe</span><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>@username</span></div>
-          </div>
-          <div style={{border:"1px solid "+C.textPrimary,borderRadius:999,width:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><IArrowRight size={13}/></div>
+        <div onClick={function(){onNav&&onNav("accounts");}} style={{display:"flex",alignItems:"center",cursor:"pointer",gap:8,padding:"6px 8px",borderRadius:12,background:isAccountActive?"rgba(241,102,92,0.08)":"transparent",border:isAccountActive?"1px solid rgba(241,102,92,0.25)":"1px solid transparent",transition:"background 0.15s,border-color 0.15s"}} onMouseEnter={function(e){if(!isAccountActive)e.currentTarget.style.background="rgba(255,255,255,0.04)";}} onMouseLeave={function(e){if(!isAccountActive)e.currentTarget.style.background="transparent";}}>
+          <div style={{width:36,height:36,borderRadius:"50%",background:C.action,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",border:isAccountActive?"2px solid "+C.textPrimary:"2px solid transparent",transition:"border-color 0.15s"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:13,color:C.bgPage}}>JD</span></div>
+          <div style={{display:"flex",flexDirection:"column",gap:2,flex:1,minWidth:0}}><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>John Doe</span><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>@username</span></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isAccountActive?C.action:C.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,transition:"stroke 0.15s"}}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </div>
         <span style={{fontFamily:mono,fontSize:12,lineHeight:"16px",color:C.textSecondary}}>© 2026 SURESHOT APS</span>
       </div>
@@ -294,6 +289,7 @@ function SectionTitle({children}){
 }
 
 function DashboardPage({onNav,onOpenEvent}){
+  var recentEvents=(function(){var live=EVENTS.filter(function(e){return e.status==="live";});var upcoming=EVENTS.filter(function(e){return e.status==="upcoming"||e.status==="period";});var ended=EVENTS.filter(function(e){return e.status==="ended";});return live.concat(upcoming).concat(ended).slice(0,3);})();
   var otherEvents=EVENTS.filter(function(e){return e.id!==2;}).slice(0,3);
   return(
     <div style={{display:"flex",alignItems:"flex-start",minHeight:"100vh",background:C.bgPage,fontFamily:sans}}>
@@ -317,191 +313,183 @@ function DashboardPage({onNav,onOpenEvent}){
           </div>
         </div>
 
-        {/* ── 2. ACTIVE EVENT ── */}
-        <div onClick={function(){onOpenEvent&&onOpenEvent(EVENTS[2]);}} style={{background:C.bgTertiary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:16,border:"1px solid rgba(241,102,92,0.35)",cursor:"pointer",transition:"border-color 0.15s, background 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.borderColor="rgba(241,102,92,0.7)";e.currentTarget.style.background="#47465f";}} onMouseLeave={function(e){e.currentTarget.style.borderColor="rgba(241,102,92,0.35)";e.currentTarget.style.background=C.bgTertiary;}}>
-          {/* section title */}
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{display:"flex",alignItems:"center",gap:6}}>
-              <div style={{position:"relative",width:10,height:10,flexShrink:0}}>
-                <div style={{position:"absolute",inset:0,borderRadius:"50%",background:C.action,animation:"none"}}/>
-                <div style={{position:"absolute",inset:-3,borderRadius:"50%",background:"rgba(241,102,92,0.25)"}}/>
-              </div>
-              <span style={{fontFamily:sans,fontWeight:700,fontSize:12,color:C.action,letterSpacing:"0.08em",textTransform:"uppercase"}}>Live now</span>
-            </div>
-            <div style={{flex:1,height:1,background:"rgba(241,102,92,0.2)"}}/>
-            <button onClick={function(e){e.stopPropagation();onNav&&onNav("events");}} style={{background:"none",border:"1px solid rgba(241,102,92,0.45)",borderRadius:999,padding:"4px 14px",fontFamily:sans,fontWeight:600,fontSize:14,color:C.action,cursor:"pointer",flexShrink:0,transition:"border-color 0.15s, color 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.borderColor=C.action;e.currentTarget.style.color=C.textPrimary;}} onMouseLeave={function(e){e.currentTarget.style.borderColor="rgba(241,102,92,0.45)";e.currentTarget.style.color=C.action;}}>See all events</button>
+        {/* ── 2. VIDEOS — full width ── */}
+        <div style={{background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:24}}>
+          {/* header row */}
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>Videos</span>
+            <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>Videos from all your events</span>
           </div>
-          {/* content row */}
-          <div style={{display:"flex",gap:24,alignItems:"center",flexWrap:"wrap"}}>
-          {/* left: event card */}
-          <div style={{display:"flex",gap:0,alignItems:"stretch",flex:"0 0 auto",background:C.bgPage,borderRadius:16,overflow:"hidden",height:156}}>
-            <div style={{width:128,flexShrink:0,position:"relative"}}>
-              <img src={DASH_ACTIVE_EVENT.cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+          {/* stats row */}
+          <div style={{display:"flex",gap:24,alignItems:"stretch"}}>
+            {/* total — filled card */}
+            <div style={{flex:1,minWidth:128,background:C.bgTertiary,borderRadius:16,padding:"12px 16px",display:"flex",flexDirection:"column",gap:8,alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontFamily:sans,fontWeight:800,fontSize:32,lineHeight:"40px",color:C.textPrimary}}>{DASH_VIDEOS.total.toLocaleString()}</span>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>Total videos</span>
             </div>
-            <div style={{padding:"16px",display:"flex",flexDirection:"column",gap:4,justifyContent:"center",minWidth:200,maxWidth:280}}>
-              <div style={{background:C.action,borderRadius:999,padding:"1px 8px",display:"inline-flex",alignSelf:"flex-start"}}>
-                <span style={{fontFamily:mono,fontSize:12,color:C.bgPage}}>LIVE!</span>
+            {/* av. per event + av. duration — outlined stacked */}
+            <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:16,justifyContent:"center"}}>
+              <div style={{flex:1,border:"1px solid "+C.border,borderRadius:12,padding:"16px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",minWidth:128}}>
+                <span style={{fontFamily:sans,fontWeight:800,fontSize:28,lineHeight:"34px",color:C.textPrimary}}>{DASH_VIDEOS.avgPerEvent}</span>
+                <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Av. per event</span>
               </div>
-              <span style={{fontFamily:sans,fontWeight:800,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{DASH_ACTIVE_EVENT.name}</span>
-              <div style={{display:"flex",alignItems:"center",gap:4}}>
-                <IUsers color={C.textSecondary} size={16}/>
-                <span style={{fontFamily:sans,fontSize:16,color:C.textSecondary}}>{DASH_USERS.totalAttendees.toLocaleString()}</span>
-              </div>
-              <div style={{display:"flex",alignItems:"center",gap:4,marginTop:2}}>
-                <span style={{fontFamily:sans,fontSize:14,color:C.action}}>Open event</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.action} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><polyline points="12 5 19 12 12 19"/></svg>
+              <div style={{flex:1,border:"1px solid "+C.border,borderRadius:12,padding:"16px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",minWidth:128}}>
+                <span style={{fontFamily:sans,fontWeight:800,fontSize:28,lineHeight:"34px",color:C.textPrimary}}>{DASH_VIDEOS.avgDuration}</span>
+                <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Av. duration</span>
               </div>
             </div>
-          </div>
-          {/* middle: last 24h stats */}
-          <div style={{display:"flex",flexDirection:"column",gap:12,flexShrink:0}}>
-            <span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>Last 24h</span>
-            <div style={{display:"flex",gap:16}}>
-              <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px",minWidth:128,display:"flex",flexDirection:"column",gap:8}}>
-                <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.action}}>{DASH_ACTIVE_EVENT.videosLastHour}</span>
-                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Shots</span>
-              </div>
-              <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px",minWidth:128,display:"flex",flexDirection:"column",gap:8}}>
-                <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.action}}>{DASH_ACTIVE_EVENT.activeUsers}</span>
-                <span style={{fontFamily:sans,fontSize:14,color:C.textSecondary}}>Active in last 24h</span>
-              </div>
-            </div>
-          </div>
-          {/* right: upload graph */}
-          <div style={{display:"flex",flexDirection:"column",gap:12,flex:1,minWidth:200}}>
-            <span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>Shots uploaded</span>
-            <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px"}}>
-              <BarChart data={DASH_ACTIVE_EVENT.uploadGraph} labels={DASH_ACTIVE_EVENT.graphHours} height={72}/>
-            </div>
-          </div>
-          </div>
-        </div>
-
-        {/* ── 3. VIDEOS + USERS ── */}
-        <div style={{display:"flex",gap:12,alignItems:"stretch"}}>
-
-          {/* Videos */}
-          <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:24}}>
-            <SectionTitle>Shots</SectionTitle>
-            <div style={{display:"flex",gap:16}}>
-              <StatCard value={DASH_VIDEOS.total.toLocaleString()} label="Total shots"/>
-              <StatCard value={DASH_VIDEOS.avgPerEvent} label="Avg. per event"/>
-              <StatCard value={DASH_VIDEOS.avgDuration} label="Avg. duration"/>
-            </div>
-            {/* orientation split */}
-            <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              <span style={{fontFamily:sans,fontSize:16,color:C.textSecondary}}>Orientation split</span>
-              <div style={{height:6,borderRadius:3,overflow:"hidden",background:C.bgPage,display:"flex"}}>
-                <div style={{width:DASH_VIDEOS.verticalPct+"%",background:C.action}}/>
-                <div style={{flex:1,background:C.bgTertiary}}/>
-              </div>
-              <div style={{display:"flex",justifyContent:"space-between"}}>
-                <div style={{display:"flex",alignItems:"center",gap:5}}>
-                  <svg width="9" height="12" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.action} strokeWidth="1.5"/></svg>
-                  <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{DASH_VIDEOS.verticalPct}% vertical</span>
+            {/* orientation split — outlined */}
+            <div style={{flex:1,minWidth:0,border:"1px solid "+C.border,borderRadius:12,padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <div style={{display:"flex",gap:28,alignItems:"flex-start",width:"100%"}}>
+                {/* vertical */}
+                <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,alignItems:"center"}}>
+                  <div style={{width:48,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <svg width="30" height="52" viewBox="0 0 30 52" fill="none"><rect x="1" y="1" width="28" height="50" rx="3" stroke={C.textPrimary} strokeWidth="1.5"/></svg>
+                  </div>
+                  <div style={{textAlign:"center",width:"100%"}}>
+                    <div style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{DASH_VIDEOS.verticalPct}%</div>
+                    <div style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>vertical</div>
+                  </div>
                 </div>
-                <div style={{display:"flex",alignItems:"center",gap:5}}>
-                  <svg width="12" height="9" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textMuted} strokeWidth="1.5"/></svg>
-                  <span style={{fontFamily:sans,fontSize:14,color:C.textMuted}}>{DASH_VIDEOS.horizontalPct}% horizontal</span>
+                {/* horizontal */}
+                <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,alignItems:"center"}}>
+                  <div style={{width:48,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <svg width="52" height="30" viewBox="0 0 52 30" fill="none"><rect x="1" y="1" width="50" height="28" rx="3" stroke={C.textPrimary} strokeWidth="1.5"/></svg>
+                  </div>
+                  <div style={{textAlign:"center",width:"100%"}}>
+                    <div style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{DASH_VIDEOS.horizontalPct}%</div>
+                    <div style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>horizontal</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Users */}
-          <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:24}}>
-            <SectionTitle>Attendees</SectionTitle>
-            <div style={{display:"flex",gap:16}}>
-              <StatCard value={DASH_USERS.totalAttendees.toLocaleString()} label="Attendees"/>
-              <StatCard value={DASH_USERS.activeUsers.toLocaleString()} label="Active attendees"/>
-              <StatCard value={DASH_USERS.uploadRate+"%"} label="Upload rate"/>
-            </div>
-            {/* top contributors — 3 only */}
-            <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              <span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>Top contributors</span>
-              <div style={{display:"flex",gap:24}}>
-                {DASH_USERS.topContributors.slice(0,3).map(function(u){
-                  return(
-                    <div key={u.handle} style={{display:"flex",flexDirection:"column",gap:4,alignItems:"flex-start"}}>
-                      <div style={{display:"flex",alignItems:"center",gap:8,height:34}}>
-                        <img src={u.avatar} alt={u.name} style={{width:24,height:24,borderRadius:"50%",objectFit:"cover",flexShrink:0}}/>
-                        <div style={{display:"flex",flexDirection:"column",gap:0}}>
-                          <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary,whiteSpace:"nowrap"}}>{u.name}</span>
-                          <span style={{fontFamily:mono,fontSize:12,color:C.textSecondary}}>{u.handle}</span>
-                        </div>
-                      </div>
-                      <span style={{fontFamily:sans,fontWeight:700,fontSize:14,color:C.textPrimary}}>{u.videos} shots</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
         </div>
 
-        {/* ── 4. HIGHLIGHTS + OTHER EVENTS ── */}
+        {/* ── 3. ATTENDEES + RECENT EVENTS (2-col) — placeholder, to be built next ── */}
         <div style={{display:"flex",gap:12,alignItems:"stretch"}}>
 
-          {/* Highlights */}
+          {/* Attendees */}
           <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:24}}>
-            <SectionTitle>Highlights</SectionTitle>
-            <div style={{display:"flex",gap:16}}>
-              <StatCard value={DASH_HIGHLIGHTS_META.total} label="Highlights"/>
-              <StatCard value={DASH_HIGHLIGHTS_META.avgPerEvent} label="Avg. per event"/>
-              <StatCard value={DASH_AVG_VIEWS.toLocaleString()} label="Avg. views"/>
-            </div>
-            {/* top performers — all 5, portrait covers with name */}
-            <div style={{display:"flex",flexDirection:"column",gap:10}}>
-              <span style={{fontFamily:sans,fontWeight:800,fontSize:16,color:C.textPrimary}}>Top performers</span>
-              <div style={{display:"flex",gap:8}}>
-                {DASH_HIGHLIGHTS.map(function(h){
-                  return(
-                    <div key={h.id} style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:6}}>
-                      <div style={{position:"relative",borderRadius:8,overflow:"hidden",paddingBottom:"146%"}}>
-                        <img src={h.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
-                        <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"20px 6px 6px",background:"linear-gradient(transparent,rgba(22,20,49,0.88))"}}>
-                          <div style={{display:"flex",alignItems:"center",gap:3}}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <span style={{fontFamily:mono,fontSize:12,color:C.textSecondary}}>{h.views.toLocaleString()}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <span style={{fontFamily:sans,fontSize:14,lineHeight:"18px",color:C.textPrimary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{h.name}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Other events */}
-          <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:20}}>
+            {/* header */}
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <SectionTitle>Other events</SectionTitle>
-              <button onClick={function(){onNav&&onNav("events");}} style={{background:"none",border:"1px solid "+C.border,borderRadius:999,padding:"4px 14px",fontFamily:sans,fontWeight:600,fontSize:14,color:C.textSecondary,cursor:"pointer",transition:"border-color 0.15s, color 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.borderColor=C.textPrimary;e.currentTarget.style.color=C.textPrimary;}} onMouseLeave={function(e){e.currentTarget.style.borderColor=C.border;e.currentTarget.style.color=C.textSecondary;}}>See all</button>
+              <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>Attendees</span>
+              <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>People attending all your events</span>
             </div>
-            {/* table header */}
-            <div style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingBottom:8}}>
-              <div style={{width:76,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>COVER</span></div>
-              <div style={{flex:1,paddingLeft:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>EVENT NAME</span></div>
-              <div style={{width:130,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>STATUS</span></div>
+            {/* total — large filled card */}
+            <div style={{background:C.bgTertiary,borderRadius:16,padding:"12px 16px",display:"flex",flexDirection:"column",gap:8,alignItems:"center",justifyContent:"center",height:168}}>
+              <span style={{fontFamily:sans,fontWeight:800,fontSize:32,lineHeight:"40px",color:C.textPrimary}}>{DASH_USERS.totalAttendees.toLocaleString()}</span>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>Total attendees</span>
             </div>
-            <div style={{display:"flex",flexDirection:"column"}}>
-              {otherEvents.map(function(ev){
+            {/* two outlined cards side by side */}
+            <div style={{display:"flex",gap:32,alignItems:"stretch"}}>
+              <div style={{flex:1,minWidth:128,border:"1px solid "+C.border,borderRadius:12,padding:"12px 24px",display:"flex",flexDirection:"column",gap:8,justifyContent:"center"}}>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"30px",color:C.textPrimary}}>{(DASH_USERS.activeUsers).toLocaleString()}</span>
+                <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,whiteSpace:"nowrap"}}>Uploaded videos</span>
+              </div>
+              <div style={{flex:1,minWidth:128,border:"1px solid "+C.border,borderRadius:12,padding:"12px 24px",display:"flex",flexDirection:"column",gap:8,justifyContent:"center"}}>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"30px",color:C.textPrimary}}>{DASH_USERS.uploadRate+"%"}</span>
+                <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,whiteSpace:"nowrap"}}>Upload rate</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent events */}
+          <div style={{flex:1,minWidth:0,background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",flexDirection:"column",gap:24}}>
+            {/* header */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>Recent events</span>
+              <span onClick={function(){onNav&&onNav("events");}} style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary,textDecoration:"underline",textUnderlineOffset:3,cursor:"pointer"}}>See all events</span>
+            </div>
+            {/* event rows */}
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {recentEvents.map(function(ev){
+                var isLive=ev.status==="live";
+                var isEnded=ev.status==="ended";
+                var isUpcoming=ev.status==="upcoming"||ev.status==="period";
+                // badge
+                var badge;
+                if(isLive){
+                  badge=<div style={{background:C.action,borderRadius:999,padding:"2px 8px",display:"inline-flex",alignSelf:"flex-start"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.bgPage}}>LIVE!</span></div>;
+                } else if(isEnded){
+                  badge=<div style={{border:"1px solid #a3a19f",borderRadius:999,padding:"2px 8px",display:"inline-flex",alignSelf:"flex-start"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:"#a3a19f"}}>ENDED</span></div>;
+                } else if(isUpcoming){
+                  badge=<div style={{border:"1px solid "+C.textPrimary,borderRadius:999,padding:"2px 8px",display:"inline-flex",alignSelf:"flex-start"}}><span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>01d 15h 30m 55s</span></div>;
+                } else {
+                  badge=null;
+                }
                 return(
-                  <div key={ev.id} onClick={function(){onOpenEvent&&onOpenEvent(ev);}} style={{display:"flex",alignItems:"center",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8,cursor:"pointer",borderRadius:4,transition:"background 0.12s"}} onMouseEnter={function(e){e.currentTarget.style.background="rgba(62,61,100,0.3)";}} onMouseLeave={function(e){e.currentTarget.style.background="transparent";}}>
-                    <div style={{width:76,flexShrink:0}}>
-                      <div style={{width:64,height:38,borderRadius:4,overflow:"hidden",background:C.bgTertiary}}>
-                        <img src={ev.cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+                  <div key={ev.id} onClick={function(){onOpenEvent&&onOpenEvent(ev);}} style={{display:"flex",alignItems:"center",gap:12,padding:12,borderRadius:16,border:"1px solid "+(isLive?C.action:C.border),background:C.bgSecondary,cursor:"pointer",transition:"background 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.background=C.bgTertiary;}} onMouseLeave={function(e){e.currentTarget.style.background=C.bgSecondary;}}>
+                    {/* cover */}
+                    <div style={{width:128,height:68,borderRadius:12,overflow:"hidden",flexShrink:0,background:C.bgTertiary}}>
+                      <img src={ev.cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+                    </div>
+                    {/* info */}
+                    <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:4}}>
+                      {badge}
+                      <span style={{fontFamily:sans,fontWeight:800,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{ev.name}</span>
+                    </div>
+                    {/* arrow chip — dark filled circle with coral arrow for live; plain arrow for others */}
+                    <div style={{width:48,height:48,borderRadius:"50%",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:isLive?C.bgPage:"transparent"}}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isLive?C.action:C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── 4. HIGHLIGHTS — full width ── */}
+        <div style={{background:C.bgSecondary,borderRadius:24,padding:"20px 24px",display:"flex",gap:24,alignItems:"stretch"}}>
+
+          {/* Left: header + stats — 2/3 */}
+          <div style={{flex:2,minWidth:0,display:"flex",flexDirection:"column",gap:32}}>
+            {/* header */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>Highlights</span>
+              <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>Curated video collections users can view on the app</span>
+            </div>
+            {/* stats row */}
+            <div style={{display:"flex",gap:32,alignItems:"stretch",height:182}}>
+              {/* total — filled card */}
+              <div style={{flex:1,minWidth:128,background:C.bgTertiary,borderRadius:16,padding:"12px 16px",display:"flex",flexDirection:"column",gap:8,alignItems:"center",justifyContent:"center"}}>
+                <span style={{fontFamily:sans,fontWeight:800,fontSize:32,lineHeight:"40px",color:C.textPrimary}}>{DASH_HIGHLIGHTS_META.total}</span>
+                <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>Total highlights</span>
+              </div>
+              {/* av. per event + av. views — outlined stacked */}
+              <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:16}}>
+                <div style={{flex:1,border:"1px solid "+C.border,borderRadius:12,padding:"16px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",minWidth:128}}>
+                  <span style={{fontFamily:sans,fontWeight:800,fontSize:28,lineHeight:"34px",color:C.textPrimary}}>{DASH_HIGHLIGHTS_META.avgPerEvent}</span>
+                  <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Av. per event</span>
+                </div>
+                <div style={{flex:1,border:"1px solid "+C.border,borderRadius:12,padding:"16px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",minWidth:128}}>
+                  <span style={{fontFamily:sans,fontWeight:800,fontSize:28,lineHeight:"34px",color:C.textPrimary}}>{DASH_AVG_VIEWS.toLocaleString()}</span>
+                  <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Av. views</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: top performers — 1/3 */}
+          <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:12}}>
+            <span style={{fontFamily:sans,fontWeight:600,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>Top performers</span>
+            {/* covers row — fills the 182px stats height, maintaining 77:134 aspect ratio */}
+            <div style={{flex:1,display:"flex",gap:12,alignItems:"stretch"}}>
+              {DASH_HIGHLIGHTS.slice(0,3).map(function(h){
+                return(
+                  <div key={h.id} style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:4}}>
+                    {/* cover — aspect ratio 77:134 ≈ 0.575 wide:tall */}
+                    <div style={{position:"relative",flex:1,borderRadius:8,overflow:"hidden",background:C.bgTertiary,aspectRatio:"77/134"}}>
+                      <img src={h.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+                      <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom, transparent 66%, rgba(0,0,0,0.5) 83%)"}}/>
+                      <div style={{position:"absolute",bottom:8,left:8,display:"flex",alignItems:"center",gap:4}}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{h.views.toLocaleString()}</span>
                       </div>
                     </div>
-                    <div style={{flex:1,minWidth:0,paddingLeft:4,paddingRight:8}}>
-                      <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textPrimary,display:"block",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{ev.name}</span>
-                    </div>
-                    <div style={{width:130,flexShrink:0}}>
-                      <ListStatusTag status={ev.status}/>
-                    </div>
+                    <span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{h.name}</span>
                   </div>
                 );
               })}
@@ -596,54 +584,85 @@ function EventsListPage({onOpenEvent,onNav}){
 
 // ── Hub: Event Status Dropdown ─────────────────────────────────────
 var STATUS_OPTIONS=[{value:"published",label:"Published",bg:C.action,textColor:C.bgPage},{value:"draft",label:"Draft",bg:"#a3a19f",textColor:C.bgPage},{value:"cancelled",label:"Cancelled",bg:"#750000",textColor:C.textPrimary}];
+// ── Hub: Status pill dropdown (inline, adapts to new header) ──────
 function EventStatusDropdown(){
   var [status,setStatus]=useState("published");
   var [open,setOpen]=useState(false);
   var ref=useRef(null);
   useEffect(function(){function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};},[]);
   var current=STATUS_OPTIONS.find(function(o){return o.value===status;})||STATUS_OPTIONS[0];
-  return(<div ref={ref} style={{position:"relative",width:241,flexShrink:0}}>
-    <div onClick={function(){setOpen(function(v){return !v;});}} style={{background:current.bg,borderRadius:open?"8px 8px 0 0":"8px",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"4px 8px 4px 12px",cursor:"pointer",userSelect:"none"}}>
-      <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:current.textColor}}>{current.label}</span>
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={current.textColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{transition:"transform .2s",transform:open?"rotate(180deg)":"rotate(0deg)"}}><polyline points="6 9 12 15 18 9"/></svg>
+  return(
+    <div ref={ref} style={{position:"relative",flexShrink:0}}>
+      <div onClick={function(){setOpen(function(v){return !v;});}} style={{border:"1px solid "+C.action,borderRadius:999,display:"flex",alignItems:"center",gap:4,padding:"4px 8px 4px 12px",cursor:"pointer",userSelect:"none",transition:"background 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.background="rgba(241,102,92,0.08)";}} onMouseLeave={function(e){e.currentTarget.style.background="transparent";}}>
+        <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.action}}>{current.label}</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.action} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{transition:"transform .2s",transform:open?"rotate(180deg)":"rotate(0deg)"}}><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      {open&&<div style={{position:"absolute",top:"calc(100% + 4px)",left:0,minWidth:160,background:C.bgSecondary,border:"1px solid "+C.border,borderRadius:12,zIndex:50,overflow:"hidden",boxShadow:"0 8px 24px rgba(0,0,0,0.35)"}}>
+        {STATUS_OPTIONS.map(function(opt){var isActive=opt.value===status;return(<div key={opt.value} onClick={function(){setStatus(opt.value);setOpen(false);}} style={{padding:"10px 16px",cursor:"pointer",background:isActive?"rgba(187,188,214,0.12)":"transparent",display:"flex",alignItems:"center",gap:8}} onMouseEnter={function(e){e.currentTarget.style.background="rgba(187,188,214,0.12)";}} onMouseLeave={function(e){e.currentTarget.style.background=isActive?"rgba(187,188,214,0.12)":"transparent";}}>{isActive&&<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.action} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}<span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:isActive?C.textPrimary:C.textSecondary}}>{opt.label}</span></div>);})}
+      </div>}
     </div>
-    {open&&<div style={{position:"absolute",top:"100%",left:0,width:241,background:C.bgTertiary,borderRadius:"0 0 8px 8px",zIndex:50,overflow:"hidden",boxShadow:"0 8px 24px rgba(0,0,0,0.3)"}}>
-      {STATUS_OPTIONS.map(function(opt){var isActive=opt.value===status;return(<div key={opt.value} onClick={function(){setStatus(opt.value);setOpen(false);}} style={{padding:"8px 12px",cursor:"pointer",background:isActive?"rgba(187,188,214,0.15)":"transparent"}} onMouseEnter={function(e){e.currentTarget.style.background="rgba(187,188,214,0.15)";}} onMouseLeave={function(e){e.currentTarget.style.background=isActive?"rgba(187,188,214,0.15)":"transparent";}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{opt.label}</span></div>);})}
-    </div>}
-  </div>);}
+  );
+}
 
 // ── Hub: Event Summary ─────────────────────────────────────────────
 function EventSummary({event}){
-  var stats=[{v:"4,498",l:"Attendees",muted:true},{v:"2,838",l:"Shots uploaded"},{v:"0:18",l:"Avg. duration"},{v:"68%",l:"Vertical shots"}];
   var cover=event?event.cover:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?q=80&w=2340&auto=format&fit=crop";
   var name=event?event.name:"Neon Nights Festival";
   var location=event?event.location:"Location name";
-  return(<div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px"}}>
-    <div style={{display:"flex",alignItems:"center",gap:24,padding:"12px 0"}}>
-      <div style={{display:"flex",flexDirection:"column",gap:12,flexShrink:0}}>
-        <div style={{width:241,height:128,borderRadius:16,overflow:"hidden",position:"relative"}}>
+  return(
+    <div style={{background:C.bgSecondary,borderRadius:12,padding:"12px 16px"}}>
+      <div style={{display:"flex",alignItems:"center",gap:24,padding:"8px 0"}}>
+
+        {/* Cover image — landscape, aspect ~185:98 */}
+        <div style={{flexShrink:0,height:98,width:185,borderRadius:16,overflow:"hidden"}}>
           <img src={cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
-          <div title="Edit cover" style={{position:"absolute",top:8,right:8,width:28,height:28,borderRadius:"50%",background:"rgba(22,20,49,0.6)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"background 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.background="rgba(22,20,49,0.88)";}} onMouseLeave={function(e){e.currentTarget.style.background="rgba(22,20,49,0.6)";}}><IEdit color={C.textPrimary} size={14}/></div>
         </div>
-        <EventStatusDropdown/>
-      </div>
-      <div style={{flex:1,display:"flex",flexDirection:"column",gap:12}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{name}</span>
-          <div title="Share event" style={{cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,opacity:0.7,transition:"opacity 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.opacity=1;}} onMouseLeave={function(e){e.currentTarget.style.opacity=0.7;}}><IShare/></div>
+
+        {/* Event info — flex:1 */}
+        <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:8}}>
+          {/* Name row + status pill */}
+          <div style={{display:"flex",alignItems:"center",gap:16}}>
+            <span style={{fontFamily:sans,fontWeight:600,fontSize:24,lineHeight:"30px",color:C.textPrimary,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{name}</span>
+            <EventStatusDropdown/>
+          </div>
+          {/* Location */}
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            <IPin color={C.textSecondary} size={16}/>
+            <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>{location}</span>
+          </div>
+          {/* Start / Finish / Duration */}
+          <div style={{display:"flex",alignItems:"center",gap:16,flexWrap:"wrap"}}>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Start</span>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>10.03.26 09:00h</span>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Finish</span>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>11.03.26 17:00h</span>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Duration</span>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>1d 10h</span>
+            </div>
+          </div>
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
-          <div style={{display:"flex",alignItems:"center",gap:4}}><IUsers size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>4,498</span></div>
-          <div style={{display:"flex",alignItems:"center",gap:4}}><IPin size={16}/><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>{location}</span></div>
-          <div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Start</span><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>10.03.26 09:00h</span></div>
-          <div style={{display:"flex",alignItems:"center",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Finish</span><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>11.03.26 17:00h</span></div>
+
+        {/* Right: Share button + attendee count */}
+        <div style={{flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
+          <button style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,whiteSpace:"nowrap"}}>
+            Share
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+            <span style={{fontFamily:mono,fontWeight:700,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>4498</span>
+          </div>
         </div>
-        <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-          {stats.map(function(sc){return(<div key={sc.l} style={{background:C.bgTertiary,borderRadius:12,padding:12,minWidth:120,display:"flex",flexDirection:"column"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{sc.v}</span><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:sc.muted?C.textMuted:C.textSecondary,whiteSpace:"nowrap"}}>{sc.l}</span></div>);})}
-        </div>
+
       </div>
     </div>
-  </div>);}
+  );
+}
 
 // ── Hub: Preview Modal ─────────────────────────────────────────────
 function PreviewModal({shot,onClose,onDiscard}){
@@ -662,7 +681,7 @@ function PreviewModal({shot,onClose,onDiscard}){
   var pct=duration>0?(current/duration)*100:0;
   return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:500,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}>
     <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,display:"flex",flexDirection:"column",width:isLandscape?"min(720px,100%)":"min(420px,100%)",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px 0"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary}}>Shot preview</span><button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4}}><IX size={20}/></button></div>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px 0"}}><span style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary}}>Video preview</span><button onClick={handleClose} style={{background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4}}><IX size={20}/></button></div>
       <div onClick={function(){setPlaying(function(v){return !v;});}} style={{position:"relative",background:"#000",margin:"12px 20px 0",borderRadius:12,overflow:"hidden",aspectRatio:isLandscape?"16/9":"9/16",cursor:"pointer",maxHeight:isLandscape?"none":"55vh"}}>
         <video ref={vidRef} src={videoSrc} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} onLoadedMetadata={function(){setDuration(vidRef.current.duration);setPlaying(true);}} onTimeUpdate={function(){if(!seeking)setCurrent(vidRef.current.currentTime);}} onEnded={function(){setPlaying(false);}} preload="auto" playsInline muted/>
         {!playing&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none"}}><div style={{width:64,height:64,borderRadius:"50%",background:"rgba(22,20,49,0.72)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><IPlay size={26}/></div></div>}
@@ -703,7 +722,7 @@ function PublicPageTag(){
   return(
     <div ref={ref} onMouseEnter={function(){var r=ref.current.getBoundingClientRect();setPos({x:r.left+r.width/2,y:r.bottom+6});}} onMouseLeave={function(){setPos(null);}} style={{position:"relative",display:"flex",alignItems:"center",padding:"2px 8px",borderRadius:4,flexShrink:0}}>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      {pos&&ReactDOM.createPortal(<div style={{position:"fixed",top:pos.y,left:pos.x,transform:"translateX(-50%)",background:C.bgPage,border:"1px solid "+C.border,borderRadius:6,padding:"4px 8px",whiteSpace:"nowrap",zIndex:9999,pointerEvents:"none",boxShadow:"0 4px 12px rgba(0,0,0,0.3)"}}><span style={{fontFamily:sans,fontSize:12,color:C.textSecondary}}>Submitted via public page</span></div>,document.body)}
+      {pos&&ReactDOM.createPortal(<div style={{position:"fixed",top:pos.y,left:pos.x,transform:"translateX(-50%)",background:C.bgPage,border:"1px solid "+C.border,borderRadius:6,padding:"4px 8px",whiteSpace:"nowrap",zIndex:9999,pointerEvents:"none",boxShadow:"0 4px 12px rgba(0,0,0,0.3)"}}><span style={{fontFamily:sans,fontSize:12,color:C.textSecondary}}>Submitted via landing page</span></div>,document.body)}
     </div>
   );
 }
@@ -781,7 +800,7 @@ function ArrangeModal({selectedIds,onBack,onPublish,isEdit,editName,editFeatured
   var canPublish=name.trim().length>0;
   function removeShot(id){setOrder(function(prev){return prev.filter(function(i){return i!==id;});});}
   useEffect(function(){if(!published||source!=="highlights")return;var t=setTimeout(function(){onPublish([],publishedName,false);},2000);return function(){clearTimeout(t);};},[published,source]);
-  if(published){return(<div onClick={source==="shots"?function(){onBack();}:undefined} style={{position:"fixed",inset:0,zIndex:400,background:"rgba(22,20,49,0.85)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}><div onClick={function(e){e.stopPropagation();}}><HighlightSuccessCard name={publishedName} isEdit={isEdit} showButton={source==="shots"} onGoTo={function(){onPublish([],publishedName,false);}}/></div></div>);}
+  if(published){return(<div onClick={source==="videos"?function(){onBack();}:undefined} style={{position:"fixed",inset:0,zIndex:400,background:"rgba(22,20,49,0.85)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}><div onClick={function(e){e.stopPropagation();}}><HighlightSuccessCard name={publishedName} isEdit={isEdit} showButton={source==="videos"} onGoTo={function(){onPublish([],publishedName,false);}}/></div></div>);}
   return(<div style={{position:"fixed",inset:0,zIndex:400,background:"rgba(22,20,49,0.85)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
     <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:620,maxHeight:"90vh",display:"flex",flexDirection:"column",overflow:"hidden",boxShadow:"0 24px 64px rgba(0,0,0,0.5)"}}>
       <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
@@ -813,9 +832,9 @@ function DownloadModal({selectedIds,onCancel,onConfirm}){
   function startDownload(){setPhase("loading");setCards([]);setProgPct(0);setProgVisible(true);runningRef.current=true;var start=Date.now(),end=start+TOTAL_MS;barTimerRef.current=setInterval(function(){setProgPct(Math.min(((Date.now()-start)/TOTAL_MS)*92,92));if(Date.now()>=end)clearInterval(barTimerRef.current);},200);var idx=0;function pushStep(){if(!runningRef.current)return;if(Date.now()>=end){clearInterval(barTimerRef.current);setProgPct(100);setTimeout(function(){setProgVisible(false);setTimeout(function(){setPhase("done");},420);},600);return;}var step=DL_STEPS[idx%DL_STEPS.length];idx++;setCards(function(prev){return [Object.assign({},step,{_id:Date.now()})].concat(prev);});loopTimerRef.current=setTimeout(pushStep,STEP_DUR);}loopTimerRef.current=setTimeout(pushStep,100);}
   return(<div onClick={phase==="pre"?onCancel:undefined} style={{position:"fixed",inset:0,zIndex:600,background:"rgba(22,20,49,0.75)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}>
     <div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:440}}>
-      {phase==="pre"&&(<><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center",textAlign:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><IDownload color={C.bgPage} size={28}/></div><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Download shots</p><p style={{fontFamily:sans,fontSize:16,color:C.textSecondary,margin:0}}>You will download the following data:</p></div><div style={{display:"flex",gap:16,width:"100%"}}>{[{v:String(count),l:count!==1?"Total files":"Total file"},{v:mb+" MB",l:"Total size"}].map(function(s){return(<div key={s.l} style={{flex:1,background:C.bgTertiary,borderRadius:16,padding:"24px 32px",display:"flex",flexDirection:"column",alignItems:"center",gap:4}}><span style={{fontFamily:sans,fontWeight:800,fontSize:36,lineHeight:"44px",color:C.textPrimary}}>{s.v}</span><span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,whiteSpace:"nowrap"}}>{s.l}</span></div>);})}</div></div><div style={{display:"flex",gap:16}}><button onClick={onCancel} style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Cancel</button><button onClick={startDownload} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}><IDownload color={C.bgPage} size={22}/> Download</button></div></>)}
+      {phase==="pre"&&(<><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center",textAlign:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><IDownload color={C.bgPage} size={28}/></div><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Download videos</p><p style={{fontFamily:sans,fontSize:16,color:C.textSecondary,margin:0}}>You will download the following data:</p></div><div style={{display:"flex",gap:16,width:"100%"}}>{[{v:String(count),l:count!==1?"Total files":"Total file"},{v:mb+" MB",l:"Total size"}].map(function(s){return(<div key={s.l} style={{flex:1,background:C.bgTertiary,borderRadius:16,padding:"24px 32px",display:"flex",flexDirection:"column",alignItems:"center",gap:4}}><span style={{fontFamily:sans,fontWeight:800,fontSize:36,lineHeight:"44px",color:C.textPrimary}}>{s.v}</span><span style={{fontFamily:sans,fontSize:16,color:C.textSecondary,whiteSpace:"nowrap"}}>{s.l}</span></div>);})}</div></div><div style={{display:"flex",gap:16}}><button onClick={onCancel} style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Cancel</button><button onClick={startDownload} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}><IDownload color={C.bgPage} size={22}/> Download</button></div></>)}
       {phase==="loading"&&(<><div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><IDownload color={C.bgPage} size={28}/></div><p style={{fontFamily:sans,fontWeight:600,fontSize:32,color:C.textPrimary,margin:0,textAlign:"center"}}>Compiling…</p></div><div style={{display:"flex",flexDirection:"column",gap:32,opacity:progVisible?1:0,transform:progVisible?"scale(1)":"scale(0.97)",transition:"opacity .4s,transform .4s"}}><div style={{position:"relative",height:108,flexShrink:0,overflow:"visible"}}>{cards.slice(0,MAX_VIS).map(function(step,i){var opacity=i===0?1:i===1?0.5:i===2?0.25:0.1;return(<div key={step._id} style={{position:"absolute",left:0,right:0,height:72,background:C.bgTertiary,borderRadius:16,display:"flex",alignItems:"center",padding:"0 20px",gap:14,top:i*PEEK,zIndex:MAX_VIS-i,opacity:opacity,transform:"scale("+(1-i*0.03)+")",transition:"top .45s cubic-bezier(.4,0,.2,1),opacity .45s,transform .45s",animation:i===0?"slideIn .45s cubic-bezier(.4,0,.2,1) both":"none"}}><div style={{width:40,height:40,background:C.bgSecondary,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:C.action}}>{step.icon}</div><span style={{flex:1,fontFamily:sans,fontSize:14,fontWeight:600,color:C.textPrimary}}>{step.label}</span></div>);})}</div><div style={{width:"100%",height:6,background:C.bgTertiary,borderRadius:999,overflow:"hidden"}}><div style={{height:"100%",width:progPct.toFixed(1)+"%",background:C.action,borderRadius:999,transition:"width 1s cubic-bezier(.4,0,.2,1)"}}/></div></div></>)}
-      {phase==="done"&&(<div style={{display:"flex",flexDirection:"column",gap:16,animation:"fadeUp .45s cubic-bezier(.34,1.1,.64,1) both"}}><div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div style={{textAlign:"center"}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,color:C.textPrimary,margin:0}}>Ready!</p><p style={{fontFamily:sans,fontSize:16,color:C.textSecondary,margin:0}}>Your shots are ready for downloading.</p></div></div><button onClick={onConfirm} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}><IDownload color={C.bgPage} size={20}/> Download</button><button onClick={function(){setCopyToast(true);setTimeout(function(){setCopyToast(false);},2200);}} style={{width:"100%",background:"transparent",border:"1px solid rgba(187,188,214,.4)",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.textSecondary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy download link</button><p style={{textAlign:"center",fontFamily:sans,fontSize:13,fontWeight:600,color:C.textPrimary,opacity:copyToast?1:0,transition:"opacity .25s",margin:0}}>Link copied to clipboard!</p></div>)}
+      {phase==="done"&&(<div style={{display:"flex",flexDirection:"column",gap:16,animation:"fadeUp .45s cubic-bezier(.34,1.1,.64,1) both"}}><div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div style={{textAlign:"center"}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,color:C.textPrimary,margin:0}}>Ready!</p><p style={{fontFamily:sans,fontSize:16,color:C.textSecondary,margin:0}}>Your videos are ready for downloading.</p></div></div><button onClick={onConfirm} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}><IDownload color={C.bgPage} size={20}/> Download</button><button onClick={function(){setCopyToast(true);setTimeout(function(){setCopyToast(false);},2200);}} style={{width:"100%",background:"transparent",border:"1px solid rgba(187,188,214,.4)",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.textSecondary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy download link</button><p style={{textAlign:"center",fontFamily:sans,fontSize:13,fontWeight:600,color:C.textPrimary,opacity:copyToast?1:0,transition:"opacity .25s",margin:0}}>Link copied to clipboard!</p></div>)}
     </div>
   </div>);}
 
@@ -832,12 +851,12 @@ function BatchDropdown({count,onDownload,onCollection,onDiscard}){
 // ── Hub: Highlights Panel ──────────────────────────────────────────
 function HighlightsPanel({onNewHighlight,highlights,onEdit,onDelete}){
   var [deleteTarget,setDeleteTarget]=useState(null);
-  var cols=[{key:"cover",w:79,label:"COVER"},{key:"name",w:200,label:"HIGHLIGHT NAME"},{key:"status",w:84,label:"STATUS"},{key:"shots",w:116,label:"SHOTS"},{key:"published",w:136,label:"PUBLISHED"},{key:"duration",w:116,label:"DURATION"},{key:"actions",w:112,label:"ACTIONS"}];
+  var cols=[{key:"cover",w:79,label:"COVER"},{key:"name",w:200,label:"HIGHLIGHT NAME"},{key:"status",w:84,label:"STATUS"},{key:"shots",w:116,label:"VIDEOS"},{key:"published",w:136,label:"PUBLISHED"},{key:"duration",w:116,label:"DURATION"},{key:"actions",w:112,label:"ACTIONS"}];
   return(<div style={{background:C.bgSecondary,borderRadius:24,padding:24,display:"flex",flexDirection:"column",gap:24}}>
     {deleteTarget&&(<div style={{position:"fixed",inset:0,zIndex:400,background:"rgba(22,20,49,0.8)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:420,textAlign:"center"}}><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><ITrash color={C.bgPage} size={26}/></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:28,color:C.textPrimary,margin:0}}>Are you sure?</p><p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>You will lose <strong style={{color:C.textPrimary}}>"{deleteTarget.name}"</strong> permanently.</p></div></div><div style={{display:"flex",gap:12}}><button onClick={function(){setDeleteTarget(null);}} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Go back</button><button onClick={function(){onDelete(deleteTarget.id);setDeleteTarget(null);}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Delete</button></div></div></div>)}
     <div style={{display:"flex",justifyContent:"flex-end"}}><button onClick={onNewHighlight} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}><IPlus color={C.bgPage} size={24}/><span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage}}>New highlight</span></button></div>
     {highlights.length===0
-      ?<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"64px 0",gap:16}}><div style={{width:64,height:64,borderRadius:"50%",background:C.bgTertiary,display:"flex",alignItems:"center",justifyContent:"center"}}><IStar color={C.textMuted} size={28}/></div><div style={{textAlign:"center",display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary,margin:0}}>No highlights yet</p><p style={{fontFamily:sans,fontSize:15,color:C.textSecondary,margin:0}}>Select shots and click "New highlight".</p></div><button onClick={onNewHighlight} style={{background:"none",border:"1px solid "+C.action,borderRadius:999,padding:"10px 24px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.action,cursor:"pointer"}}>Create your first highlight</button></div>
+      ?<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"64px 0",gap:16}}><div style={{width:64,height:64,borderRadius:"50%",background:C.bgTertiary,display:"flex",alignItems:"center",justifyContent:"center"}}><IStar color={C.textMuted} size={28}/></div><div style={{textAlign:"center",display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:18,color:C.textPrimary,margin:0}}>No highlights yet</p><p style={{fontFamily:sans,fontSize:15,color:C.textSecondary,margin:0}}>Select videos and click "New highlight".</p></div><button onClick={onNewHighlight} style={{background:"none",border:"1px solid "+C.action,borderRadius:999,padding:"10px 24px",fontFamily:sans,fontWeight:600,fontSize:16,color:C.action,cursor:"pointer"}}>Create your first highlight</button></div>
       :<><div style={{display:"flex",flexDirection:"column",gap:2}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingBottom:8}}>{cols.map(function(col){return <div key={col.key} style={{width:col.w,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,lineHeight:"20px",color:C.textSecondary,whiteSpace:"nowrap"}}>{col.label}</span></div>;})}</div>{highlights.map(function(row){return(<div key={row.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8}}><div style={{width:79,flexShrink:0,padding:4}}><div style={{width:37,height:71,borderRadius:4,overflow:"hidden",background:C.bgTertiary}}><img src={row.img} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/></div></div><div style={{width:200,flexShrink:0,padding:4}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary,whiteSpace:"nowrap"}}>{row.name}</span></div><div style={{width:84,flexShrink:0,padding:10}}><HubStatusTag status={row.status}/></div><div style={{width:116,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.shots}</span></div><div style={{width:136,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.published||"–"}</span></div><div style={{width:116,flexShrink:0,padding:10}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{row.duration}</span></div><div style={{width:112,flexShrink:0,display:"flex",alignItems:"center",gap:8}}><IconBtn onClick={function(){onEdit(row);}}><IEdit color={C.textPrimary} size={16}/></IconBtn><IconBtn onClick={function(){setDeleteTarget(row);}}><ITrash color={C.textPrimary} size={16}/></IconBtn></div></div>);})}</div><div style={{display:"flex",alignItems:"center",gap:12,padding:"0 11px"}}><IChevLeft/><div style={{width:32,height:32,borderRadius:256,background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>1</span></div><IChevRight/></div></>}
   </div>);}
 
@@ -944,7 +963,7 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
   return(<div style={{display:"flex",alignItems:"stretch",height:"100vh",background:C.bgPage}}>
     <Sidebar activeScreen="events" onNav={function(k){if(k==="events")handleBack();else onNav&&onNav(k);}}/>
     <div style={{flex:1,display:"flex",flexDirection:"column",gap:10,padding:"24px 16px",overflowY:"auto",boxSizing:"border-box",minHeight:"100%"}}>
-      {confirmDiscard&&(<div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(22,20,49,0.8)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:400,textAlign:"center"}}><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Discard progress?</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>You will lose your shot selection.</p></div></div><div style={{display:"flex",gap:16}}><button onClick={function(){setConfirmDiscard(false);}} style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Keep editing</button><button onClick={function(){setConfirmDiscard(false);onCancel();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Discard</button></div></div></div>)}
+      {confirmDiscard&&(<div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(22,20,49,0.8)",backdropFilter:"blur(4px)",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{background:C.bgSecondary,borderRadius:24,padding:32,display:"flex",flexDirection:"column",gap:32,width:400,textAlign:"center"}}><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style={{display:"flex",flexDirection:"column",gap:4}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Discard progress?</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>You will lose your video selection.</p></div></div><div style={{display:"flex",gap:16}}><button onClick={function(){setConfirmDiscard(false);}} style={{flex:1,border:"1px solid "+C.action,background:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.action,cursor:"pointer"}}>Keep editing</button><button onClick={function(){setConfirmDiscard(false);onCancel();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Discard</button></div></div></div>)}
       <div style={{background:C.bgSecondary,borderRadius:12,padding:"16px 24px",display:"flex",alignItems:"center",gap:16}}>
         <button onClick={handleBack} style={{background:C.bgTertiary,border:"none",borderRadius:"50%",width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}><IArrowLeft color={C.textPrimary} size={20}/></button>
         <p style={{flex:1,fontFamily:sans,fontWeight:600,fontSize:20,color:C.textPrimary,margin:0}}>{isEdit?"Edit highlight":"New highlight"}</p>
@@ -955,7 +974,7 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
           <div style={{display:"flex",flexDirection:"column",gap:6}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Filter by date</span><RangeSlider lo={rangeLo} hi={rangeHi} onChange={handleRange} containerW="380px"/></div>
           <div style={{display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}><Toggle active={showMeta} onToggle={function(){setShowMeta(function(v){return !v;});}} label="Show metadata"/><Toggle active={showFavsOnly} onToggle={function(){setShowFavsOnly(function(v){return !v;});}} label="Favorites only"/><CheckboxField checked={checkState} onClick={handleSelectAll} label={"Select all ("+visible.length+")"}/></div>
         </div>
-        {isEdit?<div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:C.bgTertiary,borderRadius:10,flexWrap:"wrap"}}><div style={{display:"flex",alignItems:"center",gap:8}}><div style={{background:C.action,borderRadius:999,minWidth:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 8px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.bgPage}}>{selectedIds.size}</span></div><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>shots in this highlight</span></div>{[...originalIds].some(function(id){return !selectedIds.has(id);})&&<span style={{fontFamily:sans,fontSize:13,color:C.action,marginLeft:8}}>{"−"+[...originalIds].filter(function(id){return !selectedIds.has(id);}).length+" removed"}</span>}{[...selectedIds].some(function(id){return !originalIds.has(id);})&&<span style={{fontFamily:sans,fontSize:13,color:"#5bc98a",marginLeft:8}}>{"+"+[...selectedIds].filter(function(id){return !originalIds.has(id);}).length+" added"}</span>}</div>:selectedIds.size>0&&<div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:C.bgTertiary,borderRadius:10}}><div style={{background:C.action,borderRadius:999,minWidth:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 8px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.bgPage}}>{selectedIds.size}</span></div><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{selectedIds.size===1?"shot selected":"shots selected"}</span></div>}
+        {isEdit?<div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:C.bgTertiary,borderRadius:10,flexWrap:"wrap"}}><div style={{display:"flex",alignItems:"center",gap:8}}><div style={{background:C.action,borderRadius:999,minWidth:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 8px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.bgPage}}>{selectedIds.size}</span></div><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>videos in this highlight</span></div>{[...originalIds].some(function(id){return !selectedIds.has(id);})&&<span style={{fontFamily:sans,fontSize:13,color:C.action,marginLeft:8}}>{"−"+[...originalIds].filter(function(id){return !selectedIds.has(id);}).length+" removed"}</span>}{[...selectedIds].some(function(id){return !originalIds.has(id);})&&<span style={{fontFamily:sans,fontSize:13,color:"#5bc98a",marginLeft:8}}>{"+"+[...selectedIds].filter(function(id){return !originalIds.has(id);}).length+" added"}</span>}</div>:selectedIds.size>0&&<div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:C.bgTertiary,borderRadius:10}}><div style={{background:C.action,borderRadius:999,minWidth:24,height:24,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 8px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.bgPage}}>{selectedIds.size}</span></div><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{selectedIds.size===1?"shot selected":"videos selected"}</span></div>}
         {visible.length>0?<div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>{visible.map(function(shot){var isOriginal=originalIds.has(shot.id);var isSelected=selectedIds.has(shot.id);return(<div key={shot.id} style={{position:"relative"}}><ShotCard shot={shot} selected={isSelected} onToggle={function(){toggleShot(shot.id);}} onPreview={function(){setPreviewShot(shot);}} fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}} showMeta={showMeta} discarded={false} highlightMode={true}/>{isEdit&&isOriginal&&!isSelected&&<div style={{position:"absolute",bottom:showMeta?48:8,left:8,background:"rgba(22,20,49,0.75)",borderRadius:4,padding:"2px 6px",pointerEvents:"none"}}><span style={{fontFamily:mono,fontSize:10,color:C.textMuted}}>removed</span></div>}{isEdit&&isOriginal&&isSelected&&<div style={{position:"absolute",bottom:showMeta?48:8,left:8,background:"rgba(22,20,49,0.75)",borderRadius:4,padding:"2px 6px",pointerEvents:"none"}}><span style={{fontFamily:mono,fontSize:10,color:C.textSecondary}}>in highlight</span></div>}{isEdit&&!isOriginal&&isSelected&&<div style={{position:"absolute",bottom:showMeta?48:8,left:8,background:"rgba(91,201,138,0.15)",borderRadius:4,padding:"2px 6px",pointerEvents:"none"}}><span style={{fontFamily:mono,fontSize:10,color:"#5bc98a"}}>new</span></div>}</div>);})}</div>:<div style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>No shots in this time range.</div>}
       </div>
     </div>
@@ -967,8 +986,8 @@ function NewHighlightPage({onCancel,onPublish,favIds,onToggleFav,editHighlight})
 var PUBLIC_PAGES_SEED=[{id:0,title:"Neon Nights Festival",published:true,created:"10.03.26 08:00h",cover:"https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=200&h=120&fit=crop&q=80",description:"",showUpload:false}];
 function PublishedSwitch({published,onChange}){return(<div onClick={function(){onChange(!published);}} style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}}><div style={{width:26.7,height:16,borderRadius:999,background:published?C.action:C.bgTertiary,padding:2.7,boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:published?"flex-end":"flex-start",transition:"background 0.2s",flexShrink:0}}><div style={{width:10.7,height:10.7,borderRadius:"50%",background:C.textPrimary}}/></div><span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>Published</span></div>);}
 function CoverField({cover,onChange}){var fileRef=useRef(null);var [hov,setHov]=useState(false);function handleFile(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){onChange(ev.target.result);};r.readAsDataURL(f);}return(<div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Cover image</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>jpg or png only. Max 15MB.</span><div onClick={function(){fileRef.current&&fileRef.current.click();}} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{position:"relative",width:"100%",height:256,borderRadius:16,overflow:"hidden",background:C.bgTertiary,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:8,border:"2px dashed "+(cover?"transparent":hov?C.textPrimary:C.border),transition:"border-color 0.15s"}}>{cover?<><img src={cover} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}/><div style={{position:"absolute",top:12,right:12,width:40,height:40,borderRadius:"50%",border:"1px solid "+C.textPrimary,background:"rgba(22,20,49,0.5)",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(4px)"}}><IEdit color={C.textPrimary} size={18}/></div></>:<><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={hov?C.textPrimary:C.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{transition:"stroke 0.15s"}}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style={{fontFamily:sans,fontSize:14,color:hov?C.textPrimary:C.textMuted,transition:"color 0.15s"}}>Click to upload a cover image</span></>}</div><input ref={fileRef} type="file" accept="image/jpeg,image/png" onChange={handleFile} style={{display:"none"}}/></div>);}
-function EditPageModal({page,onClose,onSave,modalTitle}){var [visible,setVisible]=useState(false);var [title,setTitle]=useState(page.title);var [titleFocused,setTitleFocused]=useState(false);var [desc,setDesc]=useState(page.description||"");var [descFocused,setDescFocused]=useState(false);var [cover,setCover]=useState(page.cover||null);var [published,setPublished]=useState(page.published);var [showUpload,setShowUpload]=useState(page.showUpload||false);var [saved,setSaved]=useState(false);useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);function handleClose(){setVisible(false);setTimeout(onClose,220);}function handleSave(){onSave(Object.assign({},page,{title:title.trim()||page.title,description:desc,cover:cover,published:published,showUpload:showUpload}));setSaved(true);}if(saved){return(<div style={{position:"fixed",inset:0,zIndex:600,background:"rgba(22,20,49,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}><div style={{background:C.bgSecondary,borderRadius:24,padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,width:420,textAlign:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Changes saved!</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>Your public event page has been updated.</p></div><button onClick={handleClose} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Done</button></div></div>);}return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:600,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}><div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(560px,100%)",maxHeight:"92vh",display:"flex",flexDirection:"column",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}><div style={{flex:1,overflowY:"auto",padding:32,display:"flex",flexDirection:"column",gap:16,position:"relative"}}><button onClick={handleClose} style={{position:"absolute",top:20,right:20,background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,display:"flex",zIndex:2}}><IX size={20}/></button><div style={{display:"flex",flexDirection:"column",gap:4,paddingRight:32}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>{modalTitle||"Public page settings"}</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>These changes will affect only this public event page.</p></div><div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Public event page title</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>150 characters maximum</span><input value={title} onChange={function(e){setTitle(e.target.value);}} onFocus={function(){setTitleFocused(true);}} onBlur={function(){setTitleFocused(false);}} maxLength={150} style={{border:"2px solid "+(titleFocused?C.textPrimary:C.border),borderRadius:16,padding:"10px 24px",fontFamily:sans,fontSize:16,background:"transparent",outline:"none",width:"100%",color:C.textSecondary,transition:"border-color 0.15s"}}/></div><div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Description</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>300 characters maximum</span><textarea value={desc} onChange={function(e){setDesc(e.target.value);}} onFocus={function(){setDescFocused(true);}} onBlur={function(){setDescFocused(false);}} placeholder="Describe your event" maxLength={300} style={{border:"2px solid "+(descFocused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:"transparent",outline:"none",width:"100%",color:C.textSecondary,resize:"none",height:192,minHeight:128,transition:"border-color 0.15s"}}/></div><CoverField cover={cover} onChange={setCover}/><PublishedSwitch published={published} onChange={setPublished}/><div style={{width:"25%",flexShrink:0,position:"relative"}}><DateTimePicker label="Video upload window" hint="When the page accepts video submissions"/></div><button onClick={handleSave} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",marginTop:8}}>Save changes</button></div></div></div>);}
-function DeletePageModal({page,onClose,onConfirm}){var [visible,setVisible]=useState(false);useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);function handleClose(){setVisible(false);setTimeout(onClose,220);}return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:700,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}><div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(440px,100%)",display:"flex",flexDirection:"column",gap:32,padding:32,textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><ITrash color={C.bgPage} size={26}/></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Remove public page?</p><p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>The page <strong style={{color:C.textPrimary}}>"{page.title}"</strong> will be permanently deleted.</p></div></div><div style={{display:"flex",gap:12}}><button onClick={handleClose} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Go back</button><button onClick={function(){onConfirm(page.id);handleClose();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Delete</button></div></div></div>);}
+function EditPageModal({page,onClose,onSave,modalTitle}){var [visible,setVisible]=useState(false);var [title,setTitle]=useState(page.title);var [titleFocused,setTitleFocused]=useState(false);var [desc,setDesc]=useState(page.description||"");var [descFocused,setDescFocused]=useState(false);var [cover,setCover]=useState(page.cover||null);var [published,setPublished]=useState(page.published);var [showUpload,setShowUpload]=useState(page.showUpload||false);var [saved,setSaved]=useState(false);useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);function handleClose(){setVisible(false);setTimeout(onClose,220);}function handleSave(){onSave(Object.assign({},page,{title:title.trim()||page.title,description:desc,cover:cover,published:published,showUpload:showUpload}));setSaved(true);}if(saved){return(<div style={{position:"fixed",inset:0,zIndex:600,background:"rgba(22,20,49,0.88)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeUp .4s cubic-bezier(.34,1.1,.64,1) both"}}><div style={{background:C.bgSecondary,borderRadius:24,padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:24,width:420,textAlign:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.bgPage} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>Changes saved!</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>Your landing page has been updated.</p></div><button onClick={handleClose} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer"}}>Done</button></div></div>);}return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:600,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}><div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(560px,100%)",maxHeight:"92vh",display:"flex",flexDirection:"column",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",overflow:"hidden",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}><div style={{flex:1,overflowY:"auto",padding:32,display:"flex",flexDirection:"column",gap:16,position:"relative"}}><button onClick={handleClose} style={{position:"absolute",top:20,right:20,background:"none",border:"none",cursor:"pointer",color:C.textSecondary,padding:4,display:"flex",zIndex:2}}><IX size={20}/></button><div style={{display:"flex",flexDirection:"column",gap:4,paddingRight:32}}><p style={{fontFamily:sans,fontWeight:600,fontSize:32,lineHeight:"40px",color:C.textPrimary,margin:0}}>{modalTitle||"Public page settings"}</p><p style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary,margin:0}}>These changes will affect only this landing page.</p></div><div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Landing page title</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>150 characters maximum</span><input value={title} onChange={function(e){setTitle(e.target.value);}} onFocus={function(){setTitleFocused(true);}} onBlur={function(){setTitleFocused(false);}} maxLength={150} style={{border:"2px solid "+(titleFocused?C.textPrimary:C.border),borderRadius:16,padding:"10px 24px",fontFamily:sans,fontSize:16,background:"transparent",outline:"none",width:"100%",color:C.textSecondary,transition:"border-color 0.15s"}}/></div><div style={{display:"flex",flexDirection:"column",gap:4}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textPrimary}}>Description</span><span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>300 characters maximum</span><textarea value={desc} onChange={function(e){setDesc(e.target.value);}} onFocus={function(){setDescFocused(true);}} onBlur={function(){setDescFocused(false);}} placeholder="Describe your event" maxLength={300} style={{border:"2px solid "+(descFocused?C.textPrimary:C.border),borderRadius:16,padding:"12px 24px",fontFamily:sans,fontSize:16,lineHeight:"24px",background:"transparent",outline:"none",width:"100%",color:C.textSecondary,resize:"none",height:192,minHeight:128,transition:"border-color 0.15s"}}/></div><CoverField cover={cover} onChange={setCover}/><PublishedSwitch published={published} onChange={setPublished}/><div style={{width:"25%",flexShrink:0,position:"relative"}}><DateTimePicker label="Video upload window" hint="When the page accepts video submissions"/></div><button onClick={handleSave} style={{width:"100%",background:C.action,border:"none",borderRadius:999,padding:"16px 24px",fontFamily:sans,fontWeight:600,fontSize:20,color:C.bgPage,cursor:"pointer",marginTop:8}}>Save changes</button></div></div></div>);}
+function DeletePageModal({page,onClose,onConfirm}){var [visible,setVisible]=useState(false);useEffect(function(){var t=setTimeout(function(){setVisible(true);},10);return function(){clearTimeout(t);};},[]);function handleClose(){setVisible(false);setTimeout(onClose,220);}return(<div onClick={handleClose} style={{position:"fixed",inset:0,zIndex:700,background:visible?"rgba(22,20,49,0.88)":"rgba(22,20,49,0)",backdropFilter:visible?"blur(8px)":"blur(0px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24,transition:"background 0.22s,backdrop-filter 0.22s"}}><div onClick={function(e){e.stopPropagation();}} style={{background:C.bgSecondary,borderRadius:24,width:"min(440px,100%)",display:"flex",flexDirection:"column",gap:32,padding:32,textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,0.55)",opacity:visible?1:0,transform:visible?"scale(1) translateY(0)":"scale(0.95) translateY(16px)",transition:"opacity 0.22s,transform 0.22s"}}><div style={{display:"flex",flexDirection:"column",gap:16,alignItems:"center"}}><div style={{background:C.action,borderRadius:"50%",width:64,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}><ITrash color={C.bgPage} size={26}/></div><div style={{display:"flex",flexDirection:"column",gap:8}}><p style={{fontFamily:sans,fontWeight:600,fontSize:24,color:C.textPrimary,margin:0}}>Remove landing page?</p><p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>The page <strong style={{color:C.textPrimary}}>"{page.title}"</strong> will be permanently deleted.</p></div></div><div style={{display:"flex",gap:12}}><button onClick={handleClose} style={{flex:1,border:"1px solid "+C.border,background:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.textSecondary,cursor:"pointer"}}>Go back</button><button onClick={function(){onConfirm(page.id);handleClose();}} style={{flex:1,background:C.action,border:"none",borderRadius:999,padding:"14px 20px",fontFamily:sans,fontWeight:600,fontSize:18,color:C.bgPage,cursor:"pointer"}}>Delete</button></div></div></div>);}
 function PublicPagesPanel({highlights}){var [pages,setPages]=useState(PUBLIC_PAGES_SEED);var [editTarget,setEditTarget]=useState(null);var [deleteTarget,setDeleteTarget]=useState(null);var [showCreate,setShowCreate]=useState(false);var NEW_PAGE_TEMPLATE={id:null,title:"",description:"",cover:null,published:false,showUpload:false,created:""};function handleSave(updated){setPages(function(prev){return prev.map(function(p){return p.id===updated.id?updated:p;});});}function handleDelete(id){setPages(function(p){return p.filter(function(pp){return pp.id!==id;});});}function handleShare(page){var url="https://sureshot.app/p/neon-nights-2026";if(navigator.share){navigator.share({title:page.title,url:url}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(url);}}return(<div style={{display:"flex",flexDirection:"column",gap:2}}>{showCreate&&<EditPageModal page={NEW_PAGE_TEMPLATE} modalTitle="New public page" onClose={function(){setShowCreate(false);}} onSave={function(p){setPages(function(prev){return prev.concat(Object.assign({},p,{id:Date.now(),created:new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"2-digit"}).replace(/\//g,".")}));});setShowCreate(false);}}/>}{editTarget&&<EditPageModal page={editTarget} onClose={function(){setEditTarget(null);}} onSave={function(p){handleSave(p);setEditTarget(null);}}/>}{deleteTarget&&<DeletePageModal page={deleteTarget} onClose={function(){setDeleteTarget(null);}} onConfirm={function(id){handleDelete(id);setDeleteTarget(null);}}/>}<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingBottom:8,marginBottom:2}}><div style={{display:"flex",alignItems:"center",gap:40}}><div style={{width:79,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>COVER</span></div><div style={{width:320,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>PUBLIC PAGE TITLE</span></div><div style={{width:160,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>STATUS</span></div><div style={{width:128,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>CREATED</span></div></div><div style={{display:"flex",alignItems:"center",gap:12}}><div style={{width:112,padding:4,flexShrink:0}}><span style={{fontFamily:mono,fontWeight:700,fontSize:14,color:C.textSecondary}}>ACTIONS</span></div><button onClick={function(){setShowCreate(true);}} style={{background:C.action,border:"none",borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer",flexShrink:0}}><IPlus color={C.bgPage} size={20}/><span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.bgPage,whiteSpace:"nowrap"}}>Create new page</span></button></div></div>{pages.length===0?<div style={{textAlign:"center",padding:"48px 0",fontFamily:sans,fontSize:16,color:C.textSecondary}}>No public page.</div>:pages.map(function(page){return(<div key={page.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+C.border,paddingTop:8,paddingBottom:8}}><div style={{display:"flex",alignItems:"center",gap:40}}><div style={{width:79,padding:"0 4px",flexShrink:0}}><div style={{width:71,height:37,borderRadius:4,overflow:"hidden",background:C.bgTertiary}}>{page.cover?<img src={page.cover} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>}</div></div><div style={{width:320,padding:"0 10px",flexShrink:0}}><span style={{fontFamily:sans,fontWeight:600,fontSize:14,color:C.textPrimary,display:"block",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{page.title}</span></div><div style={{width:160,padding:"0 10px",flexShrink:0}}><PublishedSwitch published={page.published} onChange={function(v){handleSave(Object.assign({},page,{published:v}));}}/></div><div style={{width:128,padding:"0 10px",flexShrink:0}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{page.created}</span></div></div><div style={{width:112,display:"flex",alignItems:"center",gap:4,flexShrink:0}}><IconBtn onClick={function(){setEditTarget(page);}}><IEdit color={C.textPrimary} size={16}/></IconBtn><IconBtn onClick={function(){handleShare(page);}}><IShare color={C.textSecondary} size={16}/></IconBtn><IconBtn onClick={function(){setDeleteTarget(page);}}><IX color={C.action} size={16}/></IconBtn></div></div>);})}{pages.length>10&&<div style={{display:"flex",alignItems:"center",gap:12,paddingLeft:11,paddingTop:8}}><IChevLeft color={C.textSecondary}/><div style={{width:32,height:32,borderRadius:256,background:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>1</span></div><IChevRight color={C.textSecondary}/></div>}</div>);}
 
 // ── Hub: Settings Panel ────────────────────────────────────────────
@@ -982,137 +1001,205 @@ function SettingsPanel(){var [privateEvent,setPrivateEvent]=useState(false);var 
 
 // ── Hub: Event Overview Panel ──────────────────────────────────────
 var EVENT_STATS={
-  attendees:{total:4498,uploadRate:31,avgPerAttendee:2.3},
-  shots:{total:2838,avgDuration:"0:18",verticalPct:68,horizontalPct:32},
-  highlights:{totalViews:184200,totalShots:188,published:4},
+  attendees:{total:4900,uploaded:2860,uploadRate:58.4},
+  shots:{total:1024,totalFootage:"30:45",avgDuration:"0:18",verticalPct:55,horizontalPct:45},
+  highlights:{totalViews:102560,total:5,avgViews:9560},
 };
-var TOP_CONTRIBUTORS_OV=ATTENDEES.slice(0,5).map(function(a,i){return Object.assign({},a,{videos:[35,21,14,12,10][i]});});
-var TOP_PERFORMERS_OV=HIGHLIGHTS_SEED.map(function(h,i){return Object.assign({},h,{views:[12400,9800,7200,5100,3800][i]||3000});});
+var TOP_CONTRIBUTORS_OV=ATTENDEES.slice(0,3).map(function(a,i){return Object.assign({},a,{videos:[35,21,14][i]});});
+var TOP_PERFORMERS_OV=HIGHLIGHTS_SEED.slice(0,3).map(function(h,i){return Object.assign({},h,{views:[12350,12350,12350][i]});});
 
-function OvStatCard({value,label,orange}){
+// ── Overview: small helpers ────────────────────────────────────────
+function OvSeeAll({onClick}){
+  return <span onClick={onClick} style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.action,textDecoration:"underline",textUnderlineOffset:3,cursor:"pointer",whiteSpace:"nowrap"}}>See all</span>;
+}
+function OvFilledCard({value,label,wide}){
   return(
-    <div style={{flex:1,minWidth:0,background:C.bgPage,borderRadius:12,padding:"14px 18px",display:"flex",flexDirection:"column",gap:6}}>
-      <span style={{fontFamily:sans,fontWeight:600,fontSize:22,lineHeight:"28px",color:orange?C.action:C.textPrimary}}>{value}</span>
-      <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>{label}</span>
+    <div style={{flex:wide?"none":1,width:wide?"100%":undefined,minWidth:128,background:C.bgTertiary,borderRadius:16,padding:"16px 24px",display:"flex",flexDirection:wide?"row":"column",alignItems:"center",justifyContent:wide?"space-between":"center",gap:8}}>
+      <span style={{fontFamily:sans,fontWeight:800,fontSize:32,lineHeight:"40px",color:C.textPrimary}}>{value}</span>
+      <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:wide?C.textSecondary:C.textSecondary}}>{label}</span>
     </div>
   );
 }
-
-function OvSectionTitle({children,onSeeAll}){
+function OvOutlinedCard({value,label}){
   return(
-    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-      <span style={{fontFamily:sans,fontWeight:600,fontSize:18,lineHeight:"24px",color:C.textPrimary}}>{children}</span>
-      {onSeeAll&&<button onClick={onSeeAll} style={{background:"none",border:"1px solid "+C.border,borderRadius:999,padding:"4px 14px",fontFamily:sans,fontWeight:600,fontSize:14,color:C.textSecondary,cursor:"pointer",transition:"border-color 0.15s, color 0.15s"}} onMouseEnter={function(e){e.currentTarget.style.borderColor=C.textPrimary;e.currentTarget.style.color=C.textPrimary;}} onMouseLeave={function(e){e.currentTarget.style.borderColor=C.border;e.currentTarget.style.color=C.textSecondary;}}>See all</button>}
+    <div style={{flex:1,minWidth:128,border:"1px solid "+C.border,borderRadius:12,padding:"12px 24px",display:"flex",flexDirection:"column",gap:12}}>
+      <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{value}</span>
+      <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>{label}</span>
     </div>
   );
+}
+function OvDivider(){
+  return <div style={{height:1,background:C.border,width:"100%",flexShrink:0}}/>;
 }
 
 function EventOverviewPanel({onTabChange}){
   var s=EVENT_STATS;
   return(
-    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+    <div style={{display:"flex",flexDirection:"column",gap:0}}>
 
-      {/* ── Attendees ── */}
-      <div style={{background:C.bgTertiary,borderRadius:16,padding:"20px 24px",display:"flex",flexDirection:"column",gap:20}}>
-        <OvSectionTitle onSeeAll={function(){onTabChange("Attendees");}}>Attendees</OvSectionTitle>
-        <div style={{display:"flex",gap:12}}>
-          <OvStatCard value={s.attendees.total.toLocaleString()} label="Total attendees"/>
-          <OvStatCard value={s.attendees.uploadRate+"%"} label="Upload rate" orange/>
-          <OvStatCard value={s.attendees.avgPerAttendee} label="Avg. shots per attendee"/>
+      {/* ── VIDEOS ── */}
+      <div style={{padding:"28px 24px",display:"flex",flexDirection:"column",gap:24}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>Videos</span>
+          <OvSeeAll onClick={function(){onTabChange("Videos");}}/>
         </div>
-        {/* top contributors */}
-        <div style={{display:"flex",flexDirection:"column",gap:10}}>
-          <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textSecondary}}>Top contributors</span>
-          <div style={{display:"flex",gap:12}}>
-            {TOP_CONTRIBUTORS_OV.slice(0,3).map(function(u,i){return(
-              <div key={u.id} style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:10,background:C.bgPage,borderRadius:10,padding:"10px 14px"}}>
-                <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textMuted,flexShrink:0}}>{i+1}</span>
-                <img src={u.avatar} alt={u.name} style={{width:32,height:32,borderRadius:"50%",objectFit:"cover",flexShrink:0}}/>
-                <div style={{flex:1,minWidth:0}}>
-                  <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary,display:"block",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{u.name}</span>
-                  <span style={{fontFamily:mono,fontSize:12,color:C.textSecondary}}>{u.handle}</span>
+        <div style={{display:"flex",gap:24,alignItems:"stretch"}}>
+          {/* big filled card */}
+          <div style={{flex:1,minWidth:128,background:C.bgTertiary,borderRadius:16,padding:"16px 24px",display:"flex",flexDirection:"column",gap:8,alignItems:"center",justifyContent:"center"}}>
+            <span style={{fontFamily:sans,fontWeight:800,fontSize:32,lineHeight:"40px",color:C.textPrimary}}>{s.shots.total.toLocaleString()}</span>
+            <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Total videos</span>
+          </div>
+          {/* stacked outlined cards */}
+          <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:16}}>
+            <div style={{flex:1,border:"1px solid "+C.border,borderRadius:12,padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{s.shots.totalFootage}</span>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Total footage</span>
+            </div>
+            <div style={{flex:1,border:"1px solid "+C.border,borderRadius:12,padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{s.shots.avgDuration}</span>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Avg. duration</span>
+            </div>
+          </div>
+          {/* orientation split */}
+          <div style={{flex:1,minWidth:0,border:"1px solid "+C.border,borderRadius:12,padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <div style={{display:"flex",gap:28,width:"100%"}}>
+              <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,alignItems:"center"}}>
+                <div style={{width:48,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <svg width="30" height="52" viewBox="0 0 30 52" fill="none"><rect x="1" y="1" width="28" height="50" rx="3" stroke={C.textPrimary} strokeWidth="1.5"/></svg>
                 </div>
-                <span style={{fontFamily:sans,fontWeight:600,fontSize:14,color:C.action,flexShrink:0}}>{u.videos}</span>
+                <div style={{textAlign:"center",width:"100%"}}>
+                  <div style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{s.shots.verticalPct}%</div>
+                  <div style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>vertical</div>
+                </div>
               </div>
-            );})}
+              <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,alignItems:"center"}}>
+                <div style={{width:48,height:64,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <svg width="52" height="30" viewBox="0 0 52 30" fill="none"><rect x="1" y="1" width="50" height="28" rx="3" stroke={C.textPrimary} strokeWidth="1.5"/></svg>
+                </div>
+                <div style={{textAlign:"center",width:"100%"}}>
+                  <div style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{s.shots.horizontalPct}%</div>
+                  <div style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>horizontal</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── Shots + Highlights side by side ── */}
-      <div style={{display:"flex",gap:12,alignItems:"stretch"}}>
+      <OvDivider/>
 
-        {/* Shots */}
-        <div style={{flex:1,minWidth:0,background:C.bgTertiary,borderRadius:16,padding:"20px 24px",display:"flex",flexDirection:"column",gap:20}}>
-          <OvSectionTitle onSeeAll={function(){onTabChange("Shots");}}>Shots</OvSectionTitle>
-          <div style={{display:"flex",gap:12}}>
-            <OvStatCard value={s.shots.total.toLocaleString()} label="Total shots"/>
-            <OvStatCard value={s.shots.avgDuration} label="Avg. duration"/>
-          </div>
-          {/* orientation split */}
-          <div style={{display:"flex",flexDirection:"column",gap:8}}>
-            <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textSecondary}}>Orientation split</span>
-            <div style={{height:6,borderRadius:3,overflow:"hidden",background:C.bgPage,display:"flex"}}>
-              <div style={{width:s.shots.verticalPct+"%",background:C.action,transition:"width 0.4s"}}/>
-              <div style={{flex:1,background:C.bgSecondary}}/>
-            </div>
-            <div style={{display:"flex",justifyContent:"space-between"}}>
-              <div style={{display:"flex",alignItems:"center",gap:5}}>
-                <svg width="9" height="12" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.action} strokeWidth="1.5"/></svg>
-                <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{s.shots.verticalPct}% vertical</span>
-              </div>
-              <div style={{display:"flex",alignItems:"center",gap:5}}>
-                <svg width="12" height="9" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textMuted} strokeWidth="1.5"/></svg>
-                <span style={{fontFamily:sans,fontSize:14,color:C.textMuted}}>{s.shots.horizontalPct}% horizontal</span>
-              </div>
-            </div>
-          </div>
+      {/* ── ATTENDEES ── */}
+      <div style={{padding:"28px 24px",display:"flex",flexDirection:"column",gap:24}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>Attendees</span>
+          <OvSeeAll onClick={function(){onTabChange("Attendees");}}/>
         </div>
-
-        {/* Highlights */}
-        <div style={{flex:1,minWidth:0,background:C.bgTertiary,borderRadius:16,padding:"20px 24px",display:"flex",flexDirection:"column",gap:20}}>
-          <OvSectionTitle onSeeAll={function(){onTabChange("Highlights");}}>Highlights</OvSectionTitle>
-          <div style={{display:"flex",gap:12}}>
-            <OvStatCard value={s.highlights.totalViews.toLocaleString()} label="Total views" orange/>
-            <OvStatCard value={s.highlights.published} label="Published"/>
+        <div style={{display:"flex",gap:32,alignItems:"stretch"}}>
+          {/* left: total + two outlined — stretch to match contributors */}
+          <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:16}}>
+            <div style={{flex:1,background:C.bgTertiary,borderRadius:16,padding:"16px 24px",display:"flex",flexDirection:"column",gap:8,alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontFamily:sans,fontWeight:800,fontSize:32,lineHeight:"40px",color:C.textPrimary}}>{s.attendees.total.toLocaleString()}</span>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Total attendees</span>
+            </div>
+            <div style={{display:"flex",gap:16}}>
+              <div style={{flex:1,border:"1px solid "+C.border,borderRadius:12,padding:"12px 24px",display:"flex",flexDirection:"column",gap:12}}>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{s.attendees.uploaded.toLocaleString()}</span>
+                <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Uploaded videos</span>
+              </div>
+              <div style={{flex:1,border:"1px solid "+C.border,borderRadius:12,padding:"12px 24px",display:"flex",flexDirection:"column",gap:12}}>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{s.attendees.uploadRate}%</span>
+                <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Upload rate</span>
+              </div>
+            </div>
           </div>
-          {/* top performers */}
-          <div style={{display:"flex",flexDirection:"column",gap:10}}>
-            <span style={{fontFamily:mono,fontWeight:700,fontSize:12,color:C.textSecondary}}>Top performers</span>
-            <div style={{display:"flex",gap:8}}>
-              {TOP_PERFORMERS_OV.map(function(h){return(
-                <div key={h.id} style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:5}}>
-                  <div style={{position:"relative",borderRadius:8,overflow:"hidden",paddingBottom:"150%"}}>
-                    <img src={h.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
-                    <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"16px 6px 6px",background:"linear-gradient(transparent,rgba(22,20,49,0.9))"}}>
-                      <div style={{display:"flex",alignItems:"center",gap:3}}>
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={C.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        <span style={{fontFamily:mono,fontSize:11,color:C.textSecondary}}>{h.views.toLocaleString()}</span>
-                      </div>
+          {/* right: top contributors */}
+          <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:12}}>
+            <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"28px",color:C.textPrimary}}>Top contributors</span>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {TOP_CONTRIBUTORS_OV.map(function(u){return(
+                <div key={u.id} style={{border:"1px solid "+C.border,borderRadius:12,padding:12,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <img src={u.avatar} alt={u.name} style={{width:48,height:48,borderRadius:"50%",objectFit:"cover",flexShrink:0}}/>
+                    <div style={{display:"flex",flexDirection:"column",gap:2}}>
+                      <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textPrimary}}>{u.name}</span>
+                      <span style={{fontFamily:mono,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>{u.handle}</span>
                     </div>
                   </div>
-                  <span style={{fontFamily:sans,fontSize:13,lineHeight:"17px",color:C.textPrimary,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{h.name}</span>
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:0}}>
+                    <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"28px",color:C.textPrimary}}>{u.videos}</span>
+                    <span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:C.textSecondary}}>Videos</span>
+                  </div>
                 </div>
               );})}
             </div>
           </div>
         </div>
-
       </div>
+
+      <OvDivider/>
+
+      {/* ── HIGHLIGHTS ── */}
+      <div style={{padding:"28px 24px",display:"flex",flexDirection:"column",gap:24}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>Highlights</span>
+          <OvSeeAll onClick={function(){onTabChange("Highlights");}}/>
+        </div>
+        <div style={{display:"flex",gap:32,alignItems:"stretch"}}>
+          {/* left: stats — flex:1 */}
+          <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:16}}>
+            {/* wide filled card */}
+            <div style={{background:C.bgTertiary,borderRadius:16,padding:"24px",display:"flex",alignItems:"center",justifyContent:"space-between",flex:1}}>
+              <span style={{fontFamily:sans,fontWeight:800,fontSize:36,lineHeight:"44px",color:C.textPrimary}}>{s.highlights.totalViews.toLocaleString()}</span>
+              <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Total views</span>
+            </div>
+            {/* two outlined cards side by side */}
+            <div style={{display:"flex",gap:16}}>
+              <div style={{flex:1,border:"1px solid "+C.border,borderRadius:12,padding:"16px 24px",display:"flex",flexDirection:"column",gap:8}}>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{s.highlights.total}</span>
+                <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Total highlights</span>
+              </div>
+              <div style={{flex:1,border:"1px solid "+C.border,borderRadius:12,padding:"16px 24px",display:"flex",flexDirection:"column",gap:8}}>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"24px",color:C.textPrimary}}>{s.highlights.avgViews.toLocaleString()}</span>
+                <span style={{fontFamily:sans,fontSize:16,lineHeight:"24px",color:C.textSecondary}}>Av. views</span>
+              </div>
+            </div>
+          </div>
+          {/* right: top performers — 77×134 portrait covers */}
+          <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:12}}>
+            <span style={{fontFamily:sans,fontWeight:600,fontSize:20,lineHeight:"28px",color:C.textPrimary}}>Top performers</span>
+            <div style={{display:"flex",gap:16,alignItems:"flex-start"}}>
+              {TOP_PERFORMERS_OV.map(function(h){return(
+                <div key={h.id} style={{display:"flex",flexDirection:"column",gap:8,flexShrink:0}}>
+                  <div style={{position:"relative",width:77,height:134,borderRadius:8,overflow:"hidden",background:C.bgTertiary,flexShrink:0}}>
+                    <img src={h.img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+                    <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.65) 100%)"}}/>
+                    <div style={{position:"absolute",bottom:6,left:6,display:"flex",alignItems:"center",gap:4}}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textPrimary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>{h.views.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <span style={{fontFamily:sans,fontSize:12,lineHeight:"16px",color:C.textPrimary,width:77,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{h.name}</span>
+                </div>
+              );})}
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }
 
 // ── Hub: Shots Panel ───────────────────────────────────────────────
 function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onToggleFav,showMeta,onToggleMeta,showFavsOnly,onToggleFavsOnly,rangeLo,rangeHi,onRange,onDownload,onCollection,onPreview,discardedIds,onDiscard,onRecover,onBatchDiscard,activeTab,onTabChange,onNewHighlight,highlights,onEditHighlight,onDeleteHighlight}){
-  var [innerTab,setInnerTab]=useState("shots");
+  var [innerTab,setInnerTab]=useState("videos");
   var count=selectedIds.size;
   var loMs=TL_START+rangeLo*TL_SPAN,hiMs=TL_START+rangeHi*TL_SPAN;
   var gridRef=useRef(null);
-  var tabs=["Overview","Shots","Attendees","Highlights","Public pages","Settings"];
+  var tabs=["Overview","Videos","Attendees","Highlights","Landing page","Settings"];
   var activeShots=SHOTS.filter(function(s){return !discardedIds.has(s.id);}).filter(function(s){return s.ts>=loMs&&s.ts<=hiMs;}).filter(function(s){return !showFavsOnly||favIds.has(s.id);});
   var discardedShots=SHOTS.filter(function(s){return discardedIds.has(s.id);});
-  var visible=innerTab==="shots"?activeShots:discardedShots;
+  var visible=innerTab==="videos"?activeShots:discardedShots;
   var allSel=visible.length>0&&visible.every(function(s){return selectedIds.has(s.id);});
   var someSel=!allSel&&visible.some(function(s){return selectedIds.has(s.id);});
   var checkState=allSel?true:someSel?"indeterminate":false;
@@ -1123,7 +1210,7 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
     :activeTab==="Highlights"?<HighlightsPanel onNewHighlight={onNewHighlight} highlights={highlights} onEdit={onEditHighlight} onDelete={onDeleteHighlight}/>
     :activeTab==="Settings"?<SettingsPanel/>
     :activeTab==="Attendees"?<AttendeesPanel/>
-    :activeTab==="Public pages"?<PublicPagesPanel highlights={highlights}/>
+    :activeTab==="Landing page"?<PublicPagesPanel highlights={highlights}/>
     :<>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,padding:"12px 0"}}>
         <div style={{display:"flex",flexDirection:"column",gap:6}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Filter by date</span><RangeSlider lo={rangeLo} hi={rangeHi} onChange={onRange} gridRef={gridRef}/></div>
@@ -1133,10 +1220,10 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
         <Toggle active={showMeta} onToggle={onToggleMeta} label="Show shot metadata"/>
         <Toggle active={showFavsOnly} onToggle={onToggleFavsOnly} label="Favorites only"/>
         <CheckboxField checked={checkState} onClick={handleCheckbox} label={"Select all ("+visible.length+")"}/>
-        <div onClick={function(){setInnerTab(function(t){return t==="shots"?"discarded":"shots";});}} style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"4px 12px",borderRadius:8,background:innerTab==="discarded"?C.bgTertiary:"transparent",transition:"background 0.15s",userSelect:"none",marginLeft:"auto"}}><ITrash color={innerTab==="discarded"?C.textPrimary:C.textMuted} size={14}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:innerTab==="discarded"?C.textPrimary:C.textMuted,whiteSpace:"nowrap"}}>Discarded shots</span>{discardedShots.length>0&&(<div style={{background:C.action,borderRadius:999,minWidth:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 5px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:10,color:C.bgPage}}>{discardedShots.length}</span></div>)}</div>
+        <div onClick={function(){setInnerTab(function(t){return t==="videos"?"discarded":"videos";});}} style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"4px 12px",borderRadius:8,background:innerTab==="discarded"?C.bgTertiary:"transparent",transition:"background 0.15s",userSelect:"none",marginLeft:"auto"}}><ITrash color={innerTab==="discarded"?C.textPrimary:C.textMuted} size={14}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:innerTab==="discarded"?C.textPrimary:C.textMuted,whiteSpace:"nowrap"}}>Discarded videos</span>{discardedShots.length>0&&(<div style={{background:C.action,borderRadius:999,minWidth:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 5px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:10,color:C.bgPage}}>{discardedShots.length}</span></div>)}</div>
       </div>
-      {innerTab==="discarded"&&(<div style={{display:"flex",flexDirection:"column",gap:4,padding:"12px 16px",background:C.bgTertiary,borderRadius:12}}><span style={{fontFamily:sans,fontWeight:600,fontSize:15,color:C.textPrimary}}>Discarded shots</span><span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>These shots have been removed from the event view. They'll be kept here for 30 days, then permanently deleted.</span></div>)}
-      {visible.length>0?<div ref={gridRef} style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>{visible.map(function(shot){return(<ShotCard key={shot.id} shot={shot} selected={selectedIds.has(shot.id)} onToggle={function(){onToggle(shot.id);}} onPreview={function(){onPreview(shot);}} fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}} showMeta={showMeta} discarded={discardedIds.has(shot.id)} onDiscard={function(){onDiscard(shot.id);}} onRecover={function(){onRecover(shot.id);}}/>);})}</div>:<div ref={gridRef} style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>{innerTab==="discarded"?"No discarded shots.":"No shots in this time range."}</div>}
+      {innerTab==="discarded"&&(<div style={{display:"flex",flexDirection:"column",gap:4,padding:"12px 16px",background:C.bgTertiary,borderRadius:12}}><span style={{fontFamily:sans,fontWeight:600,fontSize:15,color:C.textPrimary}}>Discarded videos</span><span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>These videos have been removed from the event view. They'll be kept here for 30 days, then permanently deleted.</span></div>)}
+      {visible.length>0?<div ref={gridRef} style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>{visible.map(function(shot){return(<ShotCard key={shot.id} shot={shot} selected={selectedIds.has(shot.id)} onToggle={function(){onToggle(shot.id);}} onPreview={function(){onPreview(shot);}} fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}} showMeta={showMeta} discarded={discardedIds.has(shot.id)} onDiscard={function(){onDiscard(shot.id);}} onRecover={function(){onRecover(shot.id);}}/>);})}</div>:<div ref={gridRef} style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>{innerTab==="discarded"?"No discarded videos.":"No videos in this time range."}</div>}
     </>}
   </div>);}
 
@@ -1175,7 +1262,7 @@ function HubPage({event,onGoToEvents,onNav,defaultTab}){
     </div>
     {previewShot&&<PreviewModal shot={previewShot} onClose={function(){setPreviewShot(null);}} onDiscard={discardShot}/>}
     {showDlModal&&<DownloadModal selectedIds={selectedIds} onConfirm={function(){setShowDlModal(false);}} onCancel={function(){setShowDlModal(false);}}/>}
-    {showArrangeModal&&<ArrangeModal selectedIds={arrangeIds} isEdit={false} editName="" editFeatured={false} source="shots" onBack={function(){setShowArrangeModal(false);}} onPublish={function(){setShowArrangeModal(false);setActiveTab("Highlights");}}/>}
+    {showArrangeModal&&<ArrangeModal selectedIds={arrangeIds} isEdit={false} editName="" editFeatured={false} source="videos" onBack={function(){setShowArrangeModal(false);}} onPublish={function(){setShowArrangeModal(false);setActiveTab("Highlights");}}/>}
   </div>);}
 
 // ── Account Page ───────────────────────────────────────────────────
@@ -1724,15 +1811,15 @@ function CreateEventPage({onNav,onCreated}){
             <div onClick={function(){setPublicPage(function(v){return !v;});}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 20px",cursor:"pointer",background:publicPage?"rgba(241,102,92,0.07)":"transparent",transition:"background 0.2s",userSelect:"none"}}>
               <div style={{display:"flex",alignItems:"center",gap:12}}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={publicPage?C.action:C.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:publicPage?C.textPrimary:C.textSecondary,transition:"color 0.2s"}}>Create a public page</span>
+                <span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:publicPage?C.textPrimary:C.textSecondary,transition:"color 0.2s"}}>Create a landing page</span>
               </div>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.textSecondary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{transition:"transform 0.2s",transform:publicPage?"rotate(180deg)":"rotate(0deg)"}}><polyline points="6 9 12 15 18 9"/></svg>
             </div>
             {publicPage&&<div style={{padding:"0 20px 20px",display:"flex",flexDirection:"column",gap:20}}>
               <div style={{height:1,background:C.border}}/>
-              <p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>A public page lets anyone submit footage without downloading the app. Share the link and anyone with it can upload videos during the window you set. You can edit or remove it at any time.</p>
+              <p style={{fontFamily:sans,fontSize:15,lineHeight:"22px",color:C.textSecondary,margin:0}}>A landing page lets anyone submit footage without downloading the app. Share the link and anyone with it can upload videos during the window you set. You can edit or remove it at any time.</p>
               <div style={{width:"25%",flexShrink:0,position:"relative"}}>
-                <DateTimePicker label="Video upload window" hint="When the public page accepts submissions"/>
+                <DateTimePicker label="Video upload window" hint="When the landing page accepts submissions"/>
               </div>
             </div>}
           </div>
@@ -1740,8 +1827,8 @@ function CreateEventPage({onNav,onCreated}){
           {/* toggles */}
           <div style={{display:"flex",flexDirection:"column",gap:16}}>
             {[
-              {active:privateEvt,  set:setPrivateEvt,  label:"Private event",           desc:"Only people you invite can join. Shots are not visible outside the event."},
-              {active:instantShare,set:setInstantShare,label:"Instant content sharing",  desc:"Shots are shared with attendees as soon as they're uploaded."},
+              {active:privateEvt,  set:setPrivateEvt,  label:"Private event",           desc:"Only people you invite can join. Videos are not visible outside the event."},
+              {active:instantShare,set:setInstantShare,label:"Instant content sharing",  desc:"Videos are shared with attendees as soon as they're uploaded."},
             ].map(function(sw){return(
               <div key={sw.label} style={{display:"flex",flexDirection:"column",gap:4}}>
                 <Toggle active={sw.active} onToggle={function(){sw.set(function(v){return !v;});}} label={sw.label}/>
