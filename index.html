@@ -155,7 +155,7 @@ function Toggle({active,onToggle,label}){return(<div onClick={onToggle} style={{
 function Checkbox({checked,onClick}){var isChecked=checked===true,isIndet=checked==="indeterminate";return(<div onClick={onClick} style={{width:16,height:16,borderRadius:4,flexShrink:0,border:"1px solid "+(isChecked||isIndet?C.action:C.border),background:isChecked||isIndet?C.action:C.textPrimary,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"background 0.15s"}}>{isChecked&&<ICheck/>}{isIndet&&<div style={{width:8,height:2,background:C.bgPage,borderRadius:1}}/>}</div>);}
 function CheckboxField({checked,onClick,label}){return(<div onClick={onClick} style={{display:"flex",alignItems:"center",gap:12,minWidth:120,cursor:"pointer",userSelect:"none"}}><Checkbox checked={checked}/><span style={{fontFamily:sans,fontWeight:400,fontSize:14,lineHeight:"20px",color:C.textPrimary}}>{label}</span></div>);}
 function CardChip({onClick,children}){return <div onClick={onClick} style={{background:C.bgPage,borderRadius:"50%",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>{children}</div>;}
-function ModalChip({onClick,tip,children}){var [hov,setHov]=useState(false);return <div onClick={onClick} title={tip} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{width:36,height:36,borderRadius:"50%",background:C.action,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,opacity:hov?0.8:1,transition:"opacity 0.15s"}}>{children}</div>;}
+function ModalChip({onClick,tip,children}){var [hov,setHov]=useState(false);return <div onClick={onClick} title={tip} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{width:32,height:32,borderRadius:"50%",background:hov?"rgba(187,188,214,0.15)":C.bgPage,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,transition:"background 0.15s"}}>{children}</div>;}
 function IconBtn({onClick,title,children}){var [hov,setHov]=useState(false);return <div onClick={onClick} title={title} onMouseEnter={function(){setHov(true);}} onMouseLeave={function(){setHov(false);}} style={{padding:8,borderRadius:"50%",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:hov?C.bgTertiary:"transparent",transition:"background 0.15s"}}>{children}</div>;}
 
 // ── Status Tags (two variants — do not merge) ──────────────────────
@@ -693,26 +693,176 @@ function PreviewModal({shot,onClose,onDiscard}){
       <div style={{padding:"16px 20px 20px",display:"flex",flexDirection:"column",gap:12}}>
         <div style={{height:1,background:C.bgTertiary}}/>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,flexWrap:"wrap"}}>
-          <div style={{display:"flex",flexWrap:"wrap",gap:6}}><Tag icon={<ICalendar/>} label={shot.date}/><Tag icon={<IClock/>} label={shot.time}/><Tag icon={<ITimer/>} label={shot.dur}/><Tag icon={<IUser/>} label={shot.user}/><Tag icon={<IFile/>} label={shot.size}/></div>
-          {onDiscard&&<div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}><ModalChip tip="Save" onClick={function(){}}><IHeart color={C.textSecondary} size={15}/></ModalChip><ModalChip tip="Discard" onClick={function(){onDiscard(shot.id);handleClose();}}><ITrash color={C.textSecondary} size={15}/></ModalChip></div>}
+          <div style={{display:"flex",flexWrap:"wrap",gap:6}}><Tag icon={<ICalendar/>} label={shot.date}/><Tag icon={<IClock/>} label={shot.time}/><Tag icon={<ITimer/>} label={shot.dur}/><Tag icon={<IUser/>} label={shot.user}/></div>
+          {onDiscard&&<div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}><ModalChip tip="Save" onClick={function(){}}><IHeart color={C.action} size={15}/></ModalChip><ModalChip tip="Download" onClick={function(){}}><IDownload color={C.action} size={15}/></ModalChip><ModalChip tip="Discard" onClick={function(){onDiscard(shot.id);handleClose();}}><ITrash color={C.action} size={15}/></ModalChip></div>}
         </div>
       </div>
     </div>
   </div>);}
 
-// ── Hub: Range Slider ──────────────────────────────────────────────
-function RangeSlider({lo,hi,onChange,gridRef,containerW}){
+// ── Hub: Date Range Filter (slider + inputs + calendar) ────────────
+var MONTHS_SHORT=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var MONTHS_FULL=["January","February","March","April","May","June","July","August","September","October","November","December"];
+var DAYS_SHORT=["MON","TUE","WED","THU","FRI","SAT","SUN"];
+
+// Mini calendar that pops under each date input
+function DatePickerDropdown({ms,onSelect,onClose,eventStartMs,eventEndMs}){
+  var initDate=new Date(ms);
+  var [viewYear,setViewYear]=useState(initDate.getFullYear());
+  var [viewMonth,setViewMonth]=useState(initDate.getMonth());
+  var ref=useRef(null);
+  useEffect(function(){
+    function h(e){if(ref.current&&!ref.current.contains(e.target))onClose();}
+    document.addEventListener("mousedown",h);
+    return function(){document.removeEventListener("mousedown",h);};
+  },[]);
+  function prevM(){if(viewMonth===0){setViewMonth(11);setViewYear(function(y){return y-1;});}else setViewMonth(function(m){return m-1;});}
+  function nextM(){if(viewMonth===11){setViewMonth(0);setViewYear(function(y){return y+1;});}else setViewMonth(function(m){return m+1;});}
+  function cells(){
+    var first=new Date(viewYear,viewMonth,1),last=new Date(viewYear,viewMonth+1,0);
+    var offset=(first.getDay()+6)%7,arr=[];
+    for(var i=0;i<offset;i++)arr.push(null);
+    for(var d=1;d<=last.getDate();d++)arr.push(d);
+    while(arr.length%7!==0)arr.push(null);
+    return arr;
+  }
+  function isSelected(d){var sel=new Date(ms);return d&&d===sel.getDate()&&viewMonth===sel.getMonth()&&viewYear===sel.getFullYear();}
+  function isEventDay(d){
+    if(!d)return false;
+    var t=new Date(viewYear,viewMonth,d).getTime();
+    var eStart=new Date(eventStartMs);eStart.setHours(0,0,0,0);
+    var eEnd=new Date(eventEndMs);eEnd.setHours(23,59,59,999);
+    return t>=eStart.getTime()&&t<=eEnd.getTime();
+  }
+  var rows=[];var c=cells();for(var i=0;i<c.length;i+=7)rows.push(c.slice(i,i+7));
+  return(
+    <div ref={ref} onClick={function(e){e.stopPropagation();}} style={{position:"absolute",top:"calc(100% + 6px)",left:0,zIndex:500,background:C.bgSecondary,borderRadius:12,boxShadow:"0 12px 40px rgba(0,0,0,0.5)",width:260,overflow:"hidden",border:"1px solid "+C.bgTertiary}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px"}}>
+        <span style={{fontFamily:sans,fontWeight:600,fontSize:14,color:C.textPrimary}}>{MONTHS_FULL[viewMonth]+" "+viewYear}</span>
+        <div style={{display:"flex",gap:16}}>
+          <div onClick={prevM} style={{cursor:"pointer",display:"flex",alignItems:"center"}}><IChevLeft color={C.textSecondary} size={14}/></div>
+          <div onClick={nextM} style={{cursor:"pointer",display:"flex",alignItems:"center"}}><IChevRight color={C.textSecondary} size={14}/></div>
+        </div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",padding:"0 10px",gap:2}}>
+        {DAYS_SHORT.map(function(d){return <div key={d} style={{textAlign:"center",fontFamily:sans,fontSize:10,color:C.textMuted,padding:"2px 0"}}>{d}</div>;})}
+        {rows.map(function(week,ri){return week.map(function(d,di){
+          var sel=isSelected(d),evDay=d&&isEventDay(d);
+          var bg=sel?C.textPrimary:evDay?"rgba(187,188,214,0.18)":"transparent";
+          var col=sel?C.bgPage:evDay?C.textPrimary:d?C.textSecondary:C.bgTertiary;
+          return(<div key={ri+"-"+di} onClick={function(){if(d){var cur=new Date(ms);var next=new Date(viewYear,viewMonth,d,cur.getHours(),cur.getMinutes());onSelect(next.getTime());}}} style={{textAlign:"center",fontFamily:sans,fontSize:13,color:col,background:bg,borderRadius:6,padding:"5px 0",cursor:d?"pointer":"default",transition:"background 0.1s",fontWeight:evDay&&!sel?600:400}}>{d||""}</div>);
+        });})}</div>
+      {/* Event date legend */}
+      <div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 14px",borderTop:"1px solid "+C.bgTertiary}}>
+        <div style={{width:10,height:10,borderRadius:2,background:"rgba(187,188,214,0.25)",border:"1px solid rgba(187,188,214,0.3)"}}/>
+        <span style={{fontFamily:sans,fontSize:11,color:C.textMuted}}>Event dates</span>
+      </div>
+    </div>
+  );
+}
+
+// Time picker dropdown (hours + minutes columns)
+function TimeDrop({ms,onSelect,onClose}){
+  var ref=useRef(null);
+  var d=new Date(ms),h=d.getHours(),m=d.getMinutes();
+  var hrs=Array.from({length:24},function(_,i){return i;});
+  var mins=Array.from({length:12},function(_,i){return i*5;});
+  var hRef=useRef(null),mRef=useRef(null);
+  useEffect(function(){
+    function cl(e){if(ref.current&&!ref.current.contains(e.target))onClose();}
+    document.addEventListener("mousedown",cl);
+    return function(){document.removeEventListener("mousedown",cl);};
+  },[]);
+  useEffect(function(){
+    if(hRef.current){var idx=hrs.indexOf(h);hRef.current.scrollTop=Math.max(0,idx*32-32);}
+    if(mRef.current){var idx2=mins.findIndex(function(v){return v>=m;});mRef.current.scrollTop=Math.max(0,idx2*32-32);}
+  },[]);
+  function col(v){return{height:32,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:6,cursor:"pointer",fontFamily:sans,fontSize:14,transition:"background .12s"};}
+  return(
+    <div ref={ref} onClick={function(e){e.stopPropagation();}} style={{position:"absolute",top:"calc(100% + 6px)",left:0,zIndex:500,background:C.bgSecondary,borderRadius:12,boxShadow:"0 12px 40px rgba(0,0,0,0.5)",display:"flex",overflow:"hidden",border:"1px solid "+C.bgTertiary}}>
+      <div ref={hRef} style={{overflowY:"auto",maxHeight:192,scrollbarWidth:"none",width:64,padding:4}}>
+        {hrs.map(function(hv){var sel=hv===h;return(<div key={hv} onClick={function(){var next=new Date(ms);next.setHours(hv);onSelect(next.getTime());}} style={Object.assign({},col(hv),{background:sel?C.action:"transparent",color:sel?C.bgPage:C.textPrimary})}>{pad2(hv)}</div>);})}
+      </div>
+      <div style={{width:1,background:C.bgTertiary}}/>
+      <div ref={mRef} style={{overflowY:"auto",maxHeight:192,scrollbarWidth:"none",width:64,padding:4}}>
+        {mins.map(function(mv){var sel=mv===Math.floor(m/5)*5;return(<div key={mv} onClick={function(){var next=new Date(ms);next.setMinutes(mv);onSelect(next.getTime());}} style={Object.assign({},col(mv),{background:sel?C.action:"transparent",color:sel?C.bgPage:C.textPrimary})}>{pad2(mv)}</div>);})}
+      </div>
+    </div>
+  );
+}
+
+// Single date+time input field — compact
+function DateTimeInput({ms,onChange,eventStartMs,eventEndMs,focused,onFocus,onBlur}){
+  var [showCal,setShowCal]=useState(false);
+  var [showTime,setShowTime]=useState(false);
+  var ref=useRef(null);
+  var d=new Date(ms);
+  var dateStr=pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+String(d.getFullYear()).slice(2);
+  var timeStr=pad2(d.getHours())+":"+pad2(d.getMinutes());
+  function openCal(e){e.stopPropagation();setShowTime(false);setShowCal(function(v){return !v;});}
+  function openTime(e){e.stopPropagation();setShowCal(false);setShowTime(function(v){return !v;});}
+  var isActive=focused||showCal||showTime;
+  return(
+    <div ref={ref} style={{position:"relative",flexShrink:0}}>
+      <div style={{display:"flex",alignItems:"center",border:"1px solid "+(isActive?C.textSecondary:C.bgTertiary),borderRadius:6,overflow:"hidden",background:C.bgPage,transition:"border-color 0.15s"}}>
+        <div onClick={openCal} onMouseEnter={onFocus} onMouseLeave={onBlur} style={{display:"flex",alignItems:"center",gap:5,padding:"4px 8px",cursor:"pointer",borderRight:"1px solid "+C.bgTertiary,userSelect:"none"}}>
+          <ICalendar color={showCal?C.textPrimary:C.textMuted} size={11}/>
+          <span style={{fontFamily:mono,fontSize:12,color:showCal?C.textPrimary:C.textSecondary,whiteSpace:"nowrap"}}>{dateStr}</span>
+        </div>
+        <div onClick={openTime} onMouseEnter={onFocus} onMouseLeave={onBlur} style={{display:"flex",alignItems:"center",gap:5,padding:"4px 8px",cursor:"pointer",userSelect:"none"}}>
+          <IClock color={showTime?C.textPrimary:C.textMuted} size={11}/>
+          <span style={{fontFamily:mono,fontSize:12,color:showTime?C.textPrimary:C.textSecondary,whiteSpace:"nowrap"}}>{timeStr}</span>
+        </div>
+      </div>
+      {showCal&&<DatePickerDropdown ms={ms} onSelect={function(v){onChange(v);setShowCal(false);}} onClose={function(){setShowCal(false);}} eventStartMs={eventStartMs} eventEndMs={eventEndMs}/>}
+      {showTime&&<TimeDrop ms={ms} onSelect={function(v){onChange(v);}} onClose={function(){setShowTime(false);}}/>}
+    </div>
+  );
+}
+
+// The combined date range component: slider first, compact inputs below
+function DateRangeFilter({lo,hi,onChange,gridRef}){
   var trackRef=useRef(null),dragging=useRef(null);
-  var [sliderW,setSliderW]=useState(null);
-  useEffect(function(){if(containerW){setSliderW(null);return;}var el=gridRef&&gridRef.current;if(!el)return;function calc(){var gw=el.getBoundingClientRect().width;setSliderW(Math.round((gw-48)/4*2+16));}calc();var ro=new ResizeObserver(calc);ro.observe(el);return function(){ro.disconnect();};},[gridRef,containerW]);
+  var [hovLo,setHovLo]=useState(false);
+  var [hovHi,setHovHi]=useState(false);
   var fracFromX=useCallback(function(cx){var r=trackRef.current.getBoundingClientRect();return Math.max(0,Math.min(1,(cx-r.left)/r.width));},[]);
-  useEffect(function(){function onMove(e){if(!dragging.current||!trackRef.current)return;var f=fracFromX(e.clientX);if(dragging.current==="lo")onChange(Math.min(f,hi-0.001),hi);else onChange(lo,Math.max(f,lo+0.001));}function onUp(){dragging.current=null;}window.addEventListener("mousemove",onMove);window.addEventListener("mouseup",onUp);return function(){window.removeEventListener("mousemove",onMove);window.removeEventListener("mouseup",onUp);};},[lo,hi,onChange,fracFromX]);
-  function ts(pct){return{position:"absolute",top:"50%",left:(pct*100)+"%",transform:"translate(-50%,-50%)",width:20,height:20,borderRadius:"50%",background:C.textPrimary,cursor:"grab",zIndex:2,userSelect:"none",boxShadow:"0 0 0 3px rgba(255,255,255,0.2)"};}
-  var w=containerW||(sliderW?sliderW+"px":"100%");
-  return(<div style={{display:"flex",flexDirection:"column",gap:8,width:w}}>
-    <div ref={trackRef} style={{position:"relative",height:6,borderRadius:3,background:"rgba(187,188,214,0.25)"}}><div style={{position:"absolute",top:0,height:"100%",borderRadius:3,left:(lo*100)+"%",width:((hi-lo)*100)+"%",background:C.textSecondary}}/><div style={ts(lo)} onMouseDown={function(e){e.preventDefault();dragging.current="lo";}}/><div style={ts(hi)} onMouseDown={function(e){e.preventDefault();dragging.current="hi";}}/></div>
-    <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{fmtMs(TL_START+lo*TL_SPAN)}</span><span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{fmtMs(TL_START+hi*TL_SPAN)}</span></div>
-  </div>);}
+  useEffect(function(){
+    function onMove(e){
+      if(!dragging.current||!trackRef.current)return;
+      var f=fracFromX(e.clientX);
+      if(dragging.current==="lo")onChange(Math.min(f,hi-0.001),hi);
+      else onChange(lo,Math.max(f,lo+0.001));
+    }
+    function onUp(){dragging.current=null;}
+    window.addEventListener("mousemove",onMove);
+    window.addEventListener("mouseup",onUp);
+    return function(){window.removeEventListener("mousemove",onMove);window.removeEventListener("mouseup",onUp);};
+  },[lo,hi,onChange,fracFromX]);
+  var loMs=TL_START+lo*TL_SPAN;
+  var hiMs=TL_START+hi*TL_SPAN;
+  function handleLoChange(ms){var f=Math.max(0,Math.min((ms-TL_START)/TL_SPAN,hi-0.001));onChange(f,hi);}
+  function handleHiChange(ms){var f=Math.max(lo+0.001,Math.min((ms-TL_START)/TL_SPAN,1));onChange(lo,f);}
+  function thumb(pct,which){
+    var hov=which==="lo"?hovLo:hovHi;
+    return{position:"absolute",top:"50%",left:(pct*100)+"%",transform:"translate(-50%,-50%)",width:18,height:18,borderRadius:"50%",background:hov?C.action:C.textPrimary,cursor:"grab",zIndex:2,userSelect:"none",boxShadow:"0 0 0 3px rgba(255,255,255,0.15)",transition:"background 0.15s"};
+  }
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+      {/* Slider — comes first */}
+      <div ref={trackRef} style={{position:"relative",height:6,borderRadius:3,background:"rgba(187,188,214,0.2)",cursor:"default"}}>
+        <div style={{position:"absolute",top:0,height:"100%",borderRadius:3,left:(lo*100)+"%",width:((hi-lo)*100)+"%",background:C.textSecondary}}/>
+        <div style={thumb(lo,"lo")} onMouseDown={function(e){e.preventDefault();dragging.current="lo";}} onMouseEnter={function(){setHovLo(true);}} onMouseLeave={function(){setHovLo(false);}}/>
+        <div style={thumb(hi,"hi")} onMouseDown={function(e){e.preventDefault();dragging.current="hi";}} onMouseEnter={function(){setHovHi(true);}} onMouseLeave={function(){setHovHi(false);}}/>
+      </div>
+      {/* Compact inputs — below slider */}
+      <div style={{display:"flex",alignItems:"center",gap:6}}>
+        <DateTimeInput ms={loMs} onChange={handleLoChange} eventStartMs={TL_START} eventEndMs={TL_END} focused={hovLo} onFocus={function(){setHovLo(true);}} onBlur={function(){setHovLo(false);}}/>
+        <span style={{fontFamily:sans,fontSize:11,color:C.textMuted,flexShrink:0}}>–</span>
+        <DateTimeInput ms={hiMs} onChange={handleHiChange} eventStartMs={TL_START} eventEndMs={TL_END} focused={hovHi} onFocus={function(){setHovHi(true);}} onBlur={function(){setHovHi(false);}}/>
+      </div>
+    </div>
+  );
+}
 
 // ── Hub: Shot Card ─────────────────────────────────────────────────
 // ── Public page source tag ─────────────────────────────────────────
@@ -749,7 +899,7 @@ function ShotCard({shot,selected,fav,showMeta,discarded,onToggle,onPreview,onTog
         {hovering&&!highlightMode&&onDiscard&&(discarded?<CardChip onClick={function(e){e.stopPropagation();onRecover();}}><IRecover color={C.action} size={15}/></CardChip>:<CardChip onClick={function(e){e.stopPropagation();onDiscard();}}><ITrash color={C.action} size={15}/></CardChip>)}
       </div>
     </div>
-    {showMeta&&<div style={{padding:12}}><div style={{display:"flex",flexWrap:"wrap",gap:2}}>{shot.public&&<PublicPageTag/>}<div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{shot.orient==="landscape"?<svg width="14" height="10" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>:<svg width="10" height="14" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>}</div><Tag icon={<ICalendar/>} label={shot.date}/><Tag icon={<IClock/>} label={shot.time}/><Tag icon={<ITimer/>} label={shot.dur}/><Tag icon={<IUser/>} label={shot.user}/><Tag icon={<IFile/>} label={shot.size}/></div></div>}
+    {showMeta&&<div style={{padding:12}}><div style={{display:"flex",flexWrap:"wrap",gap:2}}><div style={{display:"flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{shot.orient==="landscape"?<svg width="14" height="10" viewBox="0 0 18 12" fill="none"><rect x="1" y="1" width="16" height="10" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>:<svg width="10" height="14" viewBox="0 0 12 18" fill="none"><rect x="1" y="1" width="10" height="16" rx="1.5" stroke={C.textPrimary} strokeWidth="1.5"/></svg>}</div><Tag icon={<ICalendar/>} label={shot.date}/><Tag icon={<IClock/>} label={shot.time}/><Tag icon={<ITimer/>} label={shot.dur}/><Tag icon={<IUser/>} label={shot.user}/></div></div>}
   </div>);}
 
 // ── Hub: Arrange Shot Card ─────────────────────────────────────────
@@ -1190,6 +1340,169 @@ function EventOverviewPanel({onTabChange}){
   );
 }
 
+// ── Hub: Video Filters Row (row 2) ────────────────────────────────
+function IEye({open,size=16}){
+  if(open)return(<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>);
+  return(<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>);
+}
+
+
+function MoreFiltersDropdown({showFavsOnly,onToggleFavsOnly}){
+  var [open,setOpen]=useState(false);
+  var [format,setFormat]=useState("all");
+  var [contribVal,setContribVal]=useState("");
+  var [contribSels,setContribSels]=useState([]);
+  var [durLo,setDurLo]=useState(0);
+  var [durHi,setDurHi]=useState(1);
+  var [source,setSource]=useState({all:true,app:false,landing:false,uploaded:false});
+  var ref=useRef(null),durRef=useRef(null),draggingDur=useRef(null);
+  var maxDurSec=42; // longest video in dataset (Jack O. 0:42)
+  var SUGGESTIONS=ATTENDEES.map(function(a){return{name:a.name,handle:a.handle,avatar:a.avatar};});
+  var filtered=contribVal.length>1?SUGGESTIONS.filter(function(s){return s.name.toLowerCase().includes(contribVal.toLowerCase())&&!contribSels.find(function(c){return c.handle===s.handle;});}).slice(0,4):[];
+  useEffect(function(){
+    function h(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}
+    document.addEventListener("mousedown",h);
+    return function(){document.removeEventListener("mousedown",h);};
+  },[]);
+  useEffect(function(){
+    function onMove(e){
+      if(!draggingDur.current||!durRef.current)return;
+      var r=durRef.current.getBoundingClientRect();
+      var f=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+      if(draggingDur.current==="lo")setDurLo(Math.min(f,durHi-0.01));
+      else setDurHi(Math.max(f,durLo+0.01));
+    }
+    function onUp(){draggingDur.current=null;}
+    window.addEventListener("mousemove",onMove);
+    window.addEventListener("mouseup",onUp);
+    return function(){window.removeEventListener("mousemove",onMove);window.removeEventListener("mouseup",onUp);};
+  },[durLo,durHi]);
+  function fmtDur(f){var s=Math.round(f*maxDurSec);return "0:"+pad2(s);}
+  function toggleSource(key){
+    if(key==="all"){setSource({all:true,app:false,landing:false,uploaded:false});return;}
+    setSource(function(prev){var next=Object.assign({},prev,{all:false,[key]:!prev[key]});var anyOn=next.app||next.landing||next.uploaded;return anyOn?next:{all:true,app:false,landing:false,uploaded:false};});
+  }
+  var activeCount=[format!=="all",!source.all,contribSels.length>0,durLo>0||durHi<1,showFavsOnly].filter(Boolean).length;
+  var hasActive=activeCount>0;
+  return(
+    <div ref={ref} style={{position:"relative"}}>
+      <div onClick={function(){setOpen(function(v){return !v;});}} style={{display:"flex",alignItems:"center",gap:6,border:"1px solid "+(hasActive?C.action:C.bgTertiary),borderRadius:8,padding:"5px 10px",cursor:"pointer",userSelect:"none",background:hasActive?"rgba(241,102,92,0.08)":C.bgTertiary,transition:"border-color 0.15s"}}>
+        <svg width="13" height="12" viewBox="0 0 14 12" fill="none" stroke={hasActive?C.action:C.textSecondary} strokeWidth="1.6" strokeLinecap="round"><path d="M1 1h12l-4.5 6v4l-3-1.5V7z"/></svg>
+        <span style={{fontFamily:sans,fontSize:14,color:hasActive?C.action:C.textSecondary}}>More filters</span>
+        {hasActive&&<div style={{background:C.action,borderRadius:999,minWidth:16,height:16,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 4px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:9,color:C.bgPage}}>{activeCount}</span></div>}
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke={hasActive?C.action:C.textSecondary} strokeWidth="2" strokeLinecap="round"><polyline points="2 4 6 8 10 4"/></svg>
+      </div>
+      {open&&(
+        <div onClick={function(e){e.stopPropagation();}} style={{position:"absolute",top:"calc(100% + 6px)",left:0,zIndex:500,background:C.bgSecondary,borderRadius:12,boxShadow:"0 12px 40px rgba(0,0,0,0.45)",width:288,overflow:"visible",border:"1px solid "+C.bgTertiary}}>
+          <div style={{padding:"12px 16px",display:"flex",flexDirection:"column",gap:16}}>
+
+            {/* Format */}
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:11,color:C.textMuted,letterSpacing:"0.05em",textTransform:"uppercase"}}>Format</span>
+              <div style={{display:"flex",gap:6}}>
+                {[{v:"all",label:"All"},{v:"portrait",label:"Vertical"},{v:"landscape",label:"Horizontal"}].map(function(opt){
+                  var sel=format===opt.v;
+                  return(
+                    <div key={opt.v} onClick={function(){setFormat(opt.v);}} style={{display:"flex",alignItems:"center",gap:5,border:"1px solid "+(sel?C.action:C.bgTertiary),borderRadius:6,padding:"4px 10px",cursor:"pointer",userSelect:"none",background:sel?"rgba(241,102,92,0.1)":"transparent",transition:"border-color 0.12s,background 0.12s"}}>
+                      {opt.v==="portrait"&&<svg width="9" height="12" viewBox="0 0 9 12" fill="none" stroke={sel?C.action:C.textSecondary} strokeWidth="1.5"><rect x="0.75" y="0.75" width="7.5" height="10.5" rx="1"/></svg>}
+                      {opt.v==="landscape"&&<svg width="12" height="9" viewBox="0 0 12 9" fill="none" stroke={sel?C.action:C.textSecondary} strokeWidth="1.5"><rect x="0.75" y="0.75" width="10.5" height="7.5" rx="1"/></svg>}
+                      <span style={{fontFamily:sans,fontSize:13,color:sel?C.action:C.textSecondary}}>{opt.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{height:1,background:C.bgTertiary}}/>
+
+            {/* Favourites */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>Favourites only</span>
+              <Toggle active={showFavsOnly} onToggle={onToggleFavsOnly} label=""/>
+            </div>
+
+            <div style={{height:1,background:C.bgTertiary}}/>
+
+            {/* Contributor */}
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:11,color:C.textMuted,letterSpacing:"0.05em",textTransform:"uppercase"}}>Contributor</span>
+              {/* Selected pills */}
+              {contribSels.length>0&&(
+                <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                  {contribSels.map(function(s){return(
+                    <div key={s.handle} style={{display:"flex",alignItems:"center",gap:6,background:C.bgTertiary,borderRadius:20,padding:"3px 8px 3px 4px",flexShrink:0}}>
+                      <img src={s.avatar} alt="" style={{width:20,height:20,borderRadius:"50%",objectFit:"cover",flexShrink:0}}/>
+                      <span style={{fontFamily:sans,fontSize:12,color:C.textPrimary}}>{s.name}</span>
+                      <div onClick={function(){setContribSels(function(prev){return prev.filter(function(c){return c.handle!==s.handle;});});}} style={{cursor:"pointer",display:"flex",alignItems:"center"}}><IX color={C.textMuted} size={11}/></div>
+                    </div>
+                  );})}
+                </div>
+              )}
+              {/* Always-visible search input */}
+              <div style={{position:"relative"}}>
+                <div style={{display:"flex",alignItems:"center",gap:6,border:"1px solid "+C.bgTertiary,borderRadius:8,padding:"5px 10px",background:C.bgPage}}>
+                  <IUser color={C.textMuted} size={12}/>
+                  <input value={contribVal} onChange={function(e){setContribVal(e.target.value);}} placeholder={contribSels.length>0?"Add another...":"Search contributors..."} style={{border:"none",background:"transparent",outline:"none",fontFamily:sans,fontSize:13,color:C.textPrimary,width:"100%"}}/>
+                </div>
+                {filtered.length>0&&(
+                  <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:C.bgSecondary,borderRadius:8,border:"1px solid "+C.bgTertiary,overflow:"hidden",zIndex:600}}>
+                    {filtered.map(function(s){return(
+                      <div key={s.handle} onClick={function(){setContribSels(function(prev){return prev.concat(s);});setContribVal("");}} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 10px",cursor:"pointer",transition:"background 0.12s"}} onMouseEnter={function(e){e.currentTarget.style.background=C.bgTertiary;}} onMouseLeave={function(e){e.currentTarget.style.background="transparent";}}>
+                        <img src={s.avatar} alt="" style={{width:22,height:22,borderRadius:"50%",objectFit:"cover",flexShrink:0}}/>
+                        <div style={{display:"flex",flexDirection:"column"}}>
+                          <span style={{fontFamily:sans,fontSize:13,color:C.textPrimary}}>{s.name}</span>
+                          <span style={{fontFamily:mono,fontSize:11,color:C.textMuted}}>{s.handle}</span>
+                        </div>
+                      </div>
+                    );})}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div style={{height:1,background:C.bgTertiary}}/>
+
+            {/* Duration */}
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <span style={{fontFamily:mono,fontWeight:700,fontSize:11,color:C.textMuted,letterSpacing:"0.05em",textTransform:"uppercase"}}>Duration</span>
+                <span style={{fontFamily:mono,fontSize:12,color:C.textSecondary}}>{fmtDur(durLo)} – {fmtDur(durHi)}</span>
+              </div>
+              <div ref={durRef} style={{position:"relative",height:6,borderRadius:3,background:C.bgTertiary,cursor:"default"}}>
+                <div style={{position:"absolute",top:0,height:"100%",borderRadius:3,left:(durLo*100)+"%",width:((durHi-durLo)*100)+"%",background:C.textSecondary}}/>
+                {["lo","hi"].map(function(which){
+                  var pct=which==="lo"?durLo:durHi;
+                  return(<div key={which} onMouseDown={function(e){e.preventDefault();draggingDur.current=which;}} style={{position:"absolute",top:"50%",left:(pct*100)+"%",transform:"translate(-50%,-50%)",width:16,height:16,borderRadius:"50%",background:C.textPrimary,cursor:"grab",zIndex:2,userSelect:"none",boxShadow:"0 0 0 2px rgba(255,255,255,0.15)"}}/>);
+                })}
+              </div>
+            </div>
+
+            <div style={{height:1,background:C.bgTertiary}}/>
+
+            {/* Source */}
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <span style={{fontFamily:mono,fontWeight:700,fontSize:11,color:C.textMuted,letterSpacing:"0.05em",textTransform:"uppercase"}}>Source</span>
+              {[{key:"all",label:"All"},{key:"app",label:"App"},{key:"landing",label:"Landing page"},{key:"uploaded",label:"Uploaded"}].map(function(opt){
+                var checked=source[opt.key];
+                return(
+                  <div key={opt.key} onClick={function(){toggleSource(opt.key);}} style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",userSelect:"none"}}>
+                    <div style={{width:16,height:16,borderRadius:3,flexShrink:0,border:"1px solid "+(checked?C.action:C.border),background:checked?C.action:C.bgPage,display:"flex",alignItems:"center",justifyContent:"center",transition:"background 0.12s"}}>
+                      {checked&&<ICheck color={C.bgPage} size={9}/>}
+                    </div>
+                    <span style={{fontFamily:sans,fontSize:14,color:C.textPrimary}}>{opt.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 // ── Hub: Shots Panel ───────────────────────────────────────────────
 function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onToggleFav,showMeta,onToggleMeta,showFavsOnly,onToggleFavsOnly,rangeLo,rangeHi,onRange,onDownload,onCollection,onPreview,discardedIds,onDiscard,onRecover,onBatchDiscard,activeTab,onTabChange,onNewHighlight,highlights,onEditHighlight,onDeleteHighlight}){
   var [innerTab,setInnerTab]=useState("videos");
@@ -1212,15 +1525,35 @@ function ShotsPanel({selectedIds,onToggle,onSelectAll,onDeselectAll,favIds,onTog
     :activeTab==="Attendees"?<AttendeesPanel/>
     :activeTab==="Landing page"?<PublicPagesPanel highlights={highlights}/>
     :<>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:24,padding:"12px 0"}}>
-        <div style={{display:"flex",flexDirection:"column",gap:6}}><span style={{fontFamily:mono,fontWeight:700,fontSize:12,lineHeight:"16px",color:C.textPrimary}}>Filter by date</span><RangeSlider lo={rangeLo} hi={rangeHi} onChange={onRange} gridRef={gridRef}/></div>
-        <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}><div style={{border:"1px solid "+C.action,borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}><IUpload size={20}/><span style={{fontFamily:sans,fontWeight:600,fontSize:16,color:C.action}}>Upload</span></div><BatchDropdown count={count} onDownload={onDownload} onCollection={onCollection} onDiscard={onBatchDiscard}/></div>
+      {/* ── ROW 1: "Filter by date" label + Upload/Batch ── */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 0 6px"}}>
+        <span style={{fontFamily:mono,fontWeight:700,fontSize:11,lineHeight:"14px",color:C.textMuted,letterSpacing:"0.05em",textTransform:"uppercase"}}>Filter by date</span>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <div style={{border:"1px solid "+C.action,borderRadius:999,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+            <IUpload size={18}/>
+            <span style={{fontFamily:sans,fontWeight:600,fontSize:15,color:C.action}}>Upload</span>
+          </div>
+          <BatchDropdown count={count} onDownload={onDownload} onCollection={onCollection} onDiscard={onBatchDiscard}/>
+        </div>
       </div>
-      <div style={{display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
-        <Toggle active={showMeta} onToggle={onToggleMeta} label="Show shot metadata"/>
-        <Toggle active={showFavsOnly} onToggle={onToggleFavsOnly} label="Favorites only"/>
-        <CheckboxField checked={checkState} onClick={handleCheckbox} label={"Select all ("+visible.length+")"}/>
-        <div onClick={function(){setInnerTab(function(t){return t==="videos"?"discarded":"videos";});}} style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"4px 12px",borderRadius:8,background:innerTab==="discarded"?C.bgTertiary:"transparent",transition:"background 0.15s",userSelect:"none",marginLeft:"auto"}}><ITrash color={innerTab==="discarded"?C.textPrimary:C.textMuted} size={14}/><span style={{fontFamily:sans,fontSize:14,lineHeight:"20px",color:innerTab==="discarded"?C.textPrimary:C.textMuted,whiteSpace:"nowrap"}}>Discarded videos</span>{discardedShots.length>0&&(<div style={{background:C.action,borderRadius:999,minWidth:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 5px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:10,color:C.bgPage}}>{discardedShots.length}</span></div>)}</div>
+      {/* ── ROW 2: Slider+inputs+more-filters left · view controls right ── */}
+      <div style={{display:"flex",alignItems:"center",gap:20,padding:"0 0 8px"}}>
+        {/* Left: date range + more filters */}
+        <DateRangeFilter lo={rangeLo} hi={rangeHi} onChange={onRange} gridRef={gridRef}/>
+        <MoreFiltersDropdown showFavsOnly={showFavsOnly} onToggleFavsOnly={onToggleFavsOnly}/>
+        {/* Right: view controls */}
+        <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:14}}>
+          <div onClick={onToggleMeta} style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer",userSelect:"none",color:showMeta?C.textPrimary:C.textMuted,transition:"color 0.15s"}}>
+            <IEye open={showMeta} size={16}/>
+            <span style={{fontFamily:sans,fontSize:14,color:"inherit",whiteSpace:"nowrap"}}>Video details</span>
+          </div>
+          <CheckboxField checked={checkState} onClick={handleCheckbox} label={"Select all ("+visible.length+")"}/>
+          <div onClick={function(){setInnerTab(function(t){return t==="videos"?"discarded":"videos";});}} style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer",padding:"3px 10px",borderRadius:6,background:innerTab==="discarded"?C.bgTertiary:"transparent",transition:"background 0.15s",userSelect:"none"}}>
+            <ITrash color={innerTab==="discarded"?C.textPrimary:C.textMuted} size={13}/>
+            <span style={{fontFamily:sans,fontSize:14,color:innerTab==="discarded"?C.textPrimary:C.textMuted,whiteSpace:"nowrap"}}>Discarded</span>
+            {discardedShots.length>0&&<div style={{background:C.action,borderRadius:999,minWidth:16,height:16,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 4px"}}><span style={{fontFamily:mono,fontWeight:700,fontSize:9,color:C.bgPage}}>{discardedShots.length}</span></div>}
+          </div>
+        </div>
       </div>
       {innerTab==="discarded"&&(<div style={{display:"flex",flexDirection:"column",gap:4,padding:"12px 16px",background:C.bgTertiary,borderRadius:12}}><span style={{fontFamily:sans,fontWeight:600,fontSize:15,color:C.textPrimary}}>Discarded videos</span><span style={{fontFamily:sans,fontSize:13,lineHeight:"18px",color:C.textSecondary}}>These videos have been removed from the event view. They'll be kept here for 30 days, then permanently deleted.</span></div>)}
       {visible.length>0?<div ref={gridRef} style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16}}>{visible.map(function(shot){return(<ShotCard key={shot.id} shot={shot} selected={selectedIds.has(shot.id)} onToggle={function(){onToggle(shot.id);}} onPreview={function(){onPreview(shot);}} fav={favIds.has(shot.id)} onToggleFav={function(){onToggleFav(shot.id);}} showMeta={showMeta} discarded={discardedIds.has(shot.id)} onDiscard={function(){onDiscard(shot.id);}} onRecover={function(){onRecover(shot.id);}}/>);})}</div>:<div ref={gridRef} style={{textAlign:"center",padding:"48px 0",color:C.textSecondary,fontFamily:sans,fontSize:16}}>{innerTab==="discarded"?"No discarded videos.":"No videos in this time range."}</div>}
